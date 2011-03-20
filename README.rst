@@ -27,7 +27,8 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 .. _Download: https://bitbucket.org/dpc/gas/downloads
 
 The basic snippet looks like this:
-    <script type="text/javascript"> 
+.. code-block:: javascript
+    <script type="text/javascript">
     var _gas = _gas || [];
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
     _gas.push(['_trackPageview', '/test']);
