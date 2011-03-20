@@ -115,7 +115,6 @@ _gas.push = function() {
                 acc_foo = i + '.' + foo;
                 args = sub.slice();
                 args.unshift(acc_foo);
-                console.log('calling _gaq', args);
                 _gaq.push(args);
             }
         }

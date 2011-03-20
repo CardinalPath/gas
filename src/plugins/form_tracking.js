@@ -1,5 +1,6 @@
 /*!
- * GAS - Google Analytics on Steroids v0.1
+ * GAS - Google Analytics on Steroids
+ * Form Tracking Plugin
  *
  * Copyright 2011, Direct Performance
  * Licensed under the MIT license.
@@ -33,7 +34,6 @@
     function track_form(form) {
 
         function tag_element(e) {
-            console.log(arguments);
             var el = e.target;
             var el_name = el.name || el.id || el.type;
             var action_name = e.type;
