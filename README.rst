@@ -6,7 +6,7 @@
 GAS - Google Analytics on Steroids
 ==================================
 
-.. _gas-synopsis
+.. _gas-synopsis:
 
 GAS is a wrapper around the Google Analytics Tracking API from Google. It tries
 to add new functionality while keeping the same API.
@@ -17,6 +17,7 @@ with Google.
 .. contents::
    :local:
 
+.. _gas-installation:
 Installation
 ------------
 
@@ -28,6 +29,7 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 The basic snippet looks like this:
 .. code-block:: javascript
+
     <script type="text/javascript">
     var _gas = _gas || [];
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
@@ -47,6 +49,7 @@ The basic snippet looks like this:
 
 There's no need to include the ga.js file. GAS will load that file for you.
 
+.. _gas-doc:
 Documentation
 -------------
 
@@ -57,6 +60,7 @@ it supports. So go check `oficcial documentation`__ for the GA Tracker.
 
 Additionally GAS support a couple more features.
 
+.. _gas-license:
 License
 -------
 
