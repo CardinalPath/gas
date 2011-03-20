@@ -1,0 +1,49 @@
+<html>
+<head>
+<script type="text/javascript">
+    var _gas = _gas || [];
+    _gas.push(['_addHook', '_trackPageview', function() {
+        console.log('yey');
+    }]);
+    _gas.push(['_addHook', '_trackPageview', function() {
+        test.tet.tet.tet;
+    }]);
+    _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+    _gas.push(['_setDomainName', 'none']);
+    _gas.push(['_trackPageview', '/test']);
+    _gas.push(['_trackForms']);
+
+    (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+})();
+
+</script>
+</head>
+<body>
+<form method="post">
+
+<p>
+<label for="t1">Test 1: </label><input id="t1" name="t1" type="text" />
+</p>
+
+<p>
+<label for="t2">Test 2: </label><textarea id="t2" name="t2" type="text"></textarea>
+</p>
+
+<p>
+<label for="t3">Test 3</label><input id="t3" name="t3" type="text" />
+</p>
+
+<p>
+<input type="button" value="Button"/>
+<input type="submit" />
+</p>
+
+</form>
+</body>
+</html>
