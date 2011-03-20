@@ -29,22 +29,21 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 The basic snippet looks like this:
 
-::
-    <script type="text/javascript">
-    var _gas = _gas || [];
-    _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
-    _gas.push(['_trackPageview', '/test']);
-    _gas.push(['_trackForms']);
-
-    (function() {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = '/gas.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ga, s);
-    })();
-    </script> 
+   <script type="text/javascript">
+   var _gas = _gas || [];
+   _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+   _gas.push(['_trackPageview', '/test']);
+   _gas.push(['_trackForms']);
+   
+   (function() {
+       var ga = document.createElement('script');
+       ga.type = 'text/javascript';
+       ga.async = true;
+       ga.src = '/gas.js';
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+   })();
+   </script> 
     
 
 There's no need to include the ga.js file. GAS will load that file for you.
