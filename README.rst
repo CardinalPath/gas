@@ -28,6 +28,7 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 .. _Download: https://bitbucket.org/dpc/gas/downloads
 
 The basic snippet looks like this:
+
 .. code-block:: javascript
 
     <script type="text/javascript">
