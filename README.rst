@@ -29,8 +29,7 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 The basic snippet looks like this:
 
-.. code-block:: javascript
-
+::
     <script type="text/javascript">
     var _gas = _gas || [];
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
