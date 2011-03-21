@@ -66,7 +66,7 @@ _gas.push = function() {
 
     if (typeof sub === 'function') {
         // Pushed functions are executed right away
-        return _gaq.push(sub);
+        return sub.call(_gas);
 
     }else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
@@ -101,6 +101,7 @@ _gas.push = function() {
             }
         }
         // Intercept _setAccount calls
+        // TODO use == instead of indexOf
         if (foo.indexOf('_setAccount') >= 0) {
             acct_name = acct_name || String(this._accounts_length + 1);
             this._accounts[acct_name] = sub[0];
