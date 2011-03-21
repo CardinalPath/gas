@@ -17,11 +17,6 @@ to add new functionality while keeping the same API.
 GAS is not an official Google library and GAS developers are not affiliated 
 with Google.
 
-**Contents:**
-
-.. contents::
-   :local:
-
 .. _gas-installation:
 
 Installation
