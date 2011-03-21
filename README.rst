@@ -8,8 +8,8 @@ GAS - Google Analytics on Steroids
 
 .. _gas-synopsis:
 
-Introduction
-------------
+Synopsis
+--------
 
 GAS is a wrapper around the Google Analytics Tracking API from Google. It tries
 to add new functionality while keeping the same API.
