@@ -16,10 +16,10 @@
 var document = window.document;
 window._gaq = window._gaq || [];
 
-var _gas_pushed_functions = window._gas || [];
+var _prev_gas = window._gas || [];
 
 // Avoid duplicate definition
-if (_gas_pushed_functions._accounts_length >= 0) {
+if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
@@ -37,8 +37,9 @@ var _gas = {
     _accounts: {},
     _accounts_length: 0,
     _hooks: {},
-    _functions: _gas_pushed_functions._functions || {},
-    _queue: _gas_pushed_functions
+    //_plugins: {},
+    _functions: {},
+    _queue: _prev_gas
 };
 
 _gas._functions._addHook = function(fn, cb) {
@@ -102,7 +103,7 @@ _gas.push = function() {
         }
         // Intercept _setAccount calls
         // TODO use == instead of indexOf
-        if (foo.indexOf('_setAccount') >= 0) {
+        if (foo === '_setAccount') {
             acct_name = acct_name || String(this._accounts_length + 1);
             this._accounts[acct_name] = sub[0];
             this._accounts_length++;
@@ -116,35 +117,14 @@ _gas.push = function() {
                 acc_foo = i + '.' + foo;
                 args = sub.slice();
                 args.unshift(acc_foo);
+                //console.log(args);
                 _gaq.push(args);
             }
         }
     }
 };
 
-// Execute previous functions
-while (_gas_pushed_functions.length > 0) {
-    _gas.push(_gas_pushed_functions.shift());
-}
-
-
 window._gas = _gas;
 
-// Import ga.js
-(function() {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = (
-            'https:' == document.location.protocol ?
-                'https://ssl' :
-                'http://www'
-        ) +
-            '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ga, s);
-})();
-
 })(window);
-
 

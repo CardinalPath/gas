@@ -4,7 +4,7 @@ CLOSURE_COMPILER = java -jar ~/compiler.jar
 # http://code.google.com/closure/utilities/index.html
 CLOSURE_LINTER = gjslint
 
-JSFILES = $(wildcard src/plugins/*.js) src/core.js
+JSFILES = src/core.js $(wildcard src/plugins/*.js) src/wrapup.js
 
 .DEFAULT_GOAL := all
 
