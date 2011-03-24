@@ -1,0 +1,52 @@
+<html>
+<head>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+<script type="text/javascript" src="testRunner.js"></script>
+<script type="text/javascript" src="../dist/gas.js"></script>
+<style>
+.results .bar{
+    width:400px;
+    height: 20px;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    float: left;
+}
+.results .bar > div{
+    width: 0;
+    height: 100%;
+    background-color: #8e8;
+    border-width: 0;
+}
+
+.results span{
+    margin-left: 10px;
+}
+
+.errors{
+    color:red;
+    list-style: none;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+window.t = new TestRunner('#core');
+t.assertTrue('teste 1', true);
+t.assertTrue('teste 2', false);
+});
+</script>
+</head>
+<body>
+<h1>GAS Testing</h1>
+
+<div id='core'>
+    <h2>Core</h2>
+    <div class='results'>
+        <div class='bar'><div></div></div>
+        <span>asd</span>
+    </div>
+    <h3>Errors:</h3>
+    <ul class='errors'></ul>
+</div>
+
+</body>
+</html>
