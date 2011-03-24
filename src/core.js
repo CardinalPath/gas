@@ -59,7 +59,7 @@ _gas._functions._trackException = function(exception, message) {
 };
 
 _gas._execute = function() {
-    console.dir(arguments);
+    //console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
         i, foo, hooks, acct_name, repl_sub;
@@ -69,7 +69,7 @@ _gas._execute = function() {
         return _gaq.push(
             (function(s) {
                 var f = function() {
-                    s.call(_gas);
+                    s.call(_gas.gh);
                 };
                 return f;
             })(sub)

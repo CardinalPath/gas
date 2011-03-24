@@ -13,7 +13,7 @@
 
 var gas_helpers = {};
 
-gas_helpers['_sanitizeString'] = function(str) {
+gas_helpers['_sanitizeString'] = function(str, strict) {
     str = str.toLowerCase()
         .replace(/^\ +/, '')
         .replace(/\ +$/, '')
@@ -24,7 +24,11 @@ gas_helpers['_sanitizeString'] = function(str) {
         .replace(/[óòôõöøº]/g, 'o')
         .replace(/[úùûü]/g, 'u')
         .replace(/[ç¢©]/g, 'c');
-    return str;
+
+    if(strict){
+        str = str.replace(/[^a-z0-9_-]/g,'_');
+    }
+    return str.replace(/_+/g, '_');
 };
 
 gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
