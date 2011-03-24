@@ -2,15 +2,15 @@
 <head>
 <script type="text/javascript">
     var _gas = _gas || [];
-    _gas.push(['_addHook', '_trackPageview', function() {
-        console.log('yey');
+    _gas.push(['_addHook', '_trackPageview', function(url) {
+        return [this._sanitizeString(url)];
     }]);
-    _gas.push(['_addHook', '_trackPageview', function() {
-        test.tet.tet.tet;
+    _gas.push(['_addHook', '_trackPageview', function(url) {
+        console.log('Worked?',url);
     }]);
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
     _gas.push(['_setDomainName', 'none']);
-    _gas.push(['_trackPageview', '/test']);
+    _gas.push(['_trackPageview', ' /t éste ']);
     _gas.push(['_trackForms']);
     _gas.push(['_trackMaxSrcoll']);
 
@@ -19,10 +19,11 @@
         var ga = document.createElement('script');
         ga.type = 'text/javascript';
         ga.async = true;
-        ga.src = '../dist/gas.min.js';
+        ga.src = '../dist/gas.js';
+        //ga.src = '../dist/gas.min.js';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(ga, s);
-})();
+    })();
 
 </script>
 </head>
