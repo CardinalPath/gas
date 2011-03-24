@@ -100,18 +100,23 @@ function get_scroll_percentage() {
 
 var t = null;
 var max_scroll = 0;
-function update_scroll_percentage() {
+function update_scroll_percentage(now) {
     if (t) {
         clearTimeout(t);
     }
+    if(now===true){
+        max_scroll = Math.max(get_scroll_percentage(),max_scroll);
+        return;    
+    }
     t = setTimeout(function() {
-        max_scroll = get_scroll_percentage();
+        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
     }, 400);
 }
 
 
 function track_max_scroll() {
     this._addEventListener(window, 'beforeunload', function() {
+        update_scroll_percentage(true);
         var bucket = Math.floor(max_scroll / 10) * 10;
         if (bucket < 100) {
             var bucket = String(bucket) + '-' + String(bucket + 9);
