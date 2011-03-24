@@ -36,7 +36,7 @@ _gas.push(['_addHook', '_setDomainName', function(domainName) {
         return false;
     }
 }]);
-_gas.push(['_addHook', '_setExternalDomainName', function(domainName) {
+_gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
     _external_domains.push(domainName);
     return false;
 }]);
