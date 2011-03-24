@@ -58,7 +58,8 @@ _gas._functions._trackException = function(exception, message) {
     ]);
 };
 
-_gas._push_inner = function() {
+_gas._execute = function() {
+    console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
         i, foo, hooks, acct_name, repl_sub;
@@ -141,10 +142,11 @@ _gas._push_inner = function() {
 };
 
 // Everything pushed to _gas is in fact pushed back to _gaq
+// So Helpers are ready for hooks 
 _gas.push = function() {
     (function(args) {
         _gaq.push(function() {
-            _gas._push_inner.apply(_gas, args);
+            _gas._execute.apply(_gas, args);
         });
     })(arguments);
 };
