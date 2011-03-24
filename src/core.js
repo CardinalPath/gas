@@ -142,7 +142,7 @@ _gas._execute = function() {
 };
 
 // Everything pushed to _gas is in fact pushed back to _gaq
-// So Helpers are ready for hooks 
+// So Helpers are ready for hooks
 _gas.push = function() {
     (function(args) {
         _gaq.push(function() {

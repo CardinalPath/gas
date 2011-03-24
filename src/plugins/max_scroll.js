@@ -104,9 +104,9 @@ function update_scroll_percentage(now) {
     if (t) {
         clearTimeout(t);
     }
-    if(now===true){
-        max_scroll = Math.max(get_scroll_percentage(),max_scroll);
-        return;    
+    if (now === true) {
+        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
+        return;
     }
     t = setTimeout(function() {
         max_scroll = Math.max(get_scroll_percentage(), max_scroll);
