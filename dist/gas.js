@@ -2,7 +2,7 @@
 /*!
  * GAS - Google Analytics on Steroids v0.1
  *
- * Copyright 2011, Direct Performance
+ * @preserve Copyright 2011, Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardo.cereto@directperformance.com.br>
@@ -13,6 +13,13 @@
 
 
 var document = window.document;
+
+/**
+ * Google Analytics original _gaq.
+ *
+ * This never tries to do something that is not supposed to. So it won't break
+ * in the future.
+ */
 window._gaq = window._gaq || [];
 
 var _prev_gas = window._gas || [];
@@ -32,37 +39,50 @@ var toString = Object.prototype.toString,
     url = document.location.href;
 
 
+/**
+ * _gas main object.
+ *
+ * It's supposed to be used just like _gaq but here we extend it. In it's core
+ * everything pushed to _gas is run through possible hooks and then pushed to
+ * _gaq
+ */
 window._gas = {
     _accounts: {},
     _accounts_length: 0,
     _hooks: {},
-    //_plugins: {},
-    _functions: {},
-    _queue: _prev_gas
+    _queue: _prev_gas,
+    gh: {}
 };
 
-_gas._functions._addHook = function(fn, cb) {
+/**
+ * First standard Hook that is responsible to add next Hooks
+ *
+ * _addHook calls always reurn false so they don't get pushed to _gaq
+ * @param {string} fn The function you wish to add a Hook to.
+ * @param {function()} cb The callback function to be appended to hooks.
+ * @return {boolean} Always false.
+ */
+_gas._hooks['_addHook'] = [function(fn, cb) {
     if (typeof fn === 'string' && typeof cb === 'function') {
         if (typeof _gas._hooks[fn] === 'undefined') {
             _gas._hooks[fn] = [];
         }
         _gas._hooks[fn].push(cb);
     }
-};
+    return false;
+}];
 
-// Watchout for circular calls
-_gas._functions._trackException = function(exception, message) {
-    _gas.push(['_trackEvent',
-        'Exception ' + (exception.name || 'Error'),
-        message || exception.message || exception,
-        url
-    ]);
-};
-
+/**
+ * Everything pushed to _gas is executed by this call.
+ *
+ * This function should not be called directly. Instead use _gas.push
+ * @return {number} This is the same return as _gaq.push calls.
+ */
 _gas._execute = function() {
     //console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
+        gaq_execute = true,
         i, foo, hooks, acct_name, repl_sub;
 
     if (typeof sub === 'function') {
@@ -82,6 +102,8 @@ _gas._execute = function() {
         if (indexOf.call(foo, '.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
+        }else {
+            acct_name = undefined;
         }
 
         // Execute hooks
@@ -92,7 +114,7 @@ _gas._execute = function() {
                     repl_sub = hooks[i].apply(_gas.gh, sub);
                     if (repl_sub === false) {
                         // Returning false from a hook cancel the call
-                        return 1;
+                        gaq_execute = false;
                     }
                     if (repl_sub && repl_sub.length > 0) {
                         // Returning an array changes the call parameters
@@ -105,29 +127,29 @@ _gas._execute = function() {
                 }
             }
         }
-
-        // Call internal GAS functions
-        if (hasOwn.call(_gas._functions, foo)) {
-            try {
-                _gas._functions[foo].apply(_gas.gh, sub);
-            }catch (e) {
-                if (foo !== '_trackException') {
-                    _gas.push(['_trackException', e]);
-                }
-            }
+        // Cancel execution on _gaq if any hook returned false
+        if (gaq_execute === false) {
+            return 1;
         }
         // Intercept _setAccount calls
-        // TODO use == instead of indexOf
         if (foo === '_setAccount') {
-            acct_name = acct_name || String(_gas._accounts_length + 1);
+            acct_name = acct_name || '_gas' + String(_gas._accounts_length + 1);
             _gas._accounts[acct_name] = sub[0];
             _gas._accounts_length++;
             return _gaq.push([acct_name + '.' + foo, sub[0]]);
         }
 
-        // Call Original _gaq, for all accounts
+        // If user provides account than trigger event for just that account.
         var acc_foo;
-        var return_val;
+        if (acct_name && _gas._accounts[acct_name]) {
+            acc_foo = acct_name + '.' + foo;
+            args = sub.slice();
+            args.unshift(acc_foo);
+            return _gaq.push(args);
+        }
+
+        // Call Original _gaq, for all accounts
+        var return_val = 0;
         for (i in _gas._accounts) {
             if (hasOwn.call(_gas._accounts, i)) {
                 acc_foo = i + '.' + foo;
@@ -137,20 +159,54 @@ _gas._execute = function() {
                 return_val += _gaq.push(args);
             }
         }
-        //FIXME return_val is NaN sometimes
         return return_val ? 1 : 0;
     }
 };
 
-// Everything pushed to _gas is in fact pushed back to _gaq
-// So Helpers are ready for hooks
+/**
+ * Standard method to execute GA commands.
+ *
+ * Everything pushed to _gas is in fact pushed back to _gaq. So Helpers are
+ * ready for hooks. This creates _gaq as a series of functions that call
+ * _gas._execute() with the same arguments.
+ */
 _gas.push = function() {
     (function(args) {
         _gaq.push(function() {
-            _gas._execute.apply(_gas, args);
+            _gas._execute.apply(_gas.gh, args);
         });
     })(arguments);
 };
+
+/**
+ * Hook for _trackExceptions
+ *
+ * Watchout for circular calls
+ */
+_gas.push(['_addHook', '_trackException', function(exception, message) {
+    _gas.push(['_trackEvent',
+        'Exception ' + (exception.name || 'Error'),
+        message || exception.message || exception,
+        url
+    ]);
+    return false;
+}]);
+
+/**
+ * Hook to Remove other Hooks
+ *
+ * It will remove the last inserted hook from a _gas function.
+ *
+ * @param {string} func _gas Function Name to remove Hooks from.
+ * @return {boolean} Always returns false.
+ */
+_gas.push(['_addHook', '_popHook', function(func) {
+    var arr = _gas._hooks[func];
+    if (arr && arr.pop) {
+        arr.pop();
+    }
+    return false;
+}]);
 
 /*!
  * GAS - Google Analytics on Steroids
@@ -167,7 +223,14 @@ _gas.push = function() {
 
 var gas_helpers = {};
 
-gas_helpers['_sanitizeString'] = function(str, strict) {
+/**
+ * Removes special characters and Lowercase String
+ *
+ * @param {string} str to be sanitized.
+ * @param {boolean} strict_opt If we should remove any non ascii char.
+ * @return {string} Sanitized string.
+ */
+gas_helpers['_sanitizeString'] = function(str, strict_opt) {
     str = str.toLowerCase()
         .replace(/^\ +/, '')
         .replace(/\ +$/, '')
@@ -179,24 +242,51 @@ gas_helpers['_sanitizeString'] = function(str, strict) {
         .replace(/[úùûü]/g, 'u')
         .replace(/[ç¢©]/g, 'c');
 
-    if(strict){
-        str = str.replace(/[^a-z0-9_-]/g,'_');
+    if (strict_opt) {
+        str = str.replace(/[^a-z0-9_-]/g, '_');
     }
     return str.replace(/_+/g, '_');
 };
 
+/**
+ * Cross Browser helper to addEventListener
+ *
+ * @param {HTMLElement} obj The Element to attach event to.
+ * @param {string} evt The event that will trigger the binded function.
+ * @param {function(event)} fnc The function to bind to the element.
+ * @return {boolean} true if it was successfuly binded.
+ */
 gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
+    // W3C model
     if (obj.addEventListener) {
         obj.addEventListener(evt, fnc, false);
         return true;
-    } else if (obj.attachEvent) {
+    }
+    // Microsoft model
+    else if (obj.attachEvent) {
         return obj.attachEvent('on' + evt, fnc);
     }
+    // Browser don't support W3C or MSFT model, go on with traditional
     else {
-        obj['on' + evt] = fnc;
+        evt = 'on' + evt;
+        if (typeof obj[evt] === 'function') {
+            // Object already has a function on traditional
+            // Let's wrap it with our own function inside another function
+            fnc = (function(f1, f2) {
+                return function() {
+                    f1.apply(this, arguments);
+                    f2.apply(this, arguments);
+                }
+            })(obj[evt], fnc);
+        }
+        obj[evt] = fnc;
+        return true;
     }
 };
 
+// This function is the first one pushed to _gas, so it creates the _gas.gh
+//     object. It needs to be pushed into _gaq so that _gat is available when
+//     it runs.
 _gas.push(function() {
     function extend(obj) {
         for (var i in obj) {
@@ -227,12 +317,6 @@ _gas.push(function() {
  *
  * $Date$
  */
-
-
-if (typeof _gas._functions === 'undefined') {
-    _gas._functions = {};
-}
-
 function track_form(form) {
 
     function tag_element(e) {
@@ -265,11 +349,12 @@ function track_form(form) {
     this._addEventListener(form, 'submit', tag_element);
 }
 
-_gas._functions._trackForms = function() {
+_gas.push(['_addHook', '_trackForms', function() {
     for (var i in document.forms) {
         track_form.call(this, document.forms[i]);
     }
-};
+    return false;
+}]);
 
 /*!
  * GAS - Google Analytics on Steroids
@@ -286,10 +371,11 @@ _gas._functions._trackForms = function() {
  * $Date$
  */
 
-if (typeof _gas._functions === 'undefined') {
-    _gas._functions = {};
-}
-
+/**
+ * Get current windows width and heigtht
+ *
+ * @return {Array.<number>} [width,height].
+ */
 function get_window_size() {
     var myWidth = 0, myHeight = 0;
     if (typeof(window.innerWidth) == 'number') {
@@ -321,6 +407,11 @@ function get_window_size() {
     return [myWidth, myHeight];
 }
 
+/**
+ * Get current absolute window scroll position
+ *
+ * @return {Array.<number>} [XScroll,YScroll].
+ */
 function get_window_scroll() {
     var scrOfX = 0, scrOfY = 0;
     if (typeof(window.pageYOffset) == 'number') {
@@ -351,6 +442,11 @@ function get_window_scroll() {
     return [scrOfX, scrOfY];
 }
 
+/**
+ * Get current absolute document height
+ *
+ * @return {number} Current document height.
+ */
 function get_doc_height() {
     var D = document;
     return Math.max(
@@ -361,6 +457,11 @@ function get_doc_height() {
 }
 
 
+/**
+ * Get current vertical scroll percentage
+ *
+ * @return {number} Current vertical scroll percentage.
+ */
 function get_scroll_percentage() {
     return ((
         get_window_scroll()[1] +
@@ -397,7 +498,7 @@ function track_max_scroll() {
 
         _gas.push(['_trackEvent',
             'Max Scroll',
-            document.location.href,
+            url,
             String(bucket),
             Math.round(max_scroll)
         ]);
@@ -405,10 +506,10 @@ function track_max_scroll() {
 
 }
 
-_gas._functions['_trackMaxSrcoll'] = function() {
+_gas.push(['_addHook', '_trackMaxSrcoll', function() {
     this._addEventListener(window, 'scroll', update_scroll_percentage);
     track_max_scroll.call(this);
-};
+}]);
 
 /*!
  * GAS - Google Analytics on Steroids
@@ -422,54 +523,138 @@ _gas._functions['_trackMaxSrcoll'] = function() {
  *
  * $Date$
  */
-if (typeof _gas._functions === 'undefined') {
-    _gas._functions = {};
-}
 
-// Force correct use of Anchor
+/**
+ * Private variable to store allowAnchor choice
+ */
 _gas._allowAnchor = false;
+
+/**
+ * _setAllowAnchor Hook to store choice for easier use of Anchor
+ *
+ * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
+ * used the same by default
+ */
 _gas.push(['_addHook', '_setAllowAnchor', function(val) {
     _gas._allowAnchor = val;
 }]);
 
-_gas.push(['_addHook', '_getLinkerUrl', function(url, use_hash) {
-    if (use_hash === undefined) {
-        use_hash = _gas._allowAnchor;
+/**
+ * _getLinkerUrl Hook to use stored allowAnchor value.
+ */
+_gas.push(['_addHook', '_getLinkerUrl', function(url, use_anchor) {
+    if (use_anchor === undefined) {
+        use_anchor = _gas._allowAnchor;
     }
-    return [url, use_hash];
+    return [url, use_anchor];
 }]);
 
+/**
+ * _link Hook to use stored allowAnchor value.
+ */
+_gas.push(['_addHook', '_link', function(url, use_anchor) {
+    if (use_anchor === undefined) {
+        use_anchor = _gas._allowAnchor;
+    }
+    return [url, use_anchor];
+}]);
 
-// Mark pushed DomainNames as external domains
+/**
+ * _linkByPost Hook to use stored allowAnchor value.
+ */
+_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+    if (use_anchor === undefined) {
+        use_anchor = _gas._allowAnchor;
+    }
+    return [url, use_anchor];
+}]);
+
+/**
+ * Store all domains pushed by _setDomainName that don't match current domain.
+ *
+ * @type {Array.<string>}
+ */
 var _external_domains = [];
+
+/**
+ * _setDomainName Hook to add pushed domains to _external_domains if it doesn't
+ * match current domain.
+ *
+ * This Hook let you call _setDomainName multiple times. So _gas will only
+ * apply the one that matches the current domain and the other ones will be
+ * used to track external domains with cookie data.
+ */
 _gas.push(['_addHook', '_setDomainName', function(domainName) {
     if (document.location.hostname.indexOf(domainName) < 0) {
         _external_domains.push(domainName);
         return false;
     }
 }]);
+
+/**
+ * _addExternalDomainName Hook.
+ *
+ * This hook let you add external domains so that urls on current page to this
+ * domain are marked to send cookies.
+ * You should use _setDomainName for this in most of the cases.
+ */
 _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
     _external_domains.push(domainName);
     return false;
 }]);
 
-function track_links() {
+/**
+ * Function to mark links on the current pages to send links
+ *
+ * This function is used to make it easy to implement multi-domain-tracking.
+ * @param {string} event_used Should be 'now', 'click' or 'mousedown'. Default
+ * 'click'.
+ * @this _gas.gh GAS Helper functions
+ * @return {boolean} Returns false to avoid this is puhed to _gaq.
+ */
+function track_links(event_used) {
     var internal = document.location.hostname,
         i, el;
+    if (event_used !== 'now' || event_used !== 'mousedown') {
+        event_used = 'click';
+    }
     for (i = 0; i < document.links.length; i++) {
         el = document.links[i];
         if (el.href.indexOf('http') == 0) {
+            // Check to see if it's a internal link
             if (el.hostname == internal) {
                 continue;
             }
+            // Tag external Links either now or on mouse event.
             if (el.hostname in _external_domains) {
-                el.href = this._getLinkerUrl(el.href, _gas._allowAnchor);
+                if (event_used === 'now') {
+                    el.href = this._getLinkerUrl(el.href, _gas._allowAnchor);
+                }else {
+                    this._addEventListener(el, event_used, function() {
+                        this.href = this._getLinkerUrl(
+                            this.href,
+                            _gas._allowAnchor
+                        );
+                    });
+                }
             }
         }
     }
+    return false;
 }
 
-_gas._functions['_trackMultiDomain'] = track_links;
+/**
+ * Registers Hook to _setMultiDomain
+ */
+_gas.push(['_addHook', '_setMultiDomain', track_links]);
+
+/**
+ * Enable Multidomain Tracking.
+ *
+ * It will look for all links inside the page that matches one of the
+ * _external_domains and will mark that link to be tagged
+ */
+_gas.push(['_setMultiDomain', 'now']);
 /*!
  * Wrap-up
  */

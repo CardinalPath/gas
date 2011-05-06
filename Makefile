@@ -1,5 +1,5 @@
 # http://code.google.com/closure/compiler/
-CLOSURE_COMPILER = java -jar ~/compiler.jar
+#CLOSURE_COMPILER = java -jar ~/compiler.jar
 #CLOSURE_COMPILER = java -jar ~/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS
 #CLOSURE_COMPILER = java -jar ~/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --formatting PRETTY_PRINT
 CLOSURE_COMPILER = java -jar ~/compiler.jar --formatting PRETTY_PRINT
@@ -12,17 +12,18 @@ JSFILES = src/core.js src/helpers.js $(wildcard src/plugins/*.js) src/wrapup.js
 
 .DEFAULT_GOAL := all
 
-all: gas min
+all: gas.js gas.min.js
 
-# for debugging
-gas: $(JSFILES)
+gas.js: $(JSFILES)
+	# for debugging
 	# grep "console" $^
-	echo "(function(window, undefined) {" > dist/gas.js
+	echo "(function(window, undefined) {" > dist/$@
 	cat $^ >> dist/gas.js
-	echo "})(window);" >> dist/gas.js
+	echo "})(window);" >> dist/$@
+	$(CLOSURE_LINTER) dist/$@
 
-min: gas
-	$(CLOSURE_COMPILER) --js dist/gas.js --js_output_file dist/gas.min.js
+gas.min.js: gas.js
+	$(CLOSURE_COMPILER) --js dist/gas.js --js_output_file dist/$@
 
 lint: $(JSFILES)
 	$(FIXJSSTYLE) -r src

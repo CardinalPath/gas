@@ -13,7 +13,14 @@
 
 var gas_helpers = {};
 
-gas_helpers['_sanitizeString'] = function(str, strict) {
+/**
+ * Removes special characters and Lowercase String
+ *
+ * @param {string} str to be sanitized.
+ * @param {boolean} strict_opt If we should remove any non ascii char.
+ * @return {string} Sanitized string.
+ */
+gas_helpers['_sanitizeString'] = function(str, strict_opt) {
     str = str.toLowerCase()
         .replace(/^\ +/, '')
         .replace(/\ +$/, '')
@@ -25,24 +32,51 @@ gas_helpers['_sanitizeString'] = function(str, strict) {
         .replace(/[úùûü]/g, 'u')
         .replace(/[ç¢©]/g, 'c');
 
-    if(strict){
-        str = str.replace(/[^a-z0-9_-]/g,'_');
+    if (strict_opt) {
+        str = str.replace(/[^a-z0-9_-]/g, '_');
     }
     return str.replace(/_+/g, '_');
 };
 
+/**
+ * Cross Browser helper to addEventListener
+ *
+ * @param {HTMLElement} obj The Element to attach event to.
+ * @param {string} evt The event that will trigger the binded function.
+ * @param {function(event)} fnc The function to bind to the element.
+ * @return {boolean} true if it was successfuly binded.
+ */
 gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
+    // W3C model
     if (obj.addEventListener) {
         obj.addEventListener(evt, fnc, false);
         return true;
-    } else if (obj.attachEvent) {
+    }
+    // Microsoft model
+    else if (obj.attachEvent) {
         return obj.attachEvent('on' + evt, fnc);
     }
+    // Browser don't support W3C or MSFT model, go on with traditional
     else {
-        obj['on' + evt] = fnc;
+        evt = 'on' + evt;
+        if (typeof obj[evt] === 'function') {
+            // Object already has a function on traditional
+            // Let's wrap it with our own function inside another function
+            fnc = (function(f1, f2) {
+                return function() {
+                    f1.apply(this, arguments);
+                    f2.apply(this, arguments);
+                }
+            })(obj[evt], fnc);
+        }
+        obj[evt] = fnc;
+        return true;
     }
 };
 
+// This function is the first one pushed to _gas, so it creates the _gas.gh
+//     object. It needs to be pushed into _gaq so that _gat is available when
+//     it runs.
 _gas.push(function() {
     function extend(obj) {
         for (var i in obj) {

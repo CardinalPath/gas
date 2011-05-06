@@ -13,10 +13,11 @@
  * $Date$
  */
 
-if (typeof _gas._functions === 'undefined') {
-    _gas._functions = {};
-}
-
+/**
+ * Get current windows width and heigtht
+ *
+ * @return {Array.<number>} [width,height].
+ */
 function get_window_size() {
     var myWidth = 0, myHeight = 0;
     if (typeof(window.innerWidth) == 'number') {
@@ -48,6 +49,11 @@ function get_window_size() {
     return [myWidth, myHeight];
 }
 
+/**
+ * Get current absolute window scroll position
+ *
+ * @return {Array.<number>} [XScroll,YScroll].
+ */
 function get_window_scroll() {
     var scrOfX = 0, scrOfY = 0;
     if (typeof(window.pageYOffset) == 'number') {
@@ -78,6 +84,11 @@ function get_window_scroll() {
     return [scrOfX, scrOfY];
 }
 
+/**
+ * Get current absolute document height
+ *
+ * @return {number} Current document height.
+ */
 function get_doc_height() {
     var D = document;
     return Math.max(
@@ -88,6 +99,11 @@ function get_doc_height() {
 }
 
 
+/**
+ * Get current vertical scroll percentage
+ *
+ * @return {number} Current vertical scroll percentage.
+ */
 function get_scroll_percentage() {
     return ((
         get_window_scroll()[1] +
@@ -124,7 +140,7 @@ function track_max_scroll() {
 
         _gas.push(['_trackEvent',
             'Max Scroll',
-            document.location.href,
+            url,
             String(bucket),
             Math.round(max_scroll)
         ]);
@@ -132,8 +148,8 @@ function track_max_scroll() {
 
 }
 
-_gas._functions['_trackMaxSrcoll'] = function() {
+_gas.push(['_addHook', '_trackMaxSrcoll', function() {
     this._addEventListener(window, 'scroll', update_scroll_percentage);
     track_max_scroll.call(this);
-};
+}]);
 

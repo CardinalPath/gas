@@ -10,12 +10,6 @@
  *
  * $Date$
  */
-
-
-if (typeof _gas._functions === 'undefined') {
-    _gas._functions = {};
-}
-
 function track_form(form) {
 
     function tag_element(e) {
@@ -48,9 +42,10 @@ function track_form(form) {
     this._addEventListener(form, 'submit', tag_element);
 }
 
-_gas._functions._trackForms = function() {
+_gas.push(['_addHook', '_trackForms', function() {
     for (var i in document.forms) {
         track_form.call(this, document.forms[i]);
     }
-};
+    return false;
+}]);
 
