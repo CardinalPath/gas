@@ -104,7 +104,7 @@ Multi-domain setup helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This feature help you implementing Multi-domain setups. It will find and tag
-all links to other domains and mark them with the _link or _linkByPost
+all links to other domains and mark them with the ``_link`` or ``_linkByPost``
 function. You just need to push all domain names with _setDomainName. 
 
 ::
@@ -113,10 +113,10 @@ function. You just need to push all domain names with _setDomainName.
     _gas.push(['_setDomainName', 'mysite.com']);
     _gas.push(['_setDomainName', 'myothersite.com']);
 
-The above snippet can be used in either `mysite.com` or `myothersite.com`. It
-will know the right one to use for each case and all other domains pushed to
-_setdomainName will be used to discover links between the sites. The nice side
-effect is that you can have the same snippet for both websites.
+The above snippet can be used in either ``mysite.com`` or ``myothersite.com``. 
+It will know the right one to use for each case and all other domains pushed to
+``_setdomainName`` will be used to discover links between the sites. 
+The nice side effect is that you can have the same snippet for both websites.
 
 
 Max-Scroll Tracking
