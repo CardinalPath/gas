@@ -71,6 +71,7 @@ Form Tracking will trigger events every time a user submits a form or changes a
 form field.
 
 ::
+
     _gas.push(['_trackForms']);
     
 This is all you need to enable it.
@@ -84,6 +85,7 @@ or to trigger events to another tool evrytime a pageView is fired. You can
 assign multiple Hooks.
 
 ::
+
     _gas.push(['_addHook', '_trackPageview', function(page){
         console.log(page);
         if(page.toLowerCase){
@@ -106,6 +108,7 @@ all links to other domains and mark them with the _link or _linkByPost
 function. You just need to push all domain names with _setDomainName. 
 
 ::
+
     _gas.push(['_setAccount', 'UA-XXXXX-1']);
     _gas.push(['_setDomainName', 'mysite.com']);
     _gas.push(['_setDomainName', 'myothersite.com']);
@@ -123,6 +126,7 @@ This will fire events with the Max-Scroll porcentage value for evey page the
 user views.
 
 ::
+
     _gas.push(['_trackMaxSrcoll']);
 
 
@@ -134,6 +138,7 @@ Easyier handling of multi-account setups. You can fire an event to all accounts
 or just to one of the accounts you configured,
 
 ::
+
     _gas.push(['_setAccount', 'UA-XXXXX-1']);
     _gas.push(['_setAccount', 'UA-XXXXX-2']);
     _gas.push(['custom._setAccount', 'UA-XXXXX-3']);
