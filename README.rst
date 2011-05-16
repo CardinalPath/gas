@@ -100,6 +100,34 @@ return the page lowercased. So the actual value sent to GA is the lowercased
 page. This may be helpfull for sites in asp, where lowercase and uppercase
 don't matter and will save you the work for creating a GA profile Filter.
 
+Here's another handy Hook for Events. Event values must always be integer
+values. The Hook bellow will try to round floats or convert strings to integers
+when possible. This should avoid a bad value from canceling the Event.
+
+::
+
+    _gas.push(['_addHook', '_trackEvent', function(cat,act,lab,val){
+        if(typeof val == 'string'){
+            val = parseInt(val, 10);
+        }
+        val = Math.round(val);
+        return [cat, act, lab, val]
+    }]);
+
+
+You can also cancel a call returning ``false`` from a Hook to it.
+
+::
+
+    _gas.push(['_addHook', '_setVar', function(val){
+        _gas.push(['_setCustomVar', 1, 'userType', val, 1]);
+        return false;
+    }]);
+
+The above Hook will intercept and cancel any call to the, now deprecated, 
+``_setVar``. It will then trigger a call to ``_setCustomVar`` with an
+equivalent value.
+
 Multi-domain setup helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
