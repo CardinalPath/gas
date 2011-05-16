@@ -4,7 +4,7 @@
  * @preserve Copyright 2011, Direct Performance
  * Licensed under the MIT license.
  *
- * @author Eduardo Cereto <eduardo.cereto@directperformance.com.br>
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
  * @version $Revision$
  *
  * $Date$
@@ -80,10 +80,7 @@ window._gas._hooks['_addHook'] = [function(fn, cb) {
  * @return {string} Correct account name to be used already with trailling dot.
  */
 function _build_acct_name(acct) {
-    if (acct === '_gas1') {
-        return '';
-    }
-    return acct + '.';
+    return acct === '_gas1' ? '' : acct + '.';
 }
 
 /**

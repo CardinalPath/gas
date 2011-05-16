@@ -1,4 +1,4 @@
-/**
+/*!
  * Wrap-up
  */
 // Execute previous functions
