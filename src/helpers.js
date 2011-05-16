@@ -77,7 +77,7 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
-_gas.push(function() {
+window._gas.push(function() {
     function extend(obj) {
         for (var i in obj) {
             if (!(i in this)) {
@@ -91,7 +91,7 @@ _gas.push(function() {
     // Extend Tracker
     extend.call(tracker, gas_helpers);
 
-    _gas.gh = tracker;
+    window._gas.gh = tracker;
 
 });
 

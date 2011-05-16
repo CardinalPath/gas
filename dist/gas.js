@@ -11,7 +11,6 @@
  * $Date$
  */
 
-
 var document = window.document;
 
 /**
@@ -20,9 +19,9 @@ var document = window.document;
  * This never tries to do something that is not supposed to. So it won't break
  * in the future.
  */
-window._gaq = window._gaq || [];
+window['_gaq'] = window['_gaq'] || [];
 
-var _prev_gas = window._gas || [];
+var _prev_gas = window['_gas'] || [];
 
 // Avoid duplicate definition
 if (_prev_gas._accounts_length >= 0) {
@@ -46,7 +45,7 @@ var toString = Object.prototype.toString,
  * everything pushed to _gas is run through possible hooks and then pushed to
  * _gaq
  */
-window._gas = {
+window['_gas'] = {
     _accounts: {},
     _accounts_length: 0,
     _hooks: {},
@@ -62,15 +61,31 @@ window._gas = {
  * @param {function()} cb The callback function to be appended to hooks.
  * @return {boolean} Always false.
  */
-_gas._hooks['_addHook'] = [function(fn, cb) {
+window._gas._hooks['_addHook'] = [function(fn, cb) {
     if (typeof fn === 'string' && typeof cb === 'function') {
-        if (typeof _gas._hooks[fn] === 'undefined') {
-            _gas._hooks[fn] = [];
+        if (typeof window._gas._hooks[fn] === 'undefined') {
+            window._gas._hooks[fn] = [];
         }
-        _gas._hooks[fn].push(cb);
+        window._gas._hooks[fn].push(cb);
     }
     return false;
 }];
+
+/**
+ * Construct the correct account name to be used on _gaq calls.
+ *
+ * The account name for the first unamed account pushed to _gas is the standard
+ * account name. It's pushed without the account name to _gaq, so if someone
+ * calls directly _gaq it works as expected.
+ * @param {string} acct Account name.
+ * @return {string} Correct account name to be used already with trailling dot.
+ */
+function _build_acct_name(acct) {
+    if (acct === '_gas1') {
+        return '';
+    }
+    return acct + '.';
+}
 
 /**
  * Everything pushed to _gas is executed by this call.
@@ -78,7 +93,7 @@ _gas._hooks['_addHook'] = [function(fn, cb) {
  * This function should not be called directly. Instead use _gas.push
  * @return {number} This is the same return as _gaq.push calls.
  */
-_gas._execute = function() {
+window._gas._execute = function() {
     //console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
@@ -90,7 +105,7 @@ _gas._execute = function() {
         return _gaq.push(
             (function(s) {
                 var f = function() {
-                    s.call(_gas.gh);
+                    s.call(window._gas.gh);
                 };
                 return f;
             })(sub)
@@ -99,7 +114,7 @@ _gas._execute = function() {
     }else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
 
-        if (indexOf.call(foo, '.') >= 0) {
+        if (foo.indexOf('.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
         }else {
@@ -107,11 +122,11 @@ _gas._execute = function() {
         }
 
         // Execute hooks
-        hooks = _gas._hooks[foo];
+        hooks = window._gas._hooks[foo];
         if (hooks && hooks.length > 0) {
             for (i = 0; i < hooks.length; i++) {
                 try {
-                    repl_sub = hooks[i].apply(_gas.gh, sub);
+                    repl_sub = hooks[i].apply(window._gas.gh, sub);
                     if (repl_sub === false) {
                         // Returning false from a hook cancel the call
                         gaq_execute = false;
@@ -122,7 +137,7 @@ _gas._execute = function() {
                     }
                 }catch (e) {
                     if (foo !== '_trackException') {
-                        _gas.push(['_trackException', e]);
+                        window._gas.push(['_trackException', e]);
                     }
                 }
             }
@@ -133,27 +148,34 @@ _gas._execute = function() {
         }
         // Intercept _setAccount calls
         if (foo === '_setAccount') {
-            acct_name = acct_name || '_gas' + String(_gas._accounts_length + 1);
-            _gas._accounts[acct_name] = sub[0];
-            _gas._accounts_length++;
-            return _gaq.push([acct_name + '.' + foo, sub[0]]);
+            acct_name = acct_name || '_gas' +
+                String(window._gas._accounts_length + 1);
+            // Force that the first unamed account is _gas1
+            if (typeof window._gas._accounts['_gas1'] == 'undefined' &&
+                acct_name.indexOf('_gas') != -1) {
+                acct_name = '_gas1';
+            }
+            window._gas._accounts[acct_name] = sub[0];
+            window._gas._accounts_length += 1;
+            acct_name = _build_acct_name(acct_name);
+            return _gaq.push([acct_name + foo, sub[0]]);
         }
 
         // If user provides account than trigger event for just that account.
         var acc_foo;
-        if (acct_name && _gas._accounts[acct_name]) {
-            acc_foo = acct_name + '.' + foo;
-            args = sub.slice();
+        if (acct_name && window._gas._accounts[acct_name]) {
+            acc_foo = _build_acct_name(acct_name) + foo;
+            args = slice.call(sub);
             args.unshift(acc_foo);
             return _gaq.push(args);
         }
 
         // Call Original _gaq, for all accounts
         var return_val = 0;
-        for (i in _gas._accounts) {
-            if (hasOwn.call(_gas._accounts, i)) {
-                acc_foo = i + '.' + foo;
-                args = sub.slice();
+        for (i in window._gas._accounts) {
+            if (hasOwn.call(window._gas._accounts, i)) {
+                acc_foo = _build_acct_name(i) + foo;
+                args = slice.call(sub);
                 args.unshift(acc_foo);
                 //console.log(args);
                 return_val += _gaq.push(args);
@@ -170,10 +192,10 @@ _gas._execute = function() {
  * ready for hooks. This creates _gaq as a series of functions that call
  * _gas._execute() with the same arguments.
  */
-_gas.push = function() {
+window._gas.push = function() {
     (function(args) {
         _gaq.push(function() {
-            _gas._execute.apply(_gas.gh, args);
+            window._gas._execute.apply(window._gas.gh, args);
         });
     })(arguments);
 };
@@ -183,8 +205,8 @@ _gas.push = function() {
  *
  * Watchout for circular calls
  */
-_gas.push(['_addHook', '_trackException', function(exception, message) {
-    _gas.push(['_trackEvent',
+window._gas.push(['_addHook', '_trackException', function(exception, message) {
+    window._gas.push(['_trackEvent',
         'Exception ' + (exception.name || 'Error'),
         message || exception.message || exception,
         url
@@ -200,8 +222,8 @@ _gas.push(['_addHook', '_trackException', function(exception, message) {
  * @param {string} func _gas Function Name to remove Hooks from.
  * @return {boolean} Always returns false.
  */
-_gas.push(['_addHook', '_popHook', function(func) {
-    var arr = _gas._hooks[func];
+window._gas.push(['_addHook', '_popHook', function(func) {
+    var arr = window._gas._hooks[func];
     if (arr && arr.pop) {
         arr.pop();
     }
@@ -287,7 +309,7 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
-_gas.push(function() {
+window._gas.push(function() {
     function extend(obj) {
         for (var i in obj) {
             if (!(i in this)) {
@@ -301,7 +323,7 @@ _gas.push(function() {
     // Extend Tracker
     extend.call(tracker, gas_helpers);
 
-    _gas.gh = tracker;
+    window._gas.gh = tracker;
 
 });
 
@@ -655,7 +677,7 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * _external_domains and will mark that link to be tagged
  */
 _gas.push(['_setMultiDomain', 'now']);
-/*!
+/**
  * Wrap-up
  */
 // Execute previous functions
