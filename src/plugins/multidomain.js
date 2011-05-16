@@ -5,7 +5,7 @@
  * Copyright 2011, Direct Performance
  * Licensed under the MIT license.
  *
- * @author Eduardo Cereto <eduardo.cereto@directperformance.com.br>
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
  * @version $Revision$
  *
  * $Date$

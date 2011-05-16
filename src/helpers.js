@@ -5,7 +5,7 @@
  * Copyright 2011, Direct Performance
  * Licensed under the MIT license.
  *
- * @author Eduardo Cereto <eduardo.cereto@directperformance.com.br>
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
  * @version $Revision$
  *
  * $Date$
@@ -74,18 +74,24 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
     }
 };
 
+/**
+ * Extends context object with argument object.
+ *
+ * @param {object} obj Object to use.
+ * @this {object} Object that will be extended
+ */
+function extend(obj) {
+    for (var i in obj) {
+        if (!(i in this)) {
+            this[i] = obj[i];
+        }
+    }
+}
+
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
 window._gas.push(function() {
-    function extend(obj) {
-        for (var i in obj) {
-            if (!(i in this)) {
-                this[i] = obj[i];
-            }
-        }
-    }
-
     var tracker = _gat._createTracker();
 
     // Extend Tracker
