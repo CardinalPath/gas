@@ -115,7 +115,7 @@ when possible. This should avoid a bad value from canceling the Event.
     }]);
 
 
-You can also cancel a call returning ``false`` from a Hook to it.
+You can also cancel a call returning ``false`` from a Hook.
 
 ::
 
@@ -143,7 +143,7 @@ function. You just need to push all domain names with _setDomainName.
 
 The above snippet can be used in either ``mysite.com`` or ``myothersite.com``. 
 It will know the right one to use for each case and all other domains pushed to
-``_setdomainName`` will be used to discover links between the sites. 
+``_setDomainName`` will be used to discover links between the sites. 
 The nice side effect is that you can have the same snippet for both websites.
 
 
@@ -155,7 +155,7 @@ user views.
 
 ::
 
-    _gas.push(['_trackMaxSrcoll']);
+    _gas.push(['_trackMaxScroll']);
 
 
 
