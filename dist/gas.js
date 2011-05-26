@@ -268,17 +268,26 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
 };
 
 /**
- * Cross Browser helper to addEventListener
+ * Cross Browser helper to addEventListener.
+ *
+ * ga_next.js currently have a _addEventListener directive. So _gas will
+ * allways prefer that if available, and will use this one only as a fallback
  *
  * @param {HTMLElement} obj The Element to attach event to.
  * @param {string} evt The event that will trigger the binded function.
  * @param {function(event)} fnc The function to bind to the element.
+ * @param {boolean} bubble true if event should be fired at bubble phase.
+ * Defaults to false. Works only on W3C compliant browser. MSFT don't support
+ * it.
  * @return {boolean} true if it was successfuly binded.
  */
-gas_helpers['_addEventListener'] = function(obj, evt, fnc) {
+gas_helpers['_addEventListener'] = function(obj, evt, fnc, bubble) {
     // W3C model
+    if (bubble === undefined) {
+        bubble = false;
+    }
     if (obj.addEventListener) {
-        obj.addEventListener(evt, fnc, false);
+        obj.addEventListener(evt, fnc, !!bubble);
         return true;
     }
     // Microsoft model
@@ -323,10 +332,10 @@ function extend(obj) {
 window._gas.push(function() {
     var tracker = _gat._createTracker();
 
-    // Extend Tracker
-    extend.call(tracker, gas_helpers);
+    // Extend helpers with the tracker;
+    gas_helpers.tracker = tracker;
 
-    window._gas.gh = tracker;
+    window._gas.gh = gas_helpers;
 
 });
 
@@ -691,17 +700,17 @@ while (window._gas._queue.length > 0) {
 // Import ga.js
 if (_gaq && _gaq.length >= 0) {
     (function() {
-            var ga = document.createElement('script');
-            ga.type = 'text/javascript';
-            ga.async = true;
-            ga.src = (
-                'https:' == document.location.protocol ?
-                    'https://ssl' :
-                    'http://www'
-            ) +
-                '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(ga, s);
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = (
+            'https:' == document.location.protocol ?
+                'https://ssl' :
+                'http://www'
+        ) +
+            '.google-analytics.com/u/ga_next.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
     })();
 }
 
