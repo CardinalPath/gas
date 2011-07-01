@@ -358,7 +358,7 @@ if (_gaq && _gaq.length >= 0) {
                 'https://ssl' :
                 'http://www'
         ) +
-            '.google-analytics.com/u/ga_next.js';
+            '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(ga, s);
     })();
