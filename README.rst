@@ -140,6 +140,7 @@ function. You just need to push all domain names with _setDomainName.
     _gas.push(['_setAccount', 'UA-XXXXX-1']);
     _gas.push(['_setDomainName', 'mysite.com']);
     _gas.push(['_setDomainName', 'myothersite.com']);
+    _gas.push(['_setMultiDomain', 'click']);
 
 The above snippet can be used in either ``mysite.com`` or ``myothersite.com``. 
 It will know the right one to use for each case and all other domains pushed to
