@@ -12,6 +12,7 @@ COREJSFILES = src/core.js src/helpers.js
 PLUGINS = $(wildcard src/plugins/*.js)
 WRAPUP = src/wrapup.js
 JSFILES = $(COREJSFILES) $(PLUGINS) $(WRAPUP)
+TESTFILES = $(wildcard test/test_*.js)
 
 .DEFAULT_GOAL := all
 
@@ -40,6 +41,6 @@ gas.core.min.js: gas.core.js
 lint: $(JSFILES)
 	$(FIXJSSTYLE) -r src
 	$(CLOSURE_LINTER) -r src
-	$(FIXJSSTYLE) test/test_core.js
-	$(CLOSURE_LINTER) test/test_core.js
+	$(FIXJSSTYLE) $(TESTFILES)
+	$(CLOSURE_LINTER) $(TESTFILES)
 

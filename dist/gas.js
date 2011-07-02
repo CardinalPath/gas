@@ -330,7 +330,7 @@ function extend(obj) {
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
 window._gas.push(function() {
-    var tracker = _gat._createTracker();
+    var tracker = _gat._getTrackerByName();
 
     // Extend helpers with the tracker;
     gas_helpers.tracker = tracker;
@@ -574,16 +574,6 @@ _gas.push(['_addHook', '_setAllowAnchor', function(val) {
 }]);
 
 /**
- * _getLinkerUrl Hook to use stored allowAnchor value.
- */
-_gas.push(['_addHook', '_getLinkerUrl', function(url, use_anchor) {
-    if (use_anchor === undefined) {
-        use_anchor = _gas._allowAnchor;
-    }
-    return [url, use_anchor];
-}]);
-
-/**
  * _link Hook to use stored allowAnchor value.
  */
 _gas.push(['_addHook', '_link', function(url, use_anchor) {
@@ -611,6 +601,13 @@ _gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
 var _external_domains = [];
 
 /**
+ * Store the internal domain name
+ *
+ * @type string
+ */
+var _internal_domain = undefined;
+
+/**
  * _setDomainName Hook to add pushed domains to _external_domains if it doesn't
  * match current domain.
  *
@@ -623,6 +620,7 @@ _gas.push(['_addHook', '_setDomainName', function(domainName) {
         _external_domains.push(domainName);
         return false;
     }
+    _internal_domain = domainName;
 }]);
 
 /**
@@ -648,28 +646,42 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
  */
 function track_links(event_used) {
     var internal = document.location.hostname,
-        i, el;
-    if (event_used !== 'now' || event_used !== 'mousedown') {
+        gh = this,
+        i, j, el;
+    if (event_used !== 'now' && event_used !== 'mousedown') {
         event_used = 'click';
     }
     for (i = 0; i < document.links.length; i++) {
         el = document.links[i];
         if (el.href.indexOf('http') == 0) {
             // Check to see if it's a internal link
-            if (el.hostname == internal) {
+            if (el.hostname == internal ||
+              el.hostname.indexOf(_internal_domain) >= 0) {
                 continue;
             }
             // Tag external Links either now or on mouse event.
-            if (el.hostname in _external_domains) {
-                if (event_used === 'now') {
-                    el.href = this._getLinkerUrl(el.href, _gas._allowAnchor);
-                }else {
-                    this._addEventListener(el, event_used, function() {
-                        this.href = this._getLinkerUrl(
-                            this.href,
+            for (j = 0; j < _external_domains.length; j++) {
+                if (el.hostname.indexOf(_external_domains[j]) >= 0) {
+                    if (event_used === 'now') {
+                        el.href = gh.tracker._getLinkerUrl(
+                            el.href,
                             _gas._allowAnchor
                         );
-                    });
+                    }else {
+                        if (event_used === 'click') {
+                            this._addEventListener(el, event_used, function() {
+                                _gas.push(['_link', this.href]);
+                                return false;
+                            });
+                        }else {
+                            this._addEventListener(el, event_used, function() {
+                                this.href = gh.tracker._getLinkerUrl(
+                                    this.href,
+                                    _gas._allowAnchor
+                                );
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -688,7 +700,7 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * It will look for all links inside the page that matches one of the
  * _external_domains and will mark that link to be tagged
  */
-_gas.push(['_setMultiDomain', 'now']);
+//_gas.push(['_setMultiDomain', 'mousedown']);
 /*!
  * Wrap-up
  */

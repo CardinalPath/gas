@@ -101,7 +101,7 @@ function extend(obj) {
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
 window._gas.push(function() {
-    var tracker = _gat._createTracker();
+    var tracker = _gat._getTrackerByName();
 
     // Extend helpers with the tracker;
     gas_helpers.tracker = tracker;

@@ -1,6 +1,10 @@
 
 module('core');
 
+_gas.push(['_trackException', '_addHook', function() {
+    ok(false, 'Exception');
+}]);
+
 test('_sanitizeString', function() {
     var san = _gas.gh._sanitizeString;
     expect(6);
