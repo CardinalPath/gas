@@ -11,8 +11,6 @@
  * $Date$
  */
 
-var document = window.document;
-
 /**
  * Google Analytics original _gaq.
  *
@@ -28,8 +26,9 @@ if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
-//Shortcuts
-var toString = Object.prototype.toString,
+//Shortcuts, these speed up the code
+var document = window.document,
+    toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
     push = Array.prototype.push,
     slice = Array.prototype.slice,
@@ -91,7 +90,6 @@ function _build_acct_name(acct) {
  * @return {number} This is the same return as _gaq.push calls.
  */
 window._gas._execute = function() {
-    //console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
         gaq_execute = true,
@@ -101,10 +99,10 @@ window._gas._execute = function() {
         // Pushed functions are executed right away
         return _gaq.push(
             (function(s) {
-                var f = function() {
+                return function() {
+                    // pushed functions receive helpers through this object
                     s.call(window._gas.gh);
                 };
-                return f;
             })(sub)
         );
 
@@ -174,7 +172,6 @@ window._gas._execute = function() {
                 acc_foo = _build_acct_name(i) + foo;
                 args = slice.call(sub);
                 args.unshift(acc_foo);
-                //console.log(args);
                 return_val += _gaq.push(args);
             }
         }
@@ -311,20 +308,6 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc, bubble) {
         return true;
     }
 };
-
-/**
- * Extends context object with argument object.
- *
- * @param {object} obj Object to use.
- * @this {object} Object that will be extended
- */
-function extend(obj) {
-    for (var i in obj) {
-        if (!(i in this)) {
-            this[i] = obj[i];
-        }
-    }
-}
 
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when

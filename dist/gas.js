@@ -11,8 +11,6 @@
  * $Date$
  */
 
-var document = window.document;
-
 /**
  * Google Analytics original _gaq.
  *
@@ -28,8 +26,9 @@ if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
-//Shortcuts
-var toString = Object.prototype.toString,
+//Shortcuts, these speed up the code
+var document = window.document,
+    toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
     push = Array.prototype.push,
     slice = Array.prototype.slice,
@@ -91,7 +90,6 @@ function _build_acct_name(acct) {
  * @return {number} This is the same return as _gaq.push calls.
  */
 window._gas._execute = function() {
-    //console.dir(arguments);
     var args = slice.call(arguments),
         sub = args.shift(),
         gaq_execute = true,
@@ -101,10 +99,10 @@ window._gas._execute = function() {
         // Pushed functions are executed right away
         return _gaq.push(
             (function(s) {
-                var f = function() {
+                return function() {
+                    // pushed functions receive helpers through this object
                     s.call(window._gas.gh);
                 };
-                return f;
             })(sub)
         );
 
@@ -174,7 +172,6 @@ window._gas._execute = function() {
                 acc_foo = _build_acct_name(i) + foo;
                 args = slice.call(sub);
                 args.unshift(acc_foo);
-                //console.log(args);
                 return_val += _gaq.push(args);
             }
         }
@@ -312,20 +309,6 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc, bubble) {
     }
 };
 
-/**
- * Extends context object with argument object.
- *
- * @param {object} obj Object to use.
- * @this {object} Object that will be extended
- */
-function extend(obj) {
-    for (var i in obj) {
-        if (!(i in this)) {
-            this[i] = obj[i];
-        }
-    }
-}
-
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
@@ -351,7 +334,10 @@ window._gas.push(function() {
  *
  * $Date$
  */
-function track_form(form) {
+function track_form(form, opt_live) {
+    if (opt_live === undefined) {
+        opt_live = false;
+    }
 
     function tag_element(e) {
         var el = e.target;
@@ -368,24 +354,56 @@ function track_form(form) {
         ]);
     }
 
-    var i, el;
-    for (i in form.elements) {
-        el = form.elements[i];
-        if (['button', 'submit'].indexOf(el.type) >= 0) {
-            //Button
-            this._addEventListener(el, 'click', tag_element);
+
+    if (opt_live) {
+        this._addEventListener(document.body, 'click', function(e) {
+            var el = e.target;
+            if (e.type == 'click' &&
+              ['button',
+              'submit',
+              'image',
+              'reset'].indexOf(el.type.toLowerCase()) >= 0) {
+
+                tag_element(e);
+            }
+        });
+        this._addEventListener(document.body, 'change', function(e) {
+            var el = e.target;
+            if (e.type == 'change' &&
+              ['input',
+              'select',
+              'textarea',
+              'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
+
+                tag_element(e);
+            }
+        });
+    }else {
+        var i, el;
+        for (i in form.elements) {
+            el = form.elements[i];
+            if (['button', 'submit', 'image', 'reset'].indexOf(el.type) >= 0) {
+                //Button
+                this._addEventListener(el, 'click', tag_element);
+            }
+            else {
+                //Text field
+                this._addEventListener(el, 'change', tag_element);
+            }
         }
-        else {
-            //Text field
-            this._addEventListener(el, 'change', tag_element);
-        }
+        this._addEventListener(form, 'submit', tag_element);
     }
-    this._addEventListener(form, 'submit', tag_element);
 }
 
-_gas.push(['_addHook', '_trackForms', function() {
-    for (var i in document.forms) {
-        track_form.call(this, document.forms[i]);
+/**
+ * Triggers the execution
+ *
+ * @param {boolean} opt_live Either it should use live or not. Default to false.
+ */
+_gas.push(['_addHook', '_trackForms', function(opt_live) {
+    for (var i = 0; i < document.forms.length; i++) {
+        track_form.call(this, document.forms[i], opt_live);
+        if (opt_live) return false;
     }
     return false;
 }]);

@@ -83,20 +83,6 @@ gas_helpers['_addEventListener'] = function(obj, evt, fnc, bubble) {
     }
 };
 
-/**
- * Extends context object with argument object.
- *
- * @param {object} obj Object to use.
- * @this {object} Object that will be extended
- */
-function extend(obj) {
-    for (var i in obj) {
-        if (!(i in this)) {
-            this[i] = obj[i];
-        }
-    }
-}
-
 // This function is the first one pushed to _gas, so it creates the _gas.gh
 //     object. It needs to be pushed into _gaq so that _gat is available when
 //     it runs.
