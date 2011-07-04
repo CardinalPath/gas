@@ -83,6 +83,13 @@ function _build_acct_name(acct) {
     return acct === '_gas1' ? '' : acct + '.';
 }
 
+function _gaq_push(arr) {
+    if (_gas.debug_mode) {
+        console.log(arr);
+    }
+    return window._gaq.push(arr);
+}
+
 /**
  * Everything pushed to _gas is executed by this call.
  *
@@ -97,7 +104,7 @@ window._gas._execute = function() {
 
     if (typeof sub === 'function') {
         // Pushed functions are executed right away
-        return _gaq.push(
+        return _gaq_push(
             (function(s) {
                 return function() {
                     // pushed functions receive helpers through this object
@@ -153,7 +160,7 @@ window._gas._execute = function() {
             window._gas._accounts[acct_name] = sub[0];
             window._gas._accounts_length += 1;
             acct_name = _build_acct_name(acct_name);
-            return _gaq.push([acct_name + foo, sub[0]]);
+            return _gaq_push([acct_name + foo, sub[0]]);
         }
 
         // If user provides account than trigger event for just that account.
@@ -162,7 +169,7 @@ window._gas._execute = function() {
             acc_foo = _build_acct_name(acct_name) + foo;
             args = slice.call(sub);
             args.unshift(acc_foo);
-            return _gaq.push(args);
+            return _gaq_push(args);
         }
 
         // Call Original _gaq, for all accounts
@@ -172,7 +179,7 @@ window._gas._execute = function() {
                 acc_foo = _build_acct_name(i) + foo;
                 args = slice.call(sub);
                 args.unshift(acc_foo);
-                return_val += _gaq.push(args);
+                return_val += _gaq_push(args);
             }
         }
         return return_val ? 1 : 0;
@@ -187,11 +194,14 @@ window._gas._execute = function() {
  * _gas._execute() with the same arguments.
  */
 window._gas.push = function() {
-    (function(args) {
-        _gaq.push(function() {
-            window._gas._execute.apply(window._gas.gh, args);
-        });
-    })(arguments);
+    var args = slice.call(arguments);
+    for (var i = 0; i < args.length; i++) {
+        (function(arr) {
+            _gaq.push(function() {
+                window._gas._execute.call(window._gas.gh, arr);
+            });
+        })(args[i]);
+    }
 };
 
 /**
@@ -206,6 +216,13 @@ window._gas.push(['_addHook', '_trackException', function(exception, message) {
         url
     ]);
     return false;
+}]);
+
+/**
+ * Hook to enable Debug Mode
+ */
+window._gas.push(['_addHook', '_setDebug', function(set_debug) {
+    window._gas.debug_mode = !!set_debug;
 }]);
 
 /**
@@ -403,7 +420,7 @@ function track_form(form, opt_live) {
 _gas.push(['_addHook', '_trackForms', function(opt_live) {
     for (var i = 0; i < document.forms.length; i++) {
         track_form.call(this, document.forms[i], opt_live);
-        if (opt_live) return false;
+        if (opt_live) break;
     }
     return false;
 }]);

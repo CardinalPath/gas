@@ -2,8 +2,32 @@
 module('core');
 
 _gas.push(['_trackException', '_addHook', function() {
-    ok(false, 'Exception');
+    ok(false, 'Exception triggered');
 }]);
+
+test('multiple parameters passed to _gas.push', function() {
+    expect(4);
+
+    stop();
+
+    _gas.push(['_addHook', '_trackPageview', function(page) {
+        equals(page, '/test.html',
+            'PageView fired');
+        return false;
+    }]);
+    _gas.push(
+        ['_trackPageview', '/test.html'],
+        function() {
+            ok(true, 'function inside _gas.push chain');
+        },
+        ['_trackPageview', '/test.html'],
+        ['_trackPageview', '/test.html']
+    );
+
+    _gas.push(function() {start();});
+
+    _gas.push(['_popHook', '_trackPageview']);
+});
 
 test('_sanitizeString', function() {
     var san = _gas.gh._sanitizeString;
