@@ -290,13 +290,17 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
  *
  * @param {HTMLElement} obj The Element to attach event to.
  * @param {string} evt The event that will trigger the binded function.
- * @param {function(event)} fnc The function to bind to the element.
+ * @param {function(event)} ofnc The function to bind to the element.
  * @param {boolean} bubble true if event should be fired at bubble phase.
  * Defaults to false. Works only on W3C compliant browser. MSFT don't support
  * it.
  * @return {boolean} true if it was successfuly binded.
  */
-gas_helpers['_addEventListener'] = function(obj, evt, fnc, bubble) {
+gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
+    var fnc = function(event) {
+        event = event || window.event;
+        ofnc.call(this, event);
+    };
     // W3C model
     if (bubble === undefined) {
         bubble = false;
@@ -388,15 +392,17 @@ function track_form(form, opt_live) {
             }catch (e) {} //Ignore errors here.
         });
         this._addEventListener(document.body, 'change', function(e) {
-            var el = e.target;
-            if (e.type == 'change' &&
-              ['input',
-              'select',
-              'textarea',
-              'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
+            try {
+                var el = e.target;
+                if (e.type == 'change' &&
+                  ['input',
+                  'select',
+                  'textarea',
+                  'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
 
-                tag_element(e);
-            }
+                    tag_element(e);
+                }
+            }catch (e) {} //Ignore errors here.
         });
     }else {
         var i, el;

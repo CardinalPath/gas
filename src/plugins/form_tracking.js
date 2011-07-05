@@ -46,15 +46,17 @@ function track_form(form, opt_live) {
             }catch (e) {} //Ignore errors here.
         });
         this._addEventListener(document.body, 'change', function(e) {
-            var el = e.target;
-            if (e.type == 'change' &&
-              ['input',
-              'select',
-              'textarea',
-              'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
+            try {
+                var el = e.target;
+                if (e.type == 'change' &&
+                  ['input',
+                  'select',
+                  'textarea',
+                  'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
 
-                tag_element(e);
-            }
+                    tag_element(e);
+                }
+            }catch (e) {} //Ignore errors here.
         });
     }else {
         var i, el;
