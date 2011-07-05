@@ -2,6 +2,7 @@
 /*!
  * GAS - Google Analytics on Steroids v0.1
  *
+ * @preserve Copyright 2011, Cardinal Path
  * @preserve Copyright 2011, Direct Performance
  * Licensed under the MIT license.
  *
@@ -704,8 +705,11 @@ function track_links(event_used) {
                         );
                     }else {
                         if (event_used === 'click') {
-                            this._addEventListener(el, event_used, function() {
-                                _gas.push(['_link', this.href]);
+                            this._addEventListener(el, event_used, function(e) {
+                                _gas.push(
+                                    ['_link', this.href, _gas._allowAnchor]
+                                );
+                                e.preventDefault();
                                 return false;
                             });
                         }else {
