@@ -85,7 +85,9 @@ function _build_acct_name(acct) {
 
 function _gaq_push(arr) {
     if (_gas.debug_mode) {
-        console.log(arr);
+        try {
+            console.log(arr);
+        }catch (e) {}
     }
     return window._gaq.push(arr);
 }
@@ -161,6 +163,13 @@ window._gas._execute = function() {
             window._gas._accounts_length += 1;
             acct_name = _build_acct_name(acct_name);
             return _gaq_push([acct_name + foo, sub[0]]);
+        }
+
+        // Intercept _linka and _linkByPost
+        if (foo === '_link' || foo === '_linkByPost') {
+            args = slice.call(sub);
+            args.unshift(foo);
+            return _gaq_push(args);
         }
 
         // If user provides account than trigger event for just that account.

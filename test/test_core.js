@@ -1,6 +1,13 @@
 
 module('core');
 
+if (typeof console === 'undefined') {
+    var console = {};
+    console.log = function() {};
+}
+
+_gas.push(['_setDebug', true]);
+
 _gas.push(['_trackException', '_addHook', function() {
     ok(false, 'Exception triggered');
 }]);

@@ -126,8 +126,10 @@ function track_links(event_used) {
                                 _gas.push(
                                     ['_link', this.href, _gas._allowAnchor]
                                 );
-                                e.preventDefault();
-                                return false;
+                                if (e.preventDefault)
+                                    e.preventDefault();
+                                else
+                                    e.returnValue = false;
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {

@@ -86,7 +86,9 @@ function _build_acct_name(acct) {
 
 function _gaq_push(arr) {
     if (_gas.debug_mode) {
-        console.log(arr);
+        try {
+            console.log(arr);
+        }catch (e) {}
     }
     return window._gaq.push(arr);
 }
@@ -162,6 +164,13 @@ window._gas._execute = function() {
             window._gas._accounts_length += 1;
             acct_name = _build_acct_name(acct_name);
             return _gaq_push([acct_name + foo, sub[0]]);
+        }
+
+        // Intercept _linka and _linkByPost
+        if (foo === '_link' || foo === '_linkByPost') {
+            args = slice.call(sub);
+            args.unshift(foo);
+            return _gaq_push(args);
         }
 
         // If user provides account than trigger event for just that account.
@@ -299,7 +308,7 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
 gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
-        ofnc.call(this, event);
+        return ofnc.call(this, event);
     };
     // W3C model
     if (bubble === undefined) {
@@ -311,7 +320,7 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     }
     // Microsoft model
     else if (obj.attachEvent) {
-        return obj.attachEvent('on' + evt, fnc);
+        return obj.attachEvent('on' + evt, function() {fnc.call(obj);});
     }
     // Browser don't support W3C or MSFT model, go on with traditional
     else {
@@ -321,8 +330,8 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
             // Let's wrap it with our own function inside another function
             fnc = (function(f1, f2) {
                 return function() {
-                    f1.apply(this, arguments);
-                    f2.apply(this, arguments);
+                    f1.apply(obj, arguments);
+                    f2.apply(obj, arguments);
                 }
             })(obj[evt], fnc);
         }
@@ -717,8 +726,10 @@ function track_links(event_used) {
                                 _gas.push(
                                     ['_link', this.href, _gas._allowAnchor]
                                 );
-                                e.preventDefault();
-                                return false;
+                                if (e.preventDefault)
+                                    e.preventDefault();
+                                else
+                                    e.returnValue = false;
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {

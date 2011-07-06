@@ -15,6 +15,8 @@ test('_setMultiDomain now', function() {
     _gas.push(['_setAccount', 'UA-XXXXX-X']);
     _gas.push(['_setDomainName', 'example.com']);
     _gas.push(['_setDomainName', 'example2.com']);
+    _gas.push(['_setAllowHash', false]);
+    _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
     _gas.push(['_setMultiDomain', 'now']);
 
@@ -58,6 +60,8 @@ test('Don\'t Tag subdomain', function() {
 
     _gas.push(['_setAccount', 'UA-XXXXX-X']);
     _gas.push(['_setDomainName', 'www.example.com']);
+    _gas.push(['_setAllowHash', false]);
+    _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
     _gas.push(['_setMultiDomain', 'now']);
 
@@ -93,6 +97,8 @@ test('Tag subdomain', function() {
     _gas.push(['_setAccount', 'UA-XXXXX-X']);
     _gas.push(['_setDomainName', 'www.example.com']);
     _gas.push(['_setDomainName', 'subd.example.com']);
+    _gas.push(['_setAllowHash', false]);
+    _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
     _gas.push(['_setMultiDomain', 'now']);
 
@@ -133,6 +139,8 @@ test('_setMultiDomain click', function() {
     _gas.push(['_setDomainName', 'example.com']);
     _gas.push(['_setDomainName', 'example2.com']);
     _gas.push(['_trackPageview']);
+    _gas.push(['_setAllowHash', false]);
+    _gas.push(['_setAllowLinker', true]);
     _gas.push(['_setMultiDomain', 'click']);
 
     _gas.push(['_addHook', '_link', function(url, hash) {
@@ -166,7 +174,7 @@ test('_setMultiDomain click', function() {
     _gas.push(function() {
         _gas.push(['_popHook', '_link']);
         console.log($('#testlinks4').html());
-        $('#testlinks4').remove();
+        //$('#testlinks4').remove();
     });
 });
 
