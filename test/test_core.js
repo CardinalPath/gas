@@ -264,3 +264,64 @@ test('_gaq1 is always the first unamed account', function() {
     });
 
 });
+
+test('Handle Repeates UA number', function() {
+    expect(3);
+
+    _gas.push(['c1._setAccount', 'UA-XXXXX-1']);
+    _gas.push(['_setAccount', 'UA-XXXXX-2']);
+    _gas.push(['_setAccount', 'UA-XXXXX-2']);
+
+    expected_accs = {
+        c1: 'UA-XXXXX-1',
+        _gas1: 'UA-XXXXX-2'
+    };
+    deepEqual(_gas._accounts, expected_accs, 'Ignores repeated account');
+
+
+    _gas.push(function() {
+        start();
+        // Remove previous accounts
+        _gas._accounts = {};
+        _gas._accounts_length = 0;
+    });
+
+
+    _gas.push(['_setAccount', 'UA-XXXXX-1']);
+    _gas.push(['c1._setAccount', 'UA-XXXXX-2']);
+    _gas.push(['_setAccount', 'UA-XXXXX-2']);
+
+    expected_accs = {
+        _gas1: 'UA-XXXXX-1',
+        c1: 'UA-XXXXX-2'
+    };
+
+    deepEqual(_gas._accounts, expected_accs, 'Ignores repeated account');
+
+    _gas.push(function() {
+        start();
+        // Remove previous accounts
+        _gas._accounts = {};
+        _gas._accounts_length = 0;
+    });
+
+    _gas.push(['_setAccount', 'UA-XXXXX-1']);
+    _gas.push(['c1._setAccount', 'UA-XXXXX-1']);
+    _gas.push(['_setAccount', 'UA-XXXXX-2']);
+
+    expected_accs = {
+        c1: 'UA-XXXXX-1',
+        _gas1: 'UA-XXXXX-1',
+        _gas3: 'UA-XXXXX-2'
+    };
+
+    deepEqual(_gas._accounts, expected_accs, 'Overwrites repeated account when it uses named tracker');
+
+    _gas.push(function() {
+        start();
+        // Remove previous accounts
+        _gas._accounts = {};
+        _gas._accounts_length = 0;
+    });
+
+});

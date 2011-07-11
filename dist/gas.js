@@ -153,6 +153,15 @@ window._gas._execute = function() {
         }
         // Intercept _setAccount calls
         if (foo === '_setAccount') {
+
+            for (i in window._gas._accounts) {
+                if (window._gas._accounts[i] == sub[0]) {
+                    // Repeated account
+                    if (acct_name === undefined) {
+                        return 1;
+                    }
+                }
+            }
             acct_name = acct_name || '_gas' +
                 String(window._gas._accounts_length + 1);
             // Force that the first unamed account is _gas1
