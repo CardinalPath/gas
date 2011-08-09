@@ -60,7 +60,10 @@ function track_form(form, opt_live) {
         });
     }else {
         var i, el;
-        for (i in form.elements) {
+        if (!form.elements || !form.elements.length) {
+            return false;
+        }
+        for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
             if (['button', 'submit', 'image', 'reset'].indexOf(el.type) >= 0) {
                 //Button

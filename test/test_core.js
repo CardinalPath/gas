@@ -218,7 +218,98 @@ test('_gaq execution with and without named account', function() {
         _gas._accounts = {};
         _gas._accounts_length = 0;
     });
+});
 
+test('_gaq execution with default tracker name', function() {
+    expect(8);
+
+    // Remove previous accounts
+    _gas._accounts = {};
+    _gas._accounts_length = 0;
+
+    // Use fake _gaq
+    var orig_gaq = window._gaq;
+    window._gaq = {};
+
+
+    // _setAccounts, 3 calls
+    var i = 0;
+    window._gaq['push'] = function(arr) {
+        var foo = '_setAccount';
+        if (typeof arr === 'function') {arr.call(this);return 1;}
+        console.log('Fake _gaq.push: ', arr);
+        switch (i) {
+            case 0:
+                foo = '_gas1.' + foo;
+                break;
+            case 1:
+                foo = '_gas2.' + foo;
+                break;
+            case 2:
+                foo = foo;
+                break;
+            default:
+                break;
+        }
+        i += 1;
+        equals(arr[0], foo, 'Multiple _setAccount');
+    };
+    _gas.push(['_setDefaultTracker', 'custom']);
+    _gas.push(['_setAccount', 'UA-XXXXX-1']);
+    _gas.push(['_setAccount', 'UA-XXXXX-2']);
+    _gas.push(['custom._setAccount', 'UA-XXXXX-3']);
+
+
+    // _trackPageview, 3 calls
+    i = 0;
+    window._gaq['push'] = function(arr) {
+        var foo = '_trackPageview';
+        if (typeof arr === 'function') {arr.call(this);return 1;}
+        console.log('Fake _gaq.push: ', arr);
+        switch (i) {
+            case 0:
+                foo = '_gas1.' + foo;
+                break;
+            case 1:
+                foo = '_gas2.' + foo;
+                break;
+            case 2:
+                foo = foo;
+                break;
+            default:
+                break;
+        }
+        i += 1;
+        equals(arr[0], foo, 'Multiple _trackPageview');
+    };
+    _gas.push(['_trackPageview']);
+
+    window._gaq['push'] = function(arr) {
+        if (typeof arr === 'function') {arr.call(this);return 1;}
+        console.log('Fake _gaq.push: ', arr);
+        equals(arr[0], '_gas1._trackPageview', 'Call only _gas1 account');
+    };
+    _gas.push(['_gas1._trackPageview']);
+
+    // custom._trackPageview, 1call
+    window._gaq['push'] = function(arr) {
+        if (typeof arr === 'function') {arr.call(this);return 1;}
+        console.log('Fake _gaq.push: ', arr);
+        equals(arr[0], '_trackPageview', 'Call Default tracker');
+    };
+    _gas.push(['custom._trackPageview', '/test.html']);
+
+    stop();
+    _gas.push(function() {
+        start();
+        // Restore _gaq
+        window._gaq = orig_gaq;
+
+        // Remove previous accounts
+        _gas._accounts = {};
+        _gas._accounts_length = 0;
+        _gas._default_tracker = '_gas1';
+    });
 });
 
 test('_gaq1 is always the first unamed account', function() {

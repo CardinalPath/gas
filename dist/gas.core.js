@@ -50,6 +50,7 @@ window['_gas'] = {
     _accounts_length: 0,
     _hooks: {},
     _queue: _prev_gas,
+    _default_tracker: '_gas1',
     gh: {}
 };
 
@@ -81,7 +82,7 @@ window._gas._hooks['_addHook'] = [function(fn, cb) {
  * @return {string} Correct account name to be used already with trailling dot.
  */
 function _build_acct_name(acct) {
-    return acct === '_gas1' ? '' : acct + '.';
+    return acct === window._gas._default_tracker ? '' : acct + '.';
 }
 
 function _gaq_push(arr) {
@@ -260,6 +261,14 @@ window._gas.push(['_addHook', '_popHook', function(func) {
     return false;
 }]);
 
+/**
+ * Hook to set the default tracker.
+ *
+ * The default tracker is the nameless tracker that is pushed into _gaq_push
+ */
+window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
+    window._gas._default_tracker = tname;
+}]);
 /*!
  * GAS - Google Analytics on Steroids
  * Helper Functions
