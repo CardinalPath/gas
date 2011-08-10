@@ -16,7 +16,7 @@ function track_form(form, opt_live) {
     }
 
     function tag_element(e) {
-        var el = e.target;
+        var el = e.target || this;
         var el_name = el.name || el.id || el.type;
         var action_name = e.type;
         var form_name = form.name || form.id;
@@ -36,10 +36,10 @@ function track_form(form, opt_live) {
             try {
                 var el = e.target;
                 if (e.type == 'click' &&
-                  ['button',
-                  'submit',
-                  'image',
-                  'reset'].indexOf(el.type.toLowerCase()) >= 0) {
+                  this.inArray(['button', 'submit', 'image', 'reset'],
+                    el.type.toLowerCase()
+                  )
+                ) {
 
                     tag_element(e);
                 }
@@ -49,10 +49,10 @@ function track_form(form, opt_live) {
             try {
                 var el = e.target;
                 if (e.type == 'change' &&
-                  ['input',
-                  'select',
-                  'textarea',
-                  'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
+                  this.inArray(['input', 'select', 'textarea', 'hidden'],
+                    el.nodeName.toLowerCase()
+                  )
+                ) {
 
                     tag_element(e);
                 }
@@ -65,7 +65,7 @@ function track_form(form, opt_live) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (['button', 'submit', 'image', 'reset'].indexOf(el.type) >= 0) {
+            if (this.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
                 //Button
                 this._addEventListener(el, 'click', tag_element);
             }

@@ -285,6 +285,24 @@ window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
 var gas_helpers = {};
 
 /**
+ * Returns true if the element is foun in the Array, false otherwise.
+ *
+ * @param {Array} obj Array to search at.
+ * @param {object} item Item to search form.
+ * @return {boolean} true if contains.
+ */
+gas_helpers['inArray'] = function(obj, item) {
+    if (obj && obj.length) {
+        for (var i = 0; i < obj.length; i++) {
+            if (obj[i] === item) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+/**
  * Removes special characters and Lowercase String
  *
  * @param {string} str to be sanitized.

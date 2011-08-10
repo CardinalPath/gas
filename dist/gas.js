@@ -285,6 +285,24 @@ window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
 var gas_helpers = {};
 
 /**
+ * Returns true if the element is foun in the Array, false otherwise.
+ *
+ * @param {Array} obj Array to search at.
+ * @param {object} item Item to search form.
+ * @return {boolean} true if contains.
+ */
+gas_helpers['inArray'] = function(obj, item) {
+    if (obj && obj.length) {
+        for (var i = 0; i < obj.length; i++) {
+            if (obj[i] === item) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+/**
  * Removes special characters and Lowercase String
  *
  * @param {string} str to be sanitized.
@@ -408,7 +426,7 @@ function track_form(form, opt_live) {
     }
 
     function tag_element(e) {
-        var el = e.target;
+        var el = e.target || this;
         var el_name = el.name || el.id || el.type;
         var action_name = e.type;
         var form_name = form.name || form.id;
@@ -428,10 +446,10 @@ function track_form(form, opt_live) {
             try {
                 var el = e.target;
                 if (e.type == 'click' &&
-                  ['button',
-                  'submit',
-                  'image',
-                  'reset'].indexOf(el.type.toLowerCase()) >= 0) {
+                  this.inArray(['button', 'submit', 'image', 'reset'],
+                    el.type.toLowerCase()
+                  )
+                ) {
 
                     tag_element(e);
                 }
@@ -441,10 +459,10 @@ function track_form(form, opt_live) {
             try {
                 var el = e.target;
                 if (e.type == 'change' &&
-                  ['input',
-                  'select',
-                  'textarea',
-                  'hidden'].indexOf(el.nodeName.toLowerCase()) >= 0) {
+                  this.inArray(['input', 'select', 'textarea', 'hidden'],
+                    el.nodeName.toLowerCase()
+                  )
+                ) {
 
                     tag_element(e);
                 }
@@ -457,7 +475,7 @@ function track_form(form, opt_live) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (['button', 'submit', 'image', 'reset'].indexOf(el.type) >= 0) {
+            if (this.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
                 //Button
                 this._addEventListener(el, 'click', tag_element);
             }
