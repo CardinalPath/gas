@@ -73,7 +73,7 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
 gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
-        return ofnc.call(this, event);
+        return ofnc.call(obj, event);
     };
     // W3C model
     if (bubble === undefined) {
@@ -85,9 +85,9 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     }
     // Microsoft model
     else if (obj.attachEvent) {
-        return obj.attachEvent('on' + evt, function() {fnc.call(obj);});
+        return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, go on with traditional
+    // Browser don't support W3C or MSFT model, time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
@@ -95,8 +95,8 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
             // Let's wrap it with our own function inside another function
             fnc = (function(f1, f2) {
                 return function() {
-                    f1.apply(obj, arguments);
-                    f2.apply(obj, arguments);
+                    f1.apply(this, arguments);
+                    f2.apply(this, arguments);
                 }
             })(obj[evt], fnc);
         }
