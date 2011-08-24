@@ -1,4 +1,16 @@
-
+/*!
+ * GAS - Google Analytics on Steroids
+ * Outbound Link Tracking plugin
+ *
+ * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * @version $Revision$
+ *
+ * $Date$
+ */
 function _trackOutboundLinks() {
     var links = document.links;
     for (var i = 0; i < links.length; i++) {
