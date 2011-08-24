@@ -854,10 +854,8 @@ function _trackOutboundLinks() {
     }
 }
 
-_gas.push(['_addHook', '_trackOutboundLinks', function(flag) {
-    if (flag === true) {
-        _trackOutboundLinks.call(this);
-    }
+_gas.push(['_addHook', '_trackOutboundLinks', function() {
+    _trackOutboundLinks.call(this);
 }]);
 
 /*!
