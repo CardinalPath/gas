@@ -34,7 +34,8 @@ var document = window.document,
     push = Array.prototype.push,
     slice = Array.prototype.slice,
     trim = String.prototype.trim,
-    indexOf = Array.prototype.indexOf,
+    sindexOf = String.prototype.indexOf,
+    aindexOf = Array.prototype.indexOf,
     url = document.location.href;
 
 
@@ -120,7 +121,7 @@ window._gas._execute = function() {
     }else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
 
-        if (foo.indexOf('.') >= 0) {
+        if (sindexOf.call(foo, '.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
         }else {
@@ -167,7 +168,7 @@ window._gas._execute = function() {
                 String(window._gas._accounts_length + 1);
             // Force that the first unamed account is _gas1
             if (typeof window._gas._accounts['_gas1'] == 'undefined' &&
-                acct_name.indexOf('_gas') != -1) {
+                sindexOf.call(acct_name, '_gas') != -1) {
                 acct_name = '_gas1';
             }
             window._gas._accounts[acct_name] = sub[0];
@@ -344,7 +345,7 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
 gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
-        return ofnc.call(this, event);
+        return ofnc.call(obj, event);
     };
     // W3C model
     if (bubble === undefined) {
@@ -356,9 +357,9 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     }
     // Microsoft model
     else if (obj.attachEvent) {
-        return obj.attachEvent('on' + evt, function() {fnc.call(obj);});
+        return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, go on with traditional
+    // Browser don't support W3C or MSFT model, time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
@@ -366,8 +367,8 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
             // Let's wrap it with our own function inside another function
             fnc = (function(f1, f2) {
                 return function() {
-                    f1.apply(obj, arguments);
-                    f2.apply(obj, arguments);
+                    f1.apply(this, arguments);
+                    f2.apply(this, arguments);
                 }
             })(obj[evt], fnc);
         }

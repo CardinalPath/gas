@@ -73,7 +73,7 @@ form field.
 ::
 
     _gas.push(['_trackForms']);
-    
+
 This is all you need to enable it.
 
 Hooks for _gaq Functions
@@ -157,6 +157,29 @@ user views.
 ::
 
     _gas.push(['_trackMaxScroll']);
+    
+
+Outbound Link Tracking
+~~~~~~~~~~~~~~~~~~~~~~
+
+This function will look for any outbound links on the current page and will
+trigger an event when the link is clicked. It bounds to the `mousedown` 
+javascript event
+
+::
+
+    _gas.push(['_trackOutboundLinks']);
+
+Changing the Page Title
+~~~~~~~~~~~~~~~~~~~~~~~ 
+
+GAS supports a second optional parameter to the _trackPageview that parameter
+is sent to Google Analytics as the page title. If you don't provide this 
+parameter the default is to use the currnt page title.
+
+::
+
+    _gas.push(['_trackPageview', '/my_page', 'My Page Title']);
 
 
 

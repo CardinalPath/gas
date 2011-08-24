@@ -69,7 +69,7 @@ var _internal_domain = undefined;
  * used to track external domains with cookie data.
  */
 _gas.push(['_addHook', '_setDomainName', function(domainName) {
-    if (document.location.hostname.indexOf(domainName) < 0) {
+    if (sindexOf.call(document.location.hostname, domainName) < 0) {
         _external_domains.push(domainName);
         return false;
     }
@@ -106,15 +106,15 @@ function track_links(event_used) {
     }
     for (i = 0; i < document.links.length; i++) {
         el = document.links[i];
-        if (el.href.indexOf('http') == 0) {
+        if (sindexOf.call(el.href, 'http') == 0) {
             // Check to see if it's a internal link
             if (el.hostname == internal ||
-              el.hostname.indexOf(_internal_domain) >= 0) {
+              sindexOf.call(el.hostname, _internal_domain) >= 0) {
                 continue;
             }
             // Tag external Links either now or on mouse event.
             for (j = 0; j < _external_domains.length; j++) {
-                if (el.hostname.indexOf(_external_domains[j]) >= 0) {
+                if (sindexOf.call(el.hostname, _external_domains[j]) >= 0) {
                     if (event_used === 'now') {
                         el.href = gh.tracker._getLinkerUrl(
                             el.href,

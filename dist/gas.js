@@ -34,7 +34,8 @@ var document = window.document,
     push = Array.prototype.push,
     slice = Array.prototype.slice,
     trim = String.prototype.trim,
-    indexOf = Array.prototype.indexOf,
+    sindexOf = String.prototype.indexOf,
+    aindexOf = Array.prototype.indexOf,
     url = document.location.href;
 
 
@@ -120,7 +121,7 @@ window._gas._execute = function() {
     }else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
 
-        if (foo.indexOf('.') >= 0) {
+        if (sindexOf.call(foo, '.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
         }else {
@@ -167,7 +168,7 @@ window._gas._execute = function() {
                 String(window._gas._accounts_length + 1);
             // Force that the first unamed account is _gas1
             if (typeof window._gas._accounts['_gas1'] == 'undefined' &&
-                acct_name.indexOf('_gas') != -1) {
+                sindexOf.call(acct_name, '_gas') != -1) {
                 acct_name = '_gas1';
             }
             window._gas._accounts[acct_name] = sub[0];
@@ -344,7 +345,7 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
 gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
-        return ofnc.call(this, event);
+        return ofnc.call(obj, event);
     };
     // W3C model
     if (bubble === undefined) {
@@ -356,9 +357,9 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
     }
     // Microsoft model
     else if (obj.attachEvent) {
-        return obj.attachEvent('on' + evt, function() {fnc.call(obj);});
+        return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, go on with traditional
+    // Browser don't support W3C or MSFT model, time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
@@ -366,8 +367,8 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
             // Let's wrap it with our own function inside another function
             fnc = (function(f1, f2) {
                 return function() {
-                    f1.apply(obj, arguments);
-                    f2.apply(obj, arguments);
+                    f1.apply(this, arguments);
+                    f2.apply(this, arguments);
                 }
             })(obj[evt], fnc);
         }
@@ -408,6 +409,7 @@ _gas.push(['_addHook', '_trackPageview', function(url, title) {
     }
     return [url];
 }]);
+
 /*!
  * GAS - Google Analytics on Steroids
  * Form Tracking Plugin
@@ -645,7 +647,8 @@ function track_max_scroll() {
             'Max Scroll',
             url,
             String(bucket),
-            Math.round(max_scroll)
+            Math.round(max_scroll),
+            true // non-interactive
         ]);
     });
 
@@ -727,7 +730,7 @@ var _internal_domain = undefined;
  * used to track external domains with cookie data.
  */
 _gas.push(['_addHook', '_setDomainName', function(domainName) {
-    if (document.location.hostname.indexOf(domainName) < 0) {
+    if (sindexOf.call(document.location.hostname, domainName) < 0) {
         _external_domains.push(domainName);
         return false;
     }
@@ -764,15 +767,15 @@ function track_links(event_used) {
     }
     for (i = 0; i < document.links.length; i++) {
         el = document.links[i];
-        if (el.href.indexOf('http') == 0) {
+        if (sindexOf.call(el.href, 'http') == 0) {
             // Check to see if it's a internal link
             if (el.hostname == internal ||
-              el.hostname.indexOf(_internal_domain) >= 0) {
+              sindexOf.call(el.hostname, _internal_domain) >= 0) {
                 continue;
             }
             // Tag external Links either now or on mouse event.
             for (j = 0; j < _external_domains.length; j++) {
-                if (el.hostname.indexOf(_external_domains[j]) >= 0) {
+                if (sindexOf.call(el.hostname, _external_domains[j]) >= 0) {
                     if (event_used === 'now') {
                         el.href = gh.tracker._getLinkerUrl(
                             el.href,
@@ -817,6 +820,46 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * _external_domains and will mark that link to be tagged
  */
 //_gas.push(['_setMultiDomain', 'mousedown']);
+
+function _trackOutboundLinks() {
+    var links = document.links;
+    for (var i = 0; i < links.length; i++) {
+        if (
+            sindexOf.call(links[i].href, 'http') == 0 &&
+            sindexOf.call(links[i].href, document.location.host) < 0
+       ) {
+            this._addEventListener(
+                links[i],
+                'mousedown',
+                (function(l) {
+                    return function() {
+                        var h = l.href.substring(
+                            sindexOf.call(l.href, '//') + 2
+                        );
+                        var i = sindexOf.call(h, '/') > -1 ?
+                            sindexOf.call(h, '/') : undefined;
+                        var j = sindexOf.call(h, '__utma') > -1 ?
+                            sindexOf.call(h, '__utma') : undefined;
+                        _gaq.push(['_trackEvent',
+                            'Outbound',
+                            h.substring(0, i),
+                            h.substring(i, j) || '',
+                            0,
+                            true //non-interactive
+                        ]);
+                    }
+                })(links[i])
+            );
+        }
+    }
+}
+
+_gas.push(['_addHook', '_trackOutboundLinks', function(flag) {
+    if (flag === true) {
+        _trackOutboundLinks.call(this);
+    }
+}]);
+
 /*!
  * Wrap-up
  */

@@ -33,7 +33,8 @@ var document = window.document,
     push = Array.prototype.push,
     slice = Array.prototype.slice,
     trim = String.prototype.trim,
-    indexOf = Array.prototype.indexOf,
+    sindexOf = String.prototype.indexOf,
+    aindexOf = Array.prototype.indexOf,
     url = document.location.href;
 
 
@@ -119,7 +120,7 @@ window._gas._execute = function() {
     }else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
 
-        if (foo.indexOf('.') >= 0) {
+        if (sindexOf.call(foo, '.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
         }else {
@@ -166,7 +167,7 @@ window._gas._execute = function() {
                 String(window._gas._accounts_length + 1);
             // Force that the first unamed account is _gas1
             if (typeof window._gas._accounts['_gas1'] == 'undefined' &&
-                acct_name.indexOf('_gas') != -1) {
+                sindexOf.call(acct_name, '_gas') != -1) {
                 acct_name = '_gas1';
             }
             window._gas._accounts[acct_name] = sub[0];

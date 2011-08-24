@@ -142,7 +142,8 @@ function track_max_scroll() {
             'Max Scroll',
             url,
             String(bucket),
-            Math.round(max_scroll)
+            Math.round(max_scroll),
+            true // non-interactive
         ]);
     });
 
