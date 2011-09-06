@@ -225,7 +225,7 @@ Analytics as the event label. The embedding code should look like this.
 
 ::
 
-    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
+    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1&player_id=7100569" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
 
 .. _Vimeo: http://www.vimeo.com/
 
