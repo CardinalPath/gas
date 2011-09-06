@@ -46,7 +46,7 @@ var document = window.document,
  * everything pushed to _gas is run through possible hooks and then pushed to
  * _gaq
  */
-window['_gas'] = {
+window['_gas'] = _gas = {
     _accounts: {},
     _accounts_length: 0,
     _hooks: {},
@@ -397,10 +397,10 @@ window._gas.push(function() {
  * for this reason this hook must be inserted early on the hook list,
  * so other hooks don't fire twice.
  */
-_gas.push(['_addHook', '_trackPageview', function(url, title) {
+window._gas.push(['_addHook', '_trackPageview', function(url, title) {
     if (title && typeof title === 'string') {
         var oTitle = document.title;
-        _gas.push(
+        window._gas.push(
             function() {document.title = title;},
             ['_trackPageview', url],
             function() {document.title = oTitle;}
@@ -408,6 +408,18 @@ _gas.push(['_addHook', '_trackPageview', function(url, title) {
         return false;
     }
     return [url];
+}]);
+
+/**
+ * Hook to sanity check trackEvents
+ *
+ * The value is rounded and parsed to integer.
+ */
+window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
+    if (val) {
+        val = Math.abs(Math.round(val)) || 0;
+    }
+    return [cat, act, lab, val];
 }]);
 
 /*!
@@ -423,6 +435,7 @@ _gas.push(['_addHook', '_trackPageview', function(url, title) {
  * $Date$
  */
 function track_form(form, opt_live) {
+    var scp = this;
     if (opt_live === undefined) {
         opt_live = false;
     }
@@ -444,11 +457,11 @@ function track_form(form, opt_live) {
 
 
     if (opt_live) {
-        this._addEventListener(document.body, 'click', function(e) {
+        scp._addEventListener(document.body, 'click', function(e) {
             try {
                 var el = e.target;
                 if (e.type == 'click' &&
-                  this.inArray(['button', 'submit', 'image', 'reset'],
+                  scp.inArray(['button', 'submit', 'image', 'reset'],
                     el.type.toLowerCase()
                   )
                 ) {
@@ -457,11 +470,11 @@ function track_form(form, opt_live) {
                 }
             }catch (e) {} //Ignore errors here.
         });
-        this._addEventListener(document.body, 'change', function(e) {
+        scp._addEventListener(document.body, 'change', function(e) {
             try {
                 var el = e.target;
                 if (e.type == 'change' &&
-                  this.inArray(['input', 'select', 'textarea', 'hidden'],
+                  scp.inArray(['input', 'select', 'textarea', 'hidden'],
                     el.nodeName.toLowerCase()
                   )
                 ) {
@@ -477,16 +490,16 @@ function track_form(form, opt_live) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (this.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
+            if (scp.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
                 //Button
-                this._addEventListener(el, 'click', tag_element);
+                scp._addEventListener(el, 'click', tag_element);
             }
             else {
                 //Text field
-                this._addEventListener(el, 'change', tag_element);
+                scp._addEventListener(el, 'change', tag_element);
             }
         }
-        this._addEventListener(form, 'submit', tag_element);
+        scp._addEventListener(form, 'submit', tag_element);
     }
 }
 
@@ -495,9 +508,15 @@ function track_form(form, opt_live) {
  *
  * @param {boolean} opt_live Either it should use live or not. Default to false.
  */
-_gas.push(['_addHook', '_trackForms', function(opt_live) {
+window._gas.push(['_addHook', '_trackForms', function(opt_live) {
+    var scp = this;
     for (var i = 0; i < document.forms.length; i++) {
-        track_form.call(this, document.forms[i], opt_live);
+        try {
+            // I'm not sure why it sometimes fails at Fx4 and ie8
+            //FIXME: Fail with type error since it cant found the helpers on
+            // 'this' object.
+            track_form.call(scp, document.forms[i], opt_live);
+        }catch (e) {}
         if (opt_live) break;
     }
     return false;
@@ -654,7 +673,7 @@ function track_max_scroll() {
 
 }
 
-_gas.push(['_addHook', '_trackMaxSrcoll', function() {
+window._gas.push(['_addHook', '_trackMaxSrcoll', function() {
     this._addEventListener(window, 'scroll', update_scroll_percentage);
     track_max_scroll.call(this);
 }]);
@@ -675,7 +694,7 @@ _gas.push(['_addHook', '_trackMaxSrcoll', function() {
 /**
  * Private variable to store allowAnchor choice
  */
-_gas._allowAnchor = false;
+window._gas._allowAnchor = false;
 
 /**
  * _setAllowAnchor Hook to store choice for easier use of Anchor
@@ -683,14 +702,14 @@ _gas._allowAnchor = false;
  * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
  * used the same by default
  */
-_gas.push(['_addHook', '_setAllowAnchor', function(val) {
+window._gas.push(['_addHook', '_setAllowAnchor', function(val) {
     _gas._allowAnchor = val;
 }]);
 
 /**
  * _link Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_link', function(url, use_anchor) {
+window._gas.push(['_addHook', '_link', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -700,7 +719,7 @@ _gas.push(['_addHook', '_link', function(url, use_anchor) {
 /**
  * _linkByPost Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+window._gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -820,7 +839,19 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * _external_domains and will mark that link to be tagged
  */
 //_gas.push(['_setMultiDomain', 'mousedown']);
-
+/*!
+ * GAS - Google Analytics on Steroids
+ * Outbound Link Tracking plugin
+ *
+ * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * @version $Revision$
+ *
+ * $Date$
+ */
 function _trackOutboundLinks() {
     var links = document.links;
     for (var i = 0; i < links.length; i++) {
@@ -854,9 +885,69 @@ function _trackOutboundLinks() {
     }
 }
 
-_gas.push(['_addHook', '_trackOutboundLinks', function() {
+window._gas.push(['_addHook', '_trackOutboundLinks', function() {
     _trackOutboundLinks.call(this);
 }]);
+
+/*!
+ * GAS - Google Analytics on Steroids
+ * Video Tracking plugin
+ *
+ * Supports Vimeo only
+ *
+ * Copyright 2011, Cardinal Path
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * @version $Revision$
+ *
+ * $Date$
+ */
+
+
+function postMessage(method, params, target) {
+    if (!target.contentWindow.postMessage) {
+        return false;
+    }
+    var url = target.getAttribute('src').split('?')[0],
+        data = JSON.stringify({
+            method: method,
+            value: params
+        });
+    target.contentWindow.postMessage(data, url);
+}
+
+var _has_vimeo_window_event = false;
+function _trackVimeo() {
+    var iframes = document.getElementsByTagName('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+        if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > 0) {
+            postMessage('addEventListener', 'play', iframes[i]);
+            postMessage('addEventListener', 'pause', iframes[i]);
+            postMessage('addEventListener', 'finish', iframes[i]);
+        }
+    }
+    if (_has_vimeo_window_event === false) {
+        this._addEventListener(window, 'message', function(event) {
+            if (sindexOf.call(event.origin, '//player.vimeo.com')) {
+                var data = JSON.parse(event.data);
+                if (data.event === 'ready') {
+                    _trackVimeo(); // Force rerun since a player is ready
+                }else {
+                    _gas.push(['_trackEvent', 'Vimeo Video',
+                        data.event, data.player_id]);
+                }
+            }
+
+        }, false);
+        _has_vimeo_window_event = true;
+    }
+}
+
+window._gas.push(['_addHook', '_trackVimeo', function() {
+    _trackVimeo.call(this);
+}]);
+
 
 /*!
  * Wrap-up

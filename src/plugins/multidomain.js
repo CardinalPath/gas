@@ -14,7 +14,7 @@
 /**
  * Private variable to store allowAnchor choice
  */
-_gas._allowAnchor = false;
+window._gas._allowAnchor = false;
 
 /**
  * _setAllowAnchor Hook to store choice for easier use of Anchor
@@ -22,14 +22,14 @@ _gas._allowAnchor = false;
  * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
  * used the same by default
  */
-_gas.push(['_addHook', '_setAllowAnchor', function(val) {
+window._gas.push(['_addHook', '_setAllowAnchor', function(val) {
     _gas._allowAnchor = val;
 }]);
 
 /**
  * _link Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_link', function(url, use_anchor) {
+window._gas.push(['_addHook', '_link', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -39,7 +39,7 @@ _gas.push(['_addHook', '_link', function(url, use_anchor) {
 /**
  * _linkByPost Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+window._gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }

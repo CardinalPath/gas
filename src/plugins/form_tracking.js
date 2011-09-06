@@ -11,6 +11,7 @@
  * $Date$
  */
 function track_form(form, opt_live) {
+    var scp = this;
     if (opt_live === undefined) {
         opt_live = false;
     }
@@ -32,11 +33,11 @@ function track_form(form, opt_live) {
 
 
     if (opt_live) {
-        this._addEventListener(document.body, 'click', function(e) {
+        scp._addEventListener(document.body, 'click', function(e) {
             try {
                 var el = e.target;
                 if (e.type == 'click' &&
-                  this.inArray(['button', 'submit', 'image', 'reset'],
+                  scp.inArray(['button', 'submit', 'image', 'reset'],
                     el.type.toLowerCase()
                   )
                 ) {
@@ -45,11 +46,11 @@ function track_form(form, opt_live) {
                 }
             }catch (e) {} //Ignore errors here.
         });
-        this._addEventListener(document.body, 'change', function(e) {
+        scp._addEventListener(document.body, 'change', function(e) {
             try {
                 var el = e.target;
                 if (e.type == 'change' &&
-                  this.inArray(['input', 'select', 'textarea', 'hidden'],
+                  scp.inArray(['input', 'select', 'textarea', 'hidden'],
                     el.nodeName.toLowerCase()
                   )
                 ) {
@@ -65,16 +66,16 @@ function track_form(form, opt_live) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (this.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
+            if (scp.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
                 //Button
-                this._addEventListener(el, 'click', tag_element);
+                scp._addEventListener(el, 'click', tag_element);
             }
             else {
                 //Text field
-                this._addEventListener(el, 'change', tag_element);
+                scp._addEventListener(el, 'change', tag_element);
             }
         }
-        this._addEventListener(form, 'submit', tag_element);
+        scp._addEventListener(form, 'submit', tag_element);
     }
 }
 
@@ -83,9 +84,15 @@ function track_form(form, opt_live) {
  *
  * @param {boolean} opt_live Either it should use live or not. Default to false.
  */
-_gas.push(['_addHook', '_trackForms', function(opt_live) {
+window._gas.push(['_addHook', '_trackForms', function(opt_live) {
+    var scp = this;
     for (var i = 0; i < document.forms.length; i++) {
-        track_form.call(this, document.forms[i], opt_live);
+        try {
+            // I'm not sure why it sometimes fails at Fx4 and ie8
+            //FIXME: Fail with type error since it cant found the helpers on
+            // 'this' object.
+            track_form.call(scp, document.forms[i], opt_live);
+        }catch (e) {}
         if (opt_live) break;
     }
     return false;

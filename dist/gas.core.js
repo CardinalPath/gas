@@ -46,7 +46,7 @@ var document = window.document,
  * everything pushed to _gas is run through possible hooks and then pushed to
  * _gaq
  */
-window['_gas'] = {
+window['_gas'] = _gas = {
     _accounts: {},
     _accounts_length: 0,
     _hooks: {},
