@@ -204,8 +204,8 @@ or just to one of the accounts you configured,
 
 .. _gas-license:
 
-Vimeo Vido Trackig
-~~~~~~~~~~~~~~~~~~
+Vimeo Video Trackig
+~~~~~~~~~~~~~~~~~~~
 You can track Vimeo_ video events. You must be using the iframe method 
 of embeding videos. 
 
