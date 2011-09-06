@@ -207,7 +207,13 @@ or just to one of the accounts you configured,
 Vimeo Vido Trackig
 ~~~~~~~~~~~~~~~~~~
 You can track Vimeo_ video events. You must be using the iframe method 
-of embeding videos. After you enable it the following events will be tracked. 
+of embeding videos. 
+
+::
+
+    _gas.push(['_trackVimeo']);
+
+After you enable it the following events will be tracked. 
 
  * play
  * pause
@@ -215,15 +221,17 @@ of embeding videos. After you enable it the following events will be tracked.
 
 You must append to the video url the parameters `api=1&player_id=XXX` replace 
 `XXX` with a descriptive id for this video. The player_id will be sent to Google
-Analytics as the event label.
+Analytics as the event label. The embedding code should look like this.
+
+::
+
+    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
 
 .. _Vimeo: http://www.vimeo.com/
 
 
 
-::
 
-    _gas.push(['_trackVimeo']);
 
 License
 -------
