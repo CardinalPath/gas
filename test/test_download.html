@@ -1,0 +1,29 @@
+<html>
+<head>
+    <script type="text/javascript">
+        var _gas = _gas || [];
+        _gas.push(['_setDebug', true]);
+        _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+        _gas.push(['_trackPageview', '/test']);
+        _gas.push(['_trackDownloads', 'torrent,gz']);
+
+        (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.min.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+    <ul>
+    <li><a href="/test.mp3">MP3</a></li>
+    <li><a href="/test.mp3?cb=1">MP3 with CB</a></li>
+    <li><a href="/test.mp7">Dont track</a></li>
+    <li><a href="/test.torrent">Torrent (custom added)</a></li>
+    <li><a href="/test.gz">Gz (custom added)</a></li>
+    </ul>
+</body>
+</html>

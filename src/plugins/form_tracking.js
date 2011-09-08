@@ -19,9 +19,6 @@
  */
 function track_form(form, opt_live) {
     var scp = this;
-    if (opt_live === undefined) {
-        opt_live = false;
-    }
 
     function tag_element(e) {
         var el = e.target || this;
