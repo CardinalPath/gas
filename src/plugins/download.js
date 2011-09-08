@@ -1,15 +1,12 @@
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Download Tracking plugin
  *
- * Copyright 2011, Direct Performance
- * Copyright 2011, Cardinal Path
+ * Download Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**
@@ -18,6 +15,7 @@
  * Will extract the extensions from a url and check if it matches one of
  * possible options. Used to verify if a url corresponds to a download link.
  *
+ * @this {object} GA Helper object.
  * @param {string} src The url to check.
  * @param {Array} extensions an Array with strings containing the possible
  * extensions.
@@ -39,6 +37,7 @@ function _checkFile(src, extensions) {
 /**
  * Register the event to listen to downloads
  *
+ * @this {object} GA Helper object.
  * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {

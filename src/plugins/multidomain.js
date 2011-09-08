@@ -1,14 +1,12 @@
-/*!
+/**
  * GAS - Google Analytics on Steroids
+ *
  * Multi-Domain Tracking Plugin
  *
- * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**

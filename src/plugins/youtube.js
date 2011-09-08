@@ -1,17 +1,21 @@
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * YouTube embedded Video Tracking plugin
  *
+ * YouTube Video Tracking Plugin
  *
- * Copyright 2011, Cardinal Path
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
+/**
+ * Called when the Video State changes
+ *
+ * We are currently tracking only finish, play and pause events
+ *
+ * @param {Object} event the event passed by the YT api.
+ */
 function _ytStateChange(event) {
     var action = '';
     switch (event.data) {
@@ -32,10 +36,25 @@ function _ytStateChange(event) {
     }
 }
 
+/**
+ * Called when the player fires an Error Event
+ *
+ * @param {Object} event the event passed by the YT api.
+ */
 function _ytError(event) {
     _gas.push(['_trackEvent', 'YouTube Video', 'error', event.data]);
 }
 
+/**
+ * Triggers the YouTube Tracking on the page
+ *
+ * Only works for the iframe tag. The video must have the parameter
+ * enablejsapi=1 on the url in order to make the tracking work.
+ *
+ * @param {(string|boolean)} force evaluates to true if we should force the
+ * enablejsapi=1 parameter on the url to activate the api. May cause the player
+ * to reload.
+ */
 function _trackYoutube(force) {
     var youtube_videos = [];
     var iframes = document.getElementsByTagName('iframe');

@@ -1,15 +1,22 @@
-(function(window, undefined) {
-/*!
- * GAS - Google Analytics on Steroids v0.1
+/**
+ * @preserve Copyright 2011, Cardinal Path and Direct Performance.
  *
- * @preserve Copyright 2011, Cardinal Path
- * @preserve Copyright 2011, Direct Performance
+ * GAS - Google Analytics on Steroids
+ * https://bitbucket.org/dpc/gas
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * $Revision$
+ * $Date$
+ * Licensed under the MIT license.
+ */
+(function(window, undefined) {
+/**
+ * GAS - Google Analytics on Steroids
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**
@@ -270,17 +277,15 @@ window._gas.push(['_addHook', '_popHook', function(func) {
 window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
     window._gas._default_tracker = tname;
 }]);
-/*!
+/**
  * GAS - Google Analytics on Steroids
+ *
  * Helper Functions
  *
- * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 var gas_helpers = {};
@@ -420,18 +425,15 @@ window._gas.push(['_addHook', '_trackPageview', function(url, title) {
     return [url];
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Download Tracking plugin
  *
- * Copyright 2011, Direct Performance
- * Copyright 2011, Cardinal Path
+ * Download Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**
@@ -440,6 +442,7 @@ window._gas.push(['_addHook', '_trackPageview', function(url, title) {
  * Will extract the extensions from a url and check if it matches one of
  * possible options. Used to verify if a url corresponds to a download link.
  *
+ * @this {object} GA Helper object.
  * @param {string} src The url to check.
  * @param {Array} extensions an Array with strings containing the possible
  * extensions.
@@ -461,7 +464,8 @@ function _checkFile(src, extensions) {
 /**
  * Register the event to listen to downloads
  *
- * @param {Array} List of possible extensions for download links.
+ * @this {object} GA Helper object.
+ * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {
 var gh = this;
@@ -511,17 +515,24 @@ window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
     return [cat, act, lab, val];
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
+ *
  * Form Tracking Plugin
  *
- * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
+ */
+
+/**
+ * Enable form tracking for 1 form
  *
- * $Date$
+ * @this {Object} The Ga Helper object
+ * @param {HTMLFormElement} form The form element to be tagged.
+ * @param {boolean=} opt_live if we should use live binding. Defaults to false.
+ * @return {boolean} false if the form has no elements.
  */
 function track_form(form, opt_live) {
     var scp = this;
@@ -546,7 +557,7 @@ function track_form(form, opt_live) {
 
 
     if (opt_live) {
-        scp._addEventListener(document.body, 'click', function(e) {
+        scp._addEventListener(window, 'click', function(e) {
             try {
                 var el = e.target;
                 if (e.type == 'click' &&
@@ -572,6 +583,7 @@ function track_form(form, opt_live) {
                 }
             }catch (e) {} //Ignore errors here.
         });
+        //TODO: Track the submit on live binding
     }else {
         var i, el;
         if (!form.elements || !form.elements.length) {
@@ -592,11 +604,6 @@ function track_form(form, opt_live) {
     }
 }
 
-/**
- * Triggers the execution
- *
- * @param {boolean} opt_live Either it should use live or not. Default to false.
- */
 window._gas.push(['_addHook', '_trackForms', function(opt_live) {
     var scp = this;
     for (var i = 0; i < document.forms.length; i++) {
@@ -611,19 +618,15 @@ window._gas.push(['_addHook', '_trackForms', function(opt_live) {
     return false;
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Max Scroll Tracking Plugin
  *
- * Copyright 2011, Direct Performance
+ * Max-Scroll Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * Based on http://www.howtocreate.co.uk/tutorials/javascript/browserwindow
- *
- * $Date$
  */
 
 /**
@@ -767,17 +770,15 @@ window._gas.push(['_addHook', '_trackMaxSrcoll', function() {
     track_max_scroll.call(this);
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
+ *
  * Multi-Domain Tracking Plugin
  *
- * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**
@@ -928,18 +929,21 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * _external_domains and will mark that link to be tagged
  */
 //_gas.push(['_setMultiDomain', 'mousedown']);
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Outbound Link Tracking plugin
  *
- * Copyright 2011, Direct Performance
- * Copyright 2011, Cardinal Path
+ * Outbound Link Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
+ */
+
+/**
+ * Triggers the Outbound Link Tracking on the page
  *
- * $Date$
+ * @this {object} GA Helper object.
  */
 function _trackOutboundLinks() {
     var links = document.links;
@@ -978,22 +982,27 @@ window._gas.push(['_addHook', '_trackOutboundLinks', function() {
     _trackOutboundLinks.call(this);
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Vimeo Video Tracking plugin
  *
- * Copyright 2011, Cardinal Path
+ * Vimeo Video Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
-
+/**
+ * Helper function to post messages to a vimeo player
+ *
+ * @param {string} method The method from the vimeo API.
+ * @param {string} params to be passed as the value of the method.
+ * @param {object} target Iframe DOM Element for the Vimeo player.
+ * @return {boolean} true if it worked or false otherwise.
+ */
 function _vimeoPostMessage(method, params, target) {
-    if (!target.contentWindow.postMessage) {
+    if (!target.contentWindow || !target.contentWindow.postMessage) {
         return false;
     }
     var url = target.getAttribute('src').split('?')[0],
@@ -1002,10 +1011,33 @@ function _vimeoPostMessage(method, params, target) {
             value: params
         });
     target.contentWindow.postMessage(data, url);
+    return true;
 }
 
+/**
+ * Cached urls for vimeo players on the page.
+ *
+ * @type {object}
+ */
 var _vimeo_urls = {};
+
+/**
+ * Flag that indicates if the global listener has been bind to the window
+ * @type {boolean}
+ */
 var _has_vimeo_window_event = false;
+
+/**
+ * Triggers the Vimeo Tracking on the page
+ *
+ * Only works for the Universal Tag from Vimeo (iframe). The video must have
+ * the parameter api=1 on the url in order to make the tracking work.
+ *
+ * @this {object} GA Helper object.
+ * @param {(string|boolean)} force evaluates to true if we should force the
+ * api=1 parameter on the url to activate the api. May cause the player to
+ * reload.
+ */
 function _trackVimeo(force) {
     var iframes = document.getElementsByTagName('iframe');
     var vimeo_videos = 0;
@@ -1073,20 +1105,24 @@ window._gas.push(['_addHook', '_trackVimeo', function(force) {
     return false;
 }]);
 
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * YouTube embedded Video Tracking plugin
  *
+ * YouTube Video Tracking Plugin
  *
- * Copyright 2011, Cardinal Path
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
+/**
+ * Called when the Video State changes
+ *
+ * We are currently tracking only finish, play and pause events
+ *
+ * @param {Object} event the event passed by the YT api.
+ */
 function _ytStateChange(event) {
     var action = '';
     switch (event.data) {
@@ -1107,10 +1143,25 @@ function _ytStateChange(event) {
     }
 }
 
+/**
+ * Called when the player fires an Error Event
+ *
+ * @param {Object} event the event passed by the YT api.
+ */
 function _ytError(event) {
     _gas.push(['_trackEvent', 'YouTube Video', 'error', event.data]);
 }
 
+/**
+ * Triggers the YouTube Tracking on the page
+ *
+ * Only works for the iframe tag. The video must have the parameter
+ * enablejsapi=1 on the url in order to make the tracking work.
+ *
+ * @param {(string|boolean)} force evaluates to true if we should force the
+ * enablejsapi=1 parameter on the url to activate the api. May cause the player
+ * to reload.
+ */
 function _trackYoutube(force) {
     var youtube_videos = [];
     var iframes = document.getElementsByTagName('iframe');
@@ -1157,7 +1208,7 @@ window._gas.push(['_addHook', '_trackYoutube', function(force) {
     return false;
 }]);
 
-/*!
+/**
  * Wrap-up
  */
 // Execute previous functions

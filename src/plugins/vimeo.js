@@ -1,19 +1,24 @@
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Vimeo Video Tracking plugin
  *
- * Copyright 2011, Cardinal Path
+ * Vimeo Video Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
-
+/**
+ * Helper function to post messages to a vimeo player
+ *
+ * @param {string} method The method from the vimeo API.
+ * @param {string} params to be passed as the value of the method.
+ * @param {object} target Iframe DOM Element for the Vimeo player.
+ * @return {boolean} true if it worked or false otherwise.
+ */
 function _vimeoPostMessage(method, params, target) {
-    if (!target.contentWindow.postMessage) {
+    if (!target.contentWindow || !target.contentWindow.postMessage) {
         return false;
     }
     var url = target.getAttribute('src').split('?')[0],
@@ -22,10 +27,33 @@ function _vimeoPostMessage(method, params, target) {
             value: params
         });
     target.contentWindow.postMessage(data, url);
+    return true;
 }
 
+/**
+ * Cached urls for vimeo players on the page.
+ *
+ * @type {object}
+ */
 var _vimeo_urls = {};
+
+/**
+ * Flag that indicates if the global listener has been bind to the window
+ * @type {boolean}
+ */
 var _has_vimeo_window_event = false;
+
+/**
+ * Triggers the Vimeo Tracking on the page
+ *
+ * Only works for the Universal Tag from Vimeo (iframe). The video must have
+ * the parameter api=1 on the url in order to make the tracking work.
+ *
+ * @this {object} GA Helper object.
+ * @param {(string|boolean)} force evaluates to true if we should force the
+ * api=1 parameter on the url to activate the api. May cause the player to
+ * reload.
+ */
 function _trackVimeo(force) {
     var iframes = document.getElementsByTagName('iframe');
     var vimeo_videos = 0;

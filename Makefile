@@ -21,16 +21,18 @@ all: gas.js gas.core.js gas.min.js gas.core.min.js
 gas.js: $(JSFILES)
 	# for debugging
 	# grep "console" $^
-	echo "(function(window, undefined) {" > dist/$@
+	cat src/header.js > dist/$@
+	echo "(function(window, undefined) {" >> dist/$@
 	cat $^ >> dist/$@
 	echo "})(window);" >> dist/$@
-	$(CLOSURE_LINTER) dist/$@
+	# $(CLOSURE_LINTER) dist/$@
 
 gas.core.js: $(COREJSFILES) $(WRAPUP)
-	echo "(function(window, undefined) {" > dist/$@
+	cat src/header.js > dist/$@
+	echo "(function(window, undefined) {" >> dist/$@
 	cat $^ >> dist/$@
 	echo "})(window);" >> dist/$@
-	$(CLOSURE_LINTER) dist/$@
+	# $(CLOSURE_LINTER) dist/$@
 
 gas.min.js: gas.js
 	$(CLOSURE_COMPILER) --js dist/$< --js_output_file dist/$@

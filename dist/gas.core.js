@@ -1,15 +1,22 @@
-(function(window, undefined) {
-/*!
- * GAS - Google Analytics on Steroids v0.1
+/**
+ * @preserve Copyright 2011, Cardinal Path and Direct Performance.
  *
- * @preserve Copyright 2011, Cardinal Path
- * @preserve Copyright 2011, Direct Performance
+ * GAS - Google Analytics on Steroids
+ * https://bitbucket.org/dpc/gas
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * $Revision$
+ * $Date$
+ * Licensed under the MIT license.
+ */
+(function(window, undefined) {
+/**
+ * GAS - Google Analytics on Steroids
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 /**
@@ -270,17 +277,15 @@ window._gas.push(['_addHook', '_popHook', function(func) {
 window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
     window._gas._default_tracker = tname;
 }]);
-/*!
+/**
  * GAS - Google Analytics on Steroids
+ *
  * Helper Functions
  *
- * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * $Date$
  */
 
 var gas_helpers = {};
@@ -400,7 +405,7 @@ window._gas.push(function() {
 
 });
 
-/*!
+/**
  * Wrap-up
  */
 // Execute previous functions

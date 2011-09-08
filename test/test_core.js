@@ -3,6 +3,9 @@ module('core');
 
 if (typeof console === 'undefined') {
     var console = {};
+    /**
+     * Dummy function
+     */
     console.log = function() {};
 }
 
@@ -406,7 +409,8 @@ test('Handle Repeates UA number', function() {
         _gas3: 'UA-XXXXX-2'
     };
 
-    deepEqual(_gas._accounts, expected_accs, 'Overwrites repeated account when it uses named tracker');
+    deepEqual(_gas._accounts, expected_accs,
+        'Overwrites repeated account when it uses named tracker');
 
     _gas.push(function() {
         start();

@@ -1,16 +1,12 @@
-/*!
+/**
  * GAS - Google Analytics on Steroids
- * Max Scroll Tracking Plugin
  *
- * Copyright 2011, Direct Performance
+ * Max-Scroll Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
  * Licensed under the MIT license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * @version $Revision$
- *
- * Based on http://www.howtocreate.co.uk/tutorials/javascript/browserwindow
- *
- * $Date$
  */
 
 /**
