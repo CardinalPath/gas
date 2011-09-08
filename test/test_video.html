@@ -1,0 +1,34 @@
+<html>
+<head>
+    <script type="text/javascript">
+        var _gas = _gas || [];
+        _gas.push(['_setDebug', true]);
+        _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+        _gas.push(['_trackPageview', '/test']);
+        _gas.push(['_trackYoutube', 'force']);
+        _gas.push(['_trackVimeo', 'force']);
+
+        (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.min.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+    <div>
+    <iframe frameborder="0" title="YouTube video player" type="text/html" height="390" width="640" src="http://www.youtube.com/embed/u1zgFlCw8Aw?enablejsapi=1"></iframe>
+    </div>
+    
+    <div>
+    <iframe width="640" height="510" src="http://www.youtube.com/embed/d7b0jT19Bho" frameborder="0" allowfullscreen></iframe>
+    </div>
+    
+    <div>
+    <iframe src="http://player.vimeo.com/video/7100569" width="400" height="300" frameborder="0"></iframe>
+    </div>
+</body>
+</html>
