@@ -544,9 +544,6 @@ _gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
  */
 function track_form(form, opt_live) {
     var scp = this;
-    if (opt_live === undefined) {
-        opt_live = false;
-    }
 
     function tag_element(e) {
         var el = e.target || this;
@@ -965,7 +962,7 @@ function _trackOutboundLinks() {
                             sindexOf.call(h, '/') : undefined;
                         var j = sindexOf.call(h, '__utma') > -1 ?
                             sindexOf.call(h, '__utma') : undefined;
-                        _gaq.push(['_trackEvent',
+                        _gas.push(['_trackEvent',
                             'Outbound',
                             h.substring(0, i),
                             h.substring(i, j) || '',
@@ -1126,20 +1123,20 @@ _gas.push(['_addHook', '_trackVimeo', function(force) {
  */
 function _ytStateChange(event) {
     var action = '';
-    switch (event.data) {
-        case YT.PlayerState.ENDED:
+    switch (event['data']) {
+        case 0:
             action = 'finish';
             break;
-        case YT.PlayerState.PLAYING:
+        case 1:
             action = 'play';
             break;
-        case YT.PlayerState.PAUSED:
+        case 2:
             action = 'pause';
             break;
     }
     if (action) {
         _gas.push(['_trackEvent',
-            'YouTube Video', action, event.target.getVideoUrl()
+            'YouTube Video', action, event['target']['getVideoUrl']()
         ]);
     }
 }
@@ -1150,7 +1147,11 @@ function _ytStateChange(event) {
  * @param {Object} event the event passed by the YT api.
  */
 function _ytError(event) {
-    _gas.push(['_trackEvent', 'YouTube Video', 'error', event.data]);
+    _gas.push(['_trackEvent',
+        'YouTube Video',
+        'error (' + event['data'] + ')',
+        event['target']['getVideoUrl']()
+    ]);
 }
 
 /**
@@ -1186,10 +1187,10 @@ function _trackYoutube(force) {
     }
     if (youtube_videos.length > 0) {
         // this function will be called when the youtube api loads
-        window.onYouTubePlayerAPIReady = function() {
+        window['onYouTubePlayerAPIReady'] = function() {
             var p;
             for (var i = 0; i < youtube_videos.length; i++) {
-                p = new YT.Player(youtube_videos[i]);
+                p = new window['YT']['Player'](youtube_videos[i]);
                 p.addEventListener('onStateChange', _ytStateChange);
                 p.addEventListener('onError', _ytError);
             }
@@ -1214,7 +1215,7 @@ _gas.push(['_addHook', '_trackYoutube', function(force) {
  */
 // Execute previous functions
 while (_gas._queue.length > 0) {
-    _gas.push(window._gas._queue.shift());
+    _gas.push(_gas._queue.shift());
 }
 
 // Import ga.js

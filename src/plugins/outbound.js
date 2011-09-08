@@ -33,7 +33,7 @@ function _trackOutboundLinks() {
                             sindexOf.call(h, '/') : undefined;
                         var j = sindexOf.call(h, '__utma') > -1 ?
                             sindexOf.call(h, '__utma') : undefined;
-                        _gaq.push(['_trackEvent',
+                        _gas.push(['_trackEvent',
                             'Outbound',
                             h.substring(0, i),
                             h.substring(i, j) || '',
