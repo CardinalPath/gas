@@ -496,9 +496,9 @@ var gh = this;
  * @param {string|Array} extensions additional file extensions to track as
  * downloads.
  */
-_gas.push(['_addHook', '_trackDownload', function(extensions) {
+_gas.push(['_addHook', '_trackDownloads', function(extensions) {
     var ext = 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip';
-    ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3';
+    ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv';
     ext = ext.split(',');
     if (typeof extensions === 'string') {
         ext = ext.concat(extensions.split(','));
@@ -583,7 +583,7 @@ function track_form(form, opt_live) {
                 var el = e.target;
                 if (e.type == 'change' &&
                   scp.inArray(['input', 'select', 'textarea', 'hidden'],
-                    el.nodeName.toLowerCase()
+                    el.tagName.toLowerCase()
                   )
                 ) {
 
