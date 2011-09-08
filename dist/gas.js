@@ -304,6 +304,16 @@ gas_helpers['inArray'] = function(obj, item) {
 };
 
 /**
+ * Checks if the object is an Array
+ *
+ * @param {object} obj Object to check.
+ * @return {boolean} true if the object is an Array.
+ */
+gas_helpers['isArray'] = function(obj) {
+    return toString.call(obj) === '[object Array]';
+};
+
+/**
  * Removes special characters and Lowercase String
  *
  * @param {string} str to be sanitized.
@@ -410,14 +420,52 @@ window._gas.push(['_addHook', '_trackPageview', function(url, title) {
     return [url];
 }]);
 
+/*!
+ * GAS - Google Analytics on Steroids
+ * Download Tracking plugin
+ *
+ * Copyright 2011, Direct Performance
+ * Copyright 2011, Cardinal Path
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * @version $Revision$
+ *
+ * $Date$
+ */
+
+function _trackDownloads(extensions) {
+
+}
+
+/**
+ * TODO: Write doc
+ *
+ * @param {string|Array} extensions additional file extensions to track as
+ * downloads.
+ */
+window._gas.push(['_addHook', '_trackDownloads', function(extensions) {
+    var ext = 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip';
+    ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3';
+    ext = ext.split(',');
+    if (typeof extensions === 'string') {
+        ext = ext.concat(extensions.split(','));
+    }else if (this.isArray(extensions)) {
+        ext = ext.concat(extensions);
+    }
+    return _trackDownloads(ext);
+}]);
+
 /**
  * Hook to sanity check trackEvents
  *
  * The value is rounded and parsed to integer.
+ * Negative values are sent as zero.
+ * If val is NaN than it is sent as zero.
  */
 window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
     if (val) {
-        val = Math.abs(Math.round(val)) || 0;
+        val = (val < 0 ? 0 : Math.round(val)) || 0;
     }
     return [cat, act, lab, val];
 }]);
@@ -891,9 +939,7 @@ window._gas.push(['_addHook', '_trackOutboundLinks', function() {
 
 /*!
  * GAS - Google Analytics on Steroids
- * Video Tracking plugin
- *
- * Supports Vimeo only
+ * Vimeo Video Tracking plugin
  *
  * Copyright 2011, Cardinal Path
  * Licensed under the MIT license.
@@ -905,7 +951,7 @@ window._gas.push(['_addHook', '_trackOutboundLinks', function() {
  */
 
 
-function postMessage(method, params, target) {
+function _vimeoPostMessage(method, params, target) {
     if (!target.contentWindow.postMessage) {
         return false;
     }
@@ -917,25 +963,62 @@ function postMessage(method, params, target) {
     target.contentWindow.postMessage(data, url);
 }
 
+var _vimeo_urls = {};
 var _has_vimeo_window_event = false;
-function _trackVimeo() {
+function _trackVimeo(force) {
     var iframes = document.getElementsByTagName('iframe');
+    var vimeo_videos = 0;
+    var player_id;
+    var player_src;
+    var separator;
     for (var i = 0; i < iframes.length; i++) {
-        if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > 0) {
-            postMessage('addEventListener', 'play', iframes[i]);
-            postMessage('addEventListener', 'pause', iframes[i]);
-            postMessage('addEventListener', 'finish', iframes[i]);
+        if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > -1) {
+            player_id = 'gas_vimeo_' + i;
+            player_src = iframes[i].src;
+            separator = '?';
+            if (sindexOf.call(player_src, '?') > -1) {
+                separator = '&';
+            }
+            if (sindexOf.call(player_src, 'api=1') < 0) {
+                if (force) {
+                    // Reload the video enabling the api
+                    player_src += separator + 'api=1&player_id=' + player_id;
+                }else {
+                    // We won't track players that don't have api enabled.
+                    break;
+                }
+            }else {
+                if (sindexOf.call(player_src, 'player_id=') < -1) {
+                    player_src += separator + 'player_id=' + player_id;
+                }
+            }
+            vimeo_videos++;
+            iframes[i].id = player_id;
+            if (iframes[i].src !== player_src) {
+                iframes[i].src = player_src;
+                break; // break to wait until it is ready since we reloaded it.
+            }
+            // We need to cache the video url since vimeo won't provide it
+            // in the event
+            _vimeoPostMessage('getVideoUrl', '', iframes[i]);
+            _vimeoPostMessage('addEventListener', 'play', iframes[i]);
+            _vimeoPostMessage('addEventListener', 'pause', iframes[i]);
+            _vimeoPostMessage('addEventListener', 'finish', iframes[i]);
         }
     }
-    if (_has_vimeo_window_event === false) {
+    if (vimeo_videos > 0 && _has_vimeo_window_event === false) {
         this._addEventListener(window, 'message', function(event) {
-            if (sindexOf.call(event.origin, '//player.vimeo.com')) {
+            if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
                 var data = JSON.parse(event.data);
                 if (data.event === 'ready') {
                     _trackVimeo(); // Force rerun since a player is ready
-                }else {
+                }else if (data.method) {
+                    if (data.method == 'getVideoUrl') {
+                        _vimeo_urls[data.player_id] = data.value;
+                    }
+                } else {
                     _gas.push(['_trackEvent', 'Vimeo Video',
-                        data.event, data.player_id]);
+                        data.event, _vimeo_urls[data.player_id]]);
                 }
             }
 
@@ -944,10 +1027,94 @@ function _trackVimeo() {
     }
 }
 
-window._gas.push(['_addHook', '_trackVimeo', function() {
-    _trackVimeo.call(this);
+window._gas.push(['_addHook', '_trackVimeo', function(force) {
+    _trackVimeo.call(this, force);
+    return false;
 }]);
 
+/*!
+ * GAS - Google Analytics on Steroids
+ * YouTube embedded Video Tracking plugin
+ *
+ *
+ * Copyright 2011, Cardinal Path
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ * @version $Revision$
+ *
+ * $Date$
+ */
+
+function _ytStateChange(event) {
+    var action = '';
+    switch (event.data) {
+        case YT.PlayerState.ENDED:
+            action = 'finish';
+            break;
+        case YT.PlayerState.PLAYING:
+            action = 'play';
+            break;
+        case YT.PlayerState.PAUSED:
+            action = 'pause';
+            break;
+    }
+    if (action) {
+        _gas.push(['_trackEvent',
+            'YouTube Video', action, event.target.getVideoUrl()
+        ]);
+    }
+}
+
+function _ytError(event) {
+    _gas.push(['_trackEvent', 'YouTube Video', 'error', event.data]);
+}
+
+function _trackYoutube(force) {
+    var youtube_videos = [];
+    var iframes = document.getElementsByTagName('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+        if (sindexOf.call(iframes[i].src, '//www.youtube.com/embed') > -1) {
+            if (sindexOf.call(iframes[i].src, 'enablejsapi=1') < 0) {
+                if (force) {
+                    // Reload the video enabling the api
+                    if (sindexOf.call(iframes[i].src, '?') < 0) {
+                        iframes[i].src += '?enablejsapi=1';
+                    }else {
+                        iframes[i].src += '&enablejsapi=1';
+                    }
+                }else {
+                    // We can't track players that don't have api enabled.
+                    break;
+                }
+            }
+            youtube_videos.push(iframes[i]);
+        }
+    }
+    if (youtube_videos.length > 0) {
+        // this function will be called when the youtube api loads
+        window.onYouTubePlayerAPIReady = function() {
+            var p;
+            for (var i = 0; i < youtube_videos.length; i++) {
+                p = new YT.Player(youtube_videos[i]);
+                p.addEventListener('onStateChange', _ytStateChange);
+                p.addEventListener('onError', _ytError);
+            }
+        };
+        // load the youtube player api
+        var tag = document.createElement('script');
+        tag.src = 'http://www.youtube.com/player_api';
+        tag.type = 'text/javascript';
+        tag.async = true;
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+}
+
+window._gas.push(['_addHook', '_trackYoutube', function(force) {
+    _trackYoutube.call(this, force);
+    return false;
+}]);
 
 /*!
  * Wrap-up

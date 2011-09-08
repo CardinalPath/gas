@@ -304,6 +304,16 @@ gas_helpers['inArray'] = function(obj, item) {
 };
 
 /**
+ * Checks if the object is an Array
+ *
+ * @param {object} obj Object to check.
+ * @return {boolean} true if the object is an Array.
+ */
+gas_helpers['isArray'] = function(obj) {
+    return toString.call(obj) === '[object Array]';
+};
+
+/**
  * Removes special characters and Lowercase String
  *
  * @param {string} str to be sanitized.
