@@ -288,7 +288,17 @@ window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
 
-var gas_helpers = {};
+/**
+ * Creates an object with several helper functions
+ *
+ * Used as a Singleton
+ *
+ * @constructor
+ * @param {Object} tracker is an empty Google analytics tracker.
+ */
+var GasHelper = function(tracker) {
+    this.tracker = tracker;
+};
 
 /**
  * Returns true if the element is foun in the Array, false otherwise.
@@ -297,7 +307,7 @@ var gas_helpers = {};
  * @param {object} item Item to search form.
  * @return {boolean} true if contains.
  */
-gas_helpers['inArray'] = function(obj, item) {
+GasHelper.prototype.inArray = function(obj, item) {
     if (obj && obj.length) {
         for (var i = 0; i < obj.length; i++) {
             if (obj[i] === item) {
@@ -314,7 +324,7 @@ gas_helpers['inArray'] = function(obj, item) {
  * @param {object} obj Object to check.
  * @return {boolean} true if the object is an Array.
  */
-gas_helpers['isArray'] = function(obj) {
+GasHelper.prototype.isArray = function(obj) {
     return toString.call(obj) === '[object Array]';
 };
 
@@ -325,7 +335,7 @@ gas_helpers['isArray'] = function(obj) {
  * @param {boolean} strict_opt If we should remove any non ascii char.
  * @return {string} Sanitized string.
  */
-gas_helpers['_sanitizeString'] = function(str, strict_opt) {
+GasHelper.prototype._sanitizeString = function(str, strict_opt) {
     str = str.toLowerCase()
         .replace(/^\ +/, '')
         .replace(/\ +$/, '')
@@ -357,7 +367,7 @@ gas_helpers['_sanitizeString'] = function(str, strict_opt) {
  * it.
  * @return {boolean} true if it was successfuly binded.
  */
-gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
+GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
         return ofnc.call(obj, event);
@@ -398,10 +408,7 @@ gas_helpers['_addEventListener'] = function(obj, evt, ofnc, bubble) {
 window._gas.push(function() {
     var tracker = _gat._getTrackerByName();
 
-    // Extend helpers with the tracker;
-    gas_helpers.tracker = tracker;
-
-    window._gas.gh = gas_helpers;
+    window._gas.gh = new GasHelper(tracker);
 
 });
 
