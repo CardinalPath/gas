@@ -230,6 +230,9 @@ Vimeo Video Tracking
 You can track Vimeo_ video events. You must be using the iframe method 
 of embedding videos. 
 
+The browser must support HTML5 postMessage. That means it won't work on ie6 
+and ie7.
+
 ::
 
     _gas.push(['_trackVimeo', 'force']);
@@ -263,6 +266,9 @@ YouTube Video Tracking
 ~~~~~~~~~~~~~~~~~~~~~~
 You can track YouTube_ video events. You must be using the iframe method 
 of embedding videos. 
+
+The browser must support HTML5 postMessage. That means it won't work on ie6 
+and ie7.
 
 ::
 
