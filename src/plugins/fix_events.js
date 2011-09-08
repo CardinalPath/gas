@@ -5,7 +5,7 @@
  * Negative values are sent as zero.
  * If val is NaN than it is sent as zero.
  */
-window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
+_gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
     if (val) {
         val = (val < 0 ? 0 : Math.round(val)) || 0;
     }

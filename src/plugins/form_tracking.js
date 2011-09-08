@@ -12,7 +12,7 @@
 /**
  * Enable form tracking for 1 form
  *
- * @this {Object} The Ga Helper object
+ * @this {GasHelper} The Ga Helper object
  * @param {HTMLFormElement} form The form element to be tagged.
  * @param {boolean=} opt_live if we should use live binding. Defaults to false.
  * @return {boolean} false if the form has no elements.
@@ -58,7 +58,7 @@ function track_form(form, opt_live) {
                 var el = e.target;
                 if (e.type == 'change' &&
                   scp.inArray(['input', 'select', 'textarea', 'hidden'],
-                    el.nodeName.toLowerCase()
+                    el.tagName.toLowerCase()
                   )
                 ) {
 
@@ -87,7 +87,7 @@ function track_form(form, opt_live) {
     }
 }
 
-window._gas.push(['_addHook', '_trackForms', function(opt_live) {
+_gas.push(['_addHook', '_trackForms', function(opt_live) {
     var scp = this;
     for (var i = 0; i < document.forms.length; i++) {
         try {

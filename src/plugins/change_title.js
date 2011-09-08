@@ -5,7 +5,7 @@
  * for this reason this hook must be inserted early on the hook list,
  * so other hooks don't fire twice.
  */
-window._gas.push(['_addHook', '_trackPageview', function(url, title) {
+_gas.push(['_addHook', '_trackPageview', function(url, title) {
     if (title && typeof title === 'string') {
         var oTitle = document.title;
         window._gas.push(

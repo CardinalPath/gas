@@ -13,273 +13,6 @@
 /**
  * GAS - Google Analytics on Steroids
  *
- * Copyright 2011, Cardinal Path and Direct Performance
- * Licensed under the MIT license.
- *
- * @author Eduardo Cereto <eduardocereto@gmail.com>
- */
-
-/**
- * Google Analytics original _gaq.
- *
- * This never tries to do something that is not supposed to. So it won't break
- * in the future.
- */
-window['_gaq'] = window['_gaq'] || [];
-
-var _prev_gas = window['_gas'] || [];
-
-// Avoid duplicate definition
-if (_prev_gas._accounts_length >= 0) {
-    return;
-}
-
-//Shortcuts, these speed up the code
-var document = window.document,
-    toString = Object.prototype.toString,
-    hasOwn = Object.prototype.hasOwnProperty,
-    push = Array.prototype.push,
-    slice = Array.prototype.slice,
-    trim = String.prototype.trim,
-    sindexOf = String.prototype.indexOf,
-    aindexOf = Array.prototype.indexOf,
-    url = document.location.href;
-
-
-/**
- * _gas main object.
- *
- * It's supposed to be used just like _gaq but here we extend it. In it's core
- * everything pushed to _gas is run through possible hooks and then pushed to
- * _gaq
- */
-window['_gas'] = _gas = {
-    _accounts: {},
-    _accounts_length: 0,
-    _hooks: {},
-    _queue: _prev_gas,
-    _default_tracker: '_gas1',
-    gh: {}
-};
-
-/**
- * First standard Hook that is responsible to add next Hooks
- *
- * _addHook calls always reurn false so they don't get pushed to _gaq
- * @param {string} fn The function you wish to add a Hook to.
- * @param {function()} cb The callback function to be appended to hooks.
- * @return {boolean} Always false.
- */
-window._gas._hooks['_addHook'] = [function(fn, cb) {
-    if (typeof fn === 'string' && typeof cb === 'function') {
-        if (typeof window._gas._hooks[fn] === 'undefined') {
-            window._gas._hooks[fn] = [];
-        }
-        window._gas._hooks[fn].push(cb);
-    }
-    return false;
-}];
-
-/**
- * Construct the correct account name to be used on _gaq calls.
- *
- * The account name for the first unamed account pushed to _gas is the standard
- * account name. It's pushed without the account name to _gaq, so if someone
- * calls directly _gaq it works as expected.
- * @param {string} acct Account name.
- * @return {string} Correct account name to be used already with trailling dot.
- */
-function _build_acct_name(acct) {
-    return acct === window._gas._default_tracker ? '' : acct + '.';
-}
-
-function _gaq_push(arr) {
-    if (_gas.debug_mode) {
-        try {
-            console.log(arr);
-        }catch (e) {}
-    }
-    return window._gaq.push(arr);
-}
-
-/**
- * Everything pushed to _gas is executed by this call.
- *
- * This function should not be called directly. Instead use _gas.push
- * @return {number} This is the same return as _gaq.push calls.
- */
-window._gas._execute = function() {
-    var args = slice.call(arguments),
-        sub = args.shift(),
-        gaq_execute = true,
-        i, foo, hooks, acct_name, repl_sub;
-
-    if (typeof sub === 'function') {
-        // Pushed functions are executed right away
-        return _gaq_push(
-            (function(s) {
-                return function() {
-                    // pushed functions receive helpers through this object
-                    s.call(window._gas.gh);
-                };
-            })(sub)
-        );
-
-    }else if (typeof sub === 'object' && sub.length > 0) {
-        foo = sub.shift();
-
-        if (sindexOf.call(foo, '.') >= 0) {
-            acct_name = foo.split('.')[0];
-            foo = foo.split('.')[1];
-        }else {
-            acct_name = undefined;
-        }
-
-        // Execute hooks
-        hooks = window._gas._hooks[foo];
-        if (hooks && hooks.length > 0) {
-            for (i = 0; i < hooks.length; i++) {
-                try {
-                    repl_sub = hooks[i].apply(window._gas.gh, sub);
-                    if (repl_sub === false) {
-                        // Returning false from a hook cancel the call
-                        gaq_execute = false;
-                    }
-                    if (repl_sub && repl_sub.length > 0) {
-                        // Returning an array changes the call parameters
-                        sub = repl_sub;
-                    }
-                }catch (e) {
-                    if (foo !== '_trackException') {
-                        window._gas.push(['_trackException', e]);
-                    }
-                }
-            }
-        }
-        // Cancel execution on _gaq if any hook returned false
-        if (gaq_execute === false) {
-            return 1;
-        }
-        // Intercept _setAccount calls
-        if (foo === '_setAccount') {
-
-            for (i in window._gas._accounts) {
-                if (window._gas._accounts[i] == sub[0]) {
-                    // Repeated account
-                    if (acct_name === undefined) {
-                        return 1;
-                    }
-                }
-            }
-            acct_name = acct_name || '_gas' +
-                String(window._gas._accounts_length + 1);
-            // Force that the first unamed account is _gas1
-            if (typeof window._gas._accounts['_gas1'] == 'undefined' &&
-                sindexOf.call(acct_name, '_gas') != -1) {
-                acct_name = '_gas1';
-            }
-            window._gas._accounts[acct_name] = sub[0];
-            window._gas._accounts_length += 1;
-            acct_name = _build_acct_name(acct_name);
-            return _gaq_push([acct_name + foo, sub[0]]);
-        }
-
-        // Intercept _linka and _linkByPost
-        if (foo === '_link' || foo === '_linkByPost') {
-            args = slice.call(sub);
-            args.unshift(foo);
-            return _gaq_push(args);
-        }
-
-        // If user provides account than trigger event for just that account.
-        var acc_foo;
-        if (acct_name && window._gas._accounts[acct_name]) {
-            acc_foo = _build_acct_name(acct_name) + foo;
-            args = slice.call(sub);
-            args.unshift(acc_foo);
-            return _gaq_push(args);
-        }
-
-        // Call Original _gaq, for all accounts
-        var return_val = 0;
-        for (i in window._gas._accounts) {
-            if (hasOwn.call(window._gas._accounts, i)) {
-                acc_foo = _build_acct_name(i) + foo;
-                args = slice.call(sub);
-                args.unshift(acc_foo);
-                return_val += _gaq_push(args);
-            }
-        }
-        return return_val ? 1 : 0;
-    }
-};
-
-/**
- * Standard method to execute GA commands.
- *
- * Everything pushed to _gas is in fact pushed back to _gaq. So Helpers are
- * ready for hooks. This creates _gaq as a series of functions that call
- * _gas._execute() with the same arguments.
- */
-window._gas.push = function() {
-    var args = slice.call(arguments);
-    for (var i = 0; i < args.length; i++) {
-        (function(arr) {
-            _gaq.push(function() {
-                window._gas._execute.call(window._gas.gh, arr);
-            });
-        })(args[i]);
-    }
-};
-
-/**
- * Hook for _trackExceptions
- *
- * Watchout for circular calls
- */
-window._gas.push(['_addHook', '_trackException', function(exception, message) {
-    window._gas.push(['_trackEvent',
-        'Exception ' + (exception.name || 'Error'),
-        message || exception.message || exception,
-        url
-    ]);
-    return false;
-}]);
-
-/**
- * Hook to enable Debug Mode
- */
-window._gas.push(['_addHook', '_setDebug', function(set_debug) {
-    window._gas.debug_mode = !!set_debug;
-}]);
-
-/**
- * Hook to Remove other Hooks
- *
- * It will remove the last inserted hook from a _gas function.
- *
- * @param {string} func _gas Function Name to remove Hooks from.
- * @return {boolean} Always returns false.
- */
-window._gas.push(['_addHook', '_popHook', function(func) {
-    var arr = window._gas._hooks[func];
-    if (arr && arr.pop) {
-        arr.pop();
-    }
-    return false;
-}]);
-
-/**
- * Hook to set the default tracker.
- *
- * The default tracker is the nameless tracker that is pushed into _gaq_push
- */
-window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
-    window._gas._default_tracker = tname;
-}]);
-/**
- * GAS - Google Analytics on Steroids
- *
  * Helper Functions
  *
  * Copyright 2011, Cardinal Path and Direct Performance
@@ -289,15 +22,14 @@ window._gas.push(['_addHook', '_setDefaultTracker', function(tname) {
  */
 
 /**
- * Creates an object with several helper functions
+ * GasHelper singleton class
  *
- * Used as a Singleton
+ * Should be called when ga.js is loaded to get the pageTracker.
  *
  * @constructor
- * @param {Object} tracker is an empty Google analytics tracker.
  */
-var GasHelper = function(tracker) {
-    this.tracker = tracker;
+var GasHelper = function() {
+    this['tracker'] = window['_gat']['_getTrackerByName']();
 };
 
 /**
@@ -402,16 +134,285 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     }
 };
 
-// This function is the first one pushed to _gas, so it creates the _gas.gh
-//     object. It needs to be pushed into _gaq so that _gat is available when
-//     it runs.
-window._gas.push(function() {
-    var tracker = _gat._getTrackerByName();
+/**
+ * GAS - Google Analytics on Steroids
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ */
 
-    window._gas.gh = new GasHelper(tracker);
+/**
+ * Google Analytics original _gaq.
+ *
+ * This never tries to do something that is not supposed to. So it won't break
+ * in the future.
+ */
+window['_gaq'] = window['_gaq'] || [];
 
-});
+var _prev_gas = window['_gas'] || [];
 
+// Avoid duplicate definition
+if (_prev_gas._accounts_length >= 0) {
+    return;
+}
+
+//Shortcuts, these speed up the code
+var document = window.document,
+    toString = Object.prototype.toString,
+    hasOwn = Object.prototype.hasOwnProperty,
+    push = Array.prototype.push,
+    slice = Array.prototype.slice,
+    trim = String.prototype.trim,
+    sindexOf = String.prototype.indexOf,
+    aindexOf = Array.prototype.indexOf,
+    url = document.location.href;
+
+/**
+ * GAS Sigleton
+ * @constructor
+ */
+function GAS() {
+    var self = this;
+    self._accounts = {};
+    self._accounts_length = 0;
+    self._queue = _prev_gas;
+    self._default_tracker = '_gas1';
+    self.gh = {};
+    self._hooks = {
+        '_addHook': [self._addHook]
+    };
+    self.push(function() {
+        self.gh = new GasHelper();
+    });
+}
+
+/**
+ * First standard Hook that is responsible to add next Hooks
+ *
+ * _addHook calls always reurn false so they don't get pushed to _gaq
+ * @param {string} fn The function you wish to add a Hook to.
+ * @param {function()} cb The callback function to be appended to hooks.
+ * @return {boolean} Always false.
+ */
+GAS.prototype._addHook = function(fn, cb) {
+    if (typeof fn === 'string' && typeof cb === 'function') {
+        if (typeof _gas._hooks[fn] === 'undefined') {
+            _gas._hooks[fn] = [];
+        }
+        _gas._hooks[fn].push(cb);
+    }
+    return false;
+};
+
+/**
+ * Construct the correct account name to be used on _gaq calls.
+ *
+ * The account name for the first unamed account pushed to _gas is the standard
+ * account name. It's pushed without the account name to _gaq, so if someone
+ * calls directly _gaq it works as expected.
+ * @param {string} acct Account name.
+ * @return {string} Correct account name to be used already with trailling dot.
+ */
+function _build_acct_name(acct) {
+    return acct === _gas._default_tracker ? '' : acct + '.';
+}
+
+function _gaq_push(arr) {
+    if (_gas.debug_mode) {
+        try {
+            console.log(arr);
+        }catch (e) {}
+    }
+    return window['_gaq'].push(arr);
+}
+
+/**
+ * Everything pushed to _gas is executed by this call.
+ *
+ * This function should not be called directly. Instead use _gas.push
+ * @return {number} This is the same return as _gaq.push calls.
+ */
+GAS.prototype._execute = function() {
+    var args = slice.call(arguments),
+        sub = args.shift(),
+        gaq_execute = true,
+        i, foo, hooks, acct_name, repl_sub;
+
+    if (typeof sub === 'function') {
+        // Pushed functions are executed right away
+        return _gaq_push(
+            (function(s) {
+                return function() {
+                    // pushed functions receive helpers through this object
+                    s.call(_gas.gh);
+                };
+            })(sub)
+        );
+
+    }else if (typeof sub === 'object' && sub.length > 0) {
+        foo = sub.shift();
+
+        if (sindexOf.call(foo, '.') >= 0) {
+            acct_name = foo.split('.')[0];
+            foo = foo.split('.')[1];
+        }else {
+            acct_name = undefined;
+        }
+
+        // Execute hooks
+        hooks = _gas._hooks[foo];
+        if (hooks && hooks.length > 0) {
+            for (i = 0; i < hooks.length; i++) {
+                try {
+                    repl_sub = hooks[i].apply(_gas.gh, sub);
+                    if (repl_sub === false) {
+                        // Returning false from a hook cancel the call
+                        gaq_execute = false;
+                    }
+                    if (repl_sub && repl_sub.length > 0) {
+                        // Returning an array changes the call parameters
+                        sub = repl_sub;
+                    }
+                }catch (e) {
+                    if (foo !== '_trackException') {
+                        _gas.push(['_trackException', e]);
+                    }
+                }
+            }
+        }
+        // Cancel execution on _gaq if any hook returned false
+        if (gaq_execute === false) {
+            return 1;
+        }
+        // Intercept _setAccount calls
+        if (foo === '_setAccount') {
+
+            for (i in _gas._accounts) {
+                if (_gas._accounts[i] == sub[0]) {
+                    // Repeated account
+                    if (acct_name === undefined) {
+                        return 1;
+                    }
+                }
+            }
+            acct_name = acct_name || '_gas' +
+                String(_gas._accounts_length + 1);
+            // Force that the first unamed account is _gas1
+            if (typeof _gas._accounts['_gas1'] == 'undefined' &&
+                sindexOf.call(acct_name, '_gas') != -1) {
+                acct_name = '_gas1';
+            }
+            _gas._accounts[acct_name] = sub[0];
+            _gas._accounts_length += 1;
+            acct_name = _build_acct_name(acct_name);
+            return _gaq_push([acct_name + foo, sub[0]]);
+        }
+
+        // Intercept _linka and _linkByPost
+        if (foo === '_link' || foo === '_linkByPost') {
+            args = slice.call(sub);
+            args.unshift(foo);
+            return _gaq_push(args);
+        }
+
+        // If user provides account than trigger event for just that account.
+        var acc_foo;
+        if (acct_name && _gas._accounts[acct_name]) {
+            acc_foo = _build_acct_name(acct_name) + foo;
+            args = slice.call(sub);
+            args.unshift(acc_foo);
+            return _gaq_push(args);
+        }
+
+        // Call Original _gaq, for all accounts
+        var return_val = 0;
+        for (i in _gas._accounts) {
+            if (hasOwn.call(_gas._accounts, i)) {
+                acc_foo = _build_acct_name(i) + foo;
+                args = slice.call(sub);
+                args.unshift(acc_foo);
+                return_val += _gaq_push(args);
+            }
+        }
+        return return_val ? 1 : 0;
+    }
+};
+
+/**
+ * Standard method to execute GA commands.
+ *
+ * Everything pushed to _gas is in fact pushed back to _gaq. So Helpers are
+ * ready for hooks. This creates _gaq as a series of functions that call
+ * _gas._execute() with the same arguments.
+ */
+GAS.prototype.push = function() {
+    var args = slice.call(arguments);
+    for (var i = 0; i < args.length; i++) {
+        (function(arr) {
+            window['_gaq'].push(function() {
+                _gas._execute.call(_gas.gh, arr);
+            });
+        })(args[i]);
+    }
+};
+
+/**
+ * _gas main object.
+ *
+ * It's supposed to be used just like _gaq but here we extend it. In it's core
+ * everything pushed to _gas is run through possible hooks and then pushed to
+ * _gaq
+ */
+window['_gas'] = _gas = new GAS();
+
+
+/**
+ * Hook for _trackExceptions
+ *
+ * Watchout for circular calls
+ */
+_gas.push(['_addHook', '_trackException', function(exception, message) {
+    _gas.push(['_trackEvent',
+        'Exception ' + (exception.name || 'Error'),
+        message || exception.message || exception,
+        url
+    ]);
+    return false;
+}]);
+
+/**
+ * Hook to enable Debug Mode
+ */
+_gas.push(['_addHook', '_setDebug', function(set_debug) {
+    _gas.debug_mode = !!set_debug;
+}]);
+
+/**
+ * Hook to Remove other Hooks
+ *
+ * It will remove the last inserted hook from a _gas function.
+ *
+ * @param {string} func _gas Function Name to remove Hooks from.
+ * @return {boolean} Always returns false.
+ */
+_gas.push(['_addHook', '_popHook', function(func) {
+    var arr = _gas._hooks[func];
+    if (arr && arr.pop) {
+        arr.pop();
+    }
+    return false;
+}]);
+
+/**
+ * Hook to set the default tracker.
+ *
+ * The default tracker is the nameless tracker that is pushed into _gaq_push
+ */
+_gas.push(['_addHook', '_setDefaultTracker', function(tname) {
+    _gas._default_tracker = tname;
+}]);
 /**
  * Enables setting of page Title on _trackPageview.
  *
@@ -419,7 +420,7 @@ window._gas.push(function() {
  * for this reason this hook must be inserted early on the hook list,
  * so other hooks don't fire twice.
  */
-window._gas.push(['_addHook', '_trackPageview', function(url, title) {
+_gas.push(['_addHook', '_trackPageview', function(url, title) {
     if (title && typeof title === 'string') {
         var oTitle = document.title;
         window._gas.push(
@@ -449,7 +450,7 @@ window._gas.push(['_addHook', '_trackPageview', function(url, title) {
  * Will extract the extensions from a url and check if it matches one of
  * possible options. Used to verify if a url corresponds to a download link.
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {string} src The url to check.
  * @param {Array} extensions an Array with strings containing the possible
  * extensions.
@@ -471,7 +472,7 @@ function _checkFile(src, extensions) {
 /**
  * Register the event to listen to downloads
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {
@@ -495,7 +496,7 @@ var gh = this;
  * @param {string|Array} extensions additional file extensions to track as
  * downloads.
  */
-window._gas.push(['_addHook', '_trackDownload', function(extensions) {
+_gas.push(['_addHook', '_trackDownload', function(extensions) {
     var ext = 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip';
     ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3';
     ext = ext.split(',');
@@ -515,7 +516,7 @@ window._gas.push(['_addHook', '_trackDownload', function(extensions) {
  * Negative values are sent as zero.
  * If val is NaN than it is sent as zero.
  */
-window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
+_gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
     if (val) {
         val = (val < 0 ? 0 : Math.round(val)) || 0;
     }
@@ -536,7 +537,7 @@ window._gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
 /**
  * Enable form tracking for 1 form
  *
- * @this {Object} The Ga Helper object
+ * @this {GasHelper} The Ga Helper object
  * @param {HTMLFormElement} form The form element to be tagged.
  * @param {boolean=} opt_live if we should use live binding. Defaults to false.
  * @return {boolean} false if the form has no elements.
@@ -611,7 +612,7 @@ function track_form(form, opt_live) {
     }
 }
 
-window._gas.push(['_addHook', '_trackForms', function(opt_live) {
+_gas.push(['_addHook', '_trackForms', function(opt_live) {
     var scp = this;
     for (var i = 0; i < document.forms.length; i++) {
         try {
@@ -772,7 +773,7 @@ function track_max_scroll() {
 
 }
 
-window._gas.push(['_addHook', '_trackMaxSrcoll', function() {
+_gas.push(['_addHook', '_trackMaxSrcoll', function() {
     this._addEventListener(window, 'scroll', update_scroll_percentage);
     track_max_scroll.call(this);
 }]);
@@ -791,7 +792,7 @@ window._gas.push(['_addHook', '_trackMaxSrcoll', function() {
 /**
  * Private variable to store allowAnchor choice
  */
-window._gas._allowAnchor = false;
+_gas._allowAnchor = false;
 
 /**
  * _setAllowAnchor Hook to store choice for easier use of Anchor
@@ -799,14 +800,14 @@ window._gas._allowAnchor = false;
  * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
  * used the same by default
  */
-window._gas.push(['_addHook', '_setAllowAnchor', function(val) {
+_gas.push(['_addHook', '_setAllowAnchor', function(val) {
     _gas._allowAnchor = val;
 }]);
 
 /**
  * _link Hook to use stored allowAnchor value.
  */
-window._gas.push(['_addHook', '_link', function(url, use_anchor) {
+_gas.push(['_addHook', '_link', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -816,7 +817,7 @@ window._gas.push(['_addHook', '_link', function(url, use_anchor) {
 /**
  * _linkByPost Hook to use stored allowAnchor value.
  */
-window._gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -871,7 +872,7 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
  * This function is used to make it easy to implement multi-domain-tracking.
  * @param {string} event_used Should be 'now', 'click' or 'mousedown'. Default
  * 'click'.
- * @this _gas.gh GAS Helper functions
+ * @this {GasHelper} GAS Helper functions
  * @return {boolean} Returns false to avoid this is puhed to _gaq.
  */
 function track_links(event_used) {
@@ -893,7 +894,7 @@ function track_links(event_used) {
             for (j = 0; j < _external_domains.length; j++) {
                 if (sindexOf.call(el.hostname, _external_domains[j]) >= 0) {
                     if (event_used === 'now') {
-                        el.href = gh.tracker._getLinkerUrl(
+                        el.href = gh['tracker']['_getLinkerUrl'](
                             el.href,
                             _gas._allowAnchor
                         );
@@ -910,7 +911,7 @@ function track_links(event_used) {
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {
-                                this.href = gh.tracker._getLinkerUrl(
+                                this.href = gh['tracker']['_getLinkerUrl'](
                                     this.href,
                                     _gas._allowAnchor
                                 );
@@ -929,13 +930,6 @@ function track_links(event_used) {
  */
 _gas.push(['_addHook', '_setMultiDomain', track_links]);
 
-/**
- * Enable Multidomain Tracking.
- *
- * It will look for all links inside the page that matches one of the
- * _external_domains and will mark that link to be tagged
- */
-//_gas.push(['_setMultiDomain', 'mousedown']);
 /**
  * GAS - Google Analytics on Steroids
  *
@@ -985,7 +979,7 @@ function _trackOutboundLinks() {
     }
 }
 
-window._gas.push(['_addHook', '_trackOutboundLinks', function() {
+_gas.push(['_addHook', '_trackOutboundLinks', function() {
     _trackOutboundLinks.call(this);
 }]);
 
@@ -1040,7 +1034,7 @@ var _has_vimeo_window_event = false;
  * Only works for the Universal Tag from Vimeo (iframe). The video must have
  * the parameter api=1 on the url in order to make the tracking work.
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {(string|boolean)} force evaluates to true if we should force the
  * api=1 parameter on the url to activate the api. May cause the player to
  * reload.
@@ -1107,7 +1101,7 @@ function _trackVimeo(force) {
     }
 }
 
-window._gas.push(['_addHook', '_trackVimeo', function(force) {
+_gas.push(['_addHook', '_trackVimeo', function(force) {
     _trackVimeo.call(this, force);
     return false;
 }]);
@@ -1210,7 +1204,7 @@ function _trackYoutube(force) {
     }
 }
 
-window._gas.push(['_addHook', '_trackYoutube', function(force) {
+_gas.push(['_addHook', '_trackYoutube', function(force) {
     _trackYoutube.call(this, force);
     return false;
 }]);
@@ -1219,8 +1213,8 @@ window._gas.push(['_addHook', '_trackYoutube', function(force) {
  * Wrap-up
  */
 // Execute previous functions
-while (window._gas._queue.length > 0) {
-    window._gas.push(window._gas._queue.shift());
+while (_gas._queue.length > 0) {
+    _gas.push(window._gas._queue.shift());
 }
 
 // Import ga.js

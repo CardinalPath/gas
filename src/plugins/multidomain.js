@@ -12,7 +12,7 @@
 /**
  * Private variable to store allowAnchor choice
  */
-window._gas._allowAnchor = false;
+_gas._allowAnchor = false;
 
 /**
  * _setAllowAnchor Hook to store choice for easier use of Anchor
@@ -20,14 +20,14 @@ window._gas._allowAnchor = false;
  * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
  * used the same by default
  */
-window._gas.push(['_addHook', '_setAllowAnchor', function(val) {
+_gas.push(['_addHook', '_setAllowAnchor', function(val) {
     _gas._allowAnchor = val;
 }]);
 
 /**
  * _link Hook to use stored allowAnchor value.
  */
-window._gas.push(['_addHook', '_link', function(url, use_anchor) {
+_gas.push(['_addHook', '_link', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -37,7 +37,7 @@ window._gas.push(['_addHook', '_link', function(url, use_anchor) {
 /**
  * _linkByPost Hook to use stored allowAnchor value.
  */
-window._gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -92,7 +92,7 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
  * This function is used to make it easy to implement multi-domain-tracking.
  * @param {string} event_used Should be 'now', 'click' or 'mousedown'. Default
  * 'click'.
- * @this _gas.gh GAS Helper functions
+ * @this {GasHelper} GAS Helper functions
  * @return {boolean} Returns false to avoid this is puhed to _gaq.
  */
 function track_links(event_used) {
@@ -114,7 +114,7 @@ function track_links(event_used) {
             for (j = 0; j < _external_domains.length; j++) {
                 if (sindexOf.call(el.hostname, _external_domains[j]) >= 0) {
                     if (event_used === 'now') {
-                        el.href = gh.tracker._getLinkerUrl(
+                        el.href = gh['tracker']['_getLinkerUrl'](
                             el.href,
                             _gas._allowAnchor
                         );
@@ -131,7 +131,7 @@ function track_links(event_used) {
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {
-                                this.href = gh.tracker._getLinkerUrl(
+                                this.href = gh['tracker']['_getLinkerUrl'](
                                     this.href,
                                     _gas._allowAnchor
                                 );
@@ -150,10 +150,3 @@ function track_links(event_used) {
  */
 _gas.push(['_addHook', '_setMultiDomain', track_links]);
 
-/**
- * Enable Multidomain Tracking.
- *
- * It will look for all links inside the page that matches one of the
- * _external_domains and will mark that link to be tagged
- */
-//_gas.push(['_setMultiDomain', 'mousedown']);

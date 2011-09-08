@@ -145,7 +145,7 @@ function track_max_scroll() {
 
 }
 
-window._gas.push(['_addHook', '_trackMaxSrcoll', function() {
+_gas.push(['_addHook', '_trackMaxSrcoll', function() {
     this._addEventListener(window, 'scroll', update_scroll_percentage);
     track_max_scroll.call(this);
 }]);

@@ -96,7 +96,7 @@ function _trackYoutube(force) {
     }
 }
 
-window._gas.push(['_addHook', '_trackYoutube', function(force) {
+_gas.push(['_addHook', '_trackYoutube', function(force) {
     _trackYoutube.call(this, force);
     return false;
 }]);

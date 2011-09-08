@@ -23,7 +23,7 @@ Installation
 ------------
 
 To install GAS download the script from Download_ Page and put it somewhere on
-your website. Also install the basic snippet on everypege of your website. Be
+your website. Also install the basic snippet on every page of your website. Be
 sure to change the Account Number (UA) and the correct gas.js file location.
 
 .. _Download: https://bitbucket.org/dpc/gas/downloads
@@ -37,6 +37,8 @@ The basic snippet looks like this:
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
     _gas.push(['_trackPageview', '/test']);
     _gas.push(['_trackForms']);
+    _gas.push(['_trackOutboundLinks']);
+    _gas.push(['_trackDownloads']);
     
     (function() {
     var ga = document.createElement('script');
@@ -50,6 +52,7 @@ The basic snippet looks like this:
     
 
 There's no need to include the ga.js file. GAS will load that file for you.
+That snippet will enable the common features of GAS.
 
 .. _gas-doc:
 
@@ -57,7 +60,7 @@ Documentation
 -------------
 
 GAS is based on _gaq from Google and as such supports all methods and 
-directives it supports. So go check `oficcial documentation`__ for the GA 
+directives it supports. So go check `official documentation`__ for the GA 
 Tracker.
 
 .. __: http://code.google.com/apis/analytics/docs/gaJS/gaJSApi.html
@@ -81,7 +84,7 @@ Hooks for _gaq Functions
 
 Hooks are a handy feature if you want to monitor or change values of a call to
 one of the function from _gaq. You can use it as a filter to lowercase values,
-or to trigger events to another tool evrytime a pageView is fired. You can
+or to trigger events to another tool every time a pageView is fired. You can
 assign multiple Hooks.
 
 ::
@@ -97,7 +100,7 @@ assign multiple Hooks.
 
 The above Hook will print the pushed page to the browser console and will
 return the page lowercased. So the actual value sent to GA is the lowercased
-page. This may be helpfull for sites in asp, where lowercase and uppercase
+page. This may be helpful for sites in asp, where lowercase and uppercase
 don't matter and will save you the work for creating a GA profile Filter.
 
 Here's another handy Hook for Events. Event values must always be integer
@@ -151,7 +154,7 @@ The nice side effect is that you can have the same snippet for both websites.
 Max-Scroll Tracking
 ~~~~~~~~~~~~~~~~~~~
 
-This will fire events with the Max-Scroll porcentage value for evey page the
+This will fire events with the Max-Scroll percentage value for every page the
 user views.
 
 ::
@@ -175,7 +178,7 @@ Changing the Page Title
 
 GAS supports a second optional parameter to the _trackPageview that parameter
 is sent to Google Analytics as the page title. If you don't provide this 
-parameter the default is to use the currnt page title.
+parameter the default is to use the current page title.
 
 ::
 
@@ -186,7 +189,7 @@ parameter the default is to use the currnt page title.
 Multi-Account Tracking
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Easyier handling of multi-account setups. You can fire an event to all accounts
+Easier handling of multi-account setups. You can fire an event to all accounts
 or just to one of the accounts you configured,
 
 ::
@@ -202,16 +205,34 @@ or just to one of the accounts you configured,
     _gas.push(['custom._trackPageview']);
 
 
-.. _gas-license:
-
-Vimeo Video Trackig
-~~~~~~~~~~~~~~~~~~~
-You can track Vimeo_ video events. You must be using the iframe method 
-of embeding videos. 
+Download Tracking
+~~~~~~~~~~~~~~~~~
+To enable Download Tracking just include the following call on your snippet.
 
 ::
 
-    _gas.push(['_trackVimeo']);
+    _gas.push(['_trackDownloads']);
+
+GAS will track the following extensions by default:
+'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip,rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv'
+
+You can set additional extensions to be tracked if you want by passing a 
+parameter to `_trackDownloads`.
+
+::
+
+    _gas.push(['_trackDownloads', 'torrent,gz,mp4,wav']);
+
+
+
+Vimeo Video Tracking
+~~~~~~~~~~~~~~~~~~~~
+You can track Vimeo_ video events. You must be using the iframe method 
+of embedding videos. 
+
+::
+
+    _gas.push(['_trackVimeo', 'force']);
 
 After you enable it the following events will be tracked. 
 
@@ -219,20 +240,62 @@ After you enable it the following events will be tracked.
  * pause
  * finish
 
-You must append to the video url the parameters `api=1&player_id=XXX` replace 
-`XXX` with a descriptive id for this video. The player_id will be sent to Google
-Analytics as the event label. The embedding code should look like this.
+You should append to the video URL the parameter `api=1`. 
+The embedding code should look like this:
 
 ::
 
-    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1&player_id=7100569" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
+    <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
+
+If you don't provide the `api` parameter than GAS will *force* a reload on the 
+iframe adding this parameter. 
+
+If you only want to track some videos (not all) on your site you can omit the 
+`'force'`parameter and GAS will only track the Videos that already have the api 
+parameter.
+Then you can enable this parameter only in the videos you want to track.
+
+
 
 .. _Vimeo: http://www.vimeo.com/
 
+YouTube Video Tracking
+~~~~~~~~~~~~~~~~~~~~~~
+You can track YouTube_ video events. You must be using the iframe method 
+of embedding videos. 
+
+::
+
+    _gas.push(['_trackYouTube', 'force']);
+
+After you enable it the following events will be tracked. 
+
+ * play
+ * pause
+ * finish
+ * error
+
+You should append to the video URL the parameter `enablejsapi=1`. 
+The embedding code should look like this:
+
+::
+
+    <iframe width="640" height="510" src="http://www.youtube.com/embed/u1zgFlCw8Aw?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
+
+If you don't provide the `enablejsapi` parameter than GAS will *force* a 
+reload on the iframe adding this parameter. 
+
+If you only want to track some videos (not all) on your site you can omit the 
+`'force'`parameter and GAS will only track the Videos that already have the 
+`enablejsapi` parameter.
+Then you can enable this parameter only in the videos you want to track.
 
 
 
+.. _YouTube: http://www.youtube.com/
 
+
+.. _gas-license:
 License
 -------
 

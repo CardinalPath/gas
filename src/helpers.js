@@ -10,15 +10,14 @@
  */
 
 /**
- * Creates an object with several helper functions
+ * GasHelper singleton class
  *
- * Used as a Singleton
+ * Should be called when ga.js is loaded to get the pageTracker.
  *
  * @constructor
- * @param {Object} tracker is an empty Google analytics tracker.
  */
-var GasHelper = function(tracker) {
-    this.tracker = tracker;
+var GasHelper = function() {
+    this['tracker'] = window['_gat']['_getTrackerByName']();
 };
 
 /**
@@ -122,14 +121,4 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
         return true;
     }
 };
-
-// This function is the first one pushed to _gas, so it creates the _gas.gh
-//     object. It needs to be pushed into _gaq so that _gat is available when
-//     it runs.
-window._gas.push(function() {
-    var tracker = _gat._getTrackerByName();
-
-    window._gas.gh = new GasHelper(tracker);
-
-});
 

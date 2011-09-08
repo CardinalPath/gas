@@ -49,7 +49,7 @@ var _has_vimeo_window_event = false;
  * Only works for the Universal Tag from Vimeo (iframe). The video must have
  * the parameter api=1 on the url in order to make the tracking work.
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {(string|boolean)} force evaluates to true if we should force the
  * api=1 parameter on the url to activate the api. May cause the player to
  * reload.
@@ -116,7 +116,7 @@ function _trackVimeo(force) {
     }
 }
 
-window._gas.push(['_addHook', '_trackVimeo', function(force) {
+_gas.push(['_addHook', '_trackVimeo', function(force) {
     _trackVimeo.call(this, force);
     return false;
 }]);

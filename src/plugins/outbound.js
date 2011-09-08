@@ -47,7 +47,7 @@ function _trackOutboundLinks() {
     }
 }
 
-window._gas.push(['_addHook', '_trackOutboundLinks', function() {
+_gas.push(['_addHook', '_trackOutboundLinks', function() {
     _trackOutboundLinks.call(this);
 }]);
 

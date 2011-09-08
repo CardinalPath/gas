@@ -15,7 +15,7 @@
  * Will extract the extensions from a url and check if it matches one of
  * possible options. Used to verify if a url corresponds to a download link.
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {string} src The url to check.
  * @param {Array} extensions an Array with strings containing the possible
  * extensions.
@@ -37,7 +37,7 @@ function _checkFile(src, extensions) {
 /**
  * Register the event to listen to downloads
  *
- * @this {object} GA Helper object.
+ * @this {GasHelper} GA Helper object.
  * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {
@@ -61,9 +61,9 @@ var gh = this;
  * @param {string|Array} extensions additional file extensions to track as
  * downloads.
  */
-window._gas.push(['_addHook', '_trackDownload', function(extensions) {
+_gas.push(['_addHook', '_trackDownloads', function(extensions) {
     var ext = 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip';
-    ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3';
+    ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv';
     ext = ext.split(',');
     if (typeof extensions === 'string') {
         ext = ext.concat(extensions.split(','));
