@@ -251,7 +251,7 @@ If you don't provide the `api` parameter than GAS will *force* a reload on the
 iframe adding this parameter. 
 
 If you only want to track some videos (not all) on your site you can omit the 
-`'force'`parameter and GAS will only track the Videos that already have the api 
+`'force'` parameter and GAS will only track the Videos that already have the api 
 parameter.
 Then you can enable this parameter only in the videos you want to track.
 
@@ -286,16 +286,16 @@ If you don't provide the `enablejsapi` parameter than GAS will *force* a
 reload on the iframe adding this parameter. 
 
 If you only want to track some videos (not all) on your site you can omit the 
-`'force'`parameter and GAS will only track the Videos that already have the 
+`'force'` parameter and GAS will only track the Videos that already have the 
 `enablejsapi` parameter.
 Then you can enable this parameter only in the videos you want to track.
-
 
 
 .. _YouTube: http://www.youtube.com/
 
 
 .. _gas-license:
+
 License
 -------
 
