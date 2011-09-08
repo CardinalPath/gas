@@ -3,7 +3,7 @@
  */
 // Execute previous functions
 while (_gas._queue.length > 0) {
-    _gas.push(window._gas._queue.shift());
+    _gas.push(_gas._queue.shift());
 }
 
 // Import ga.js
