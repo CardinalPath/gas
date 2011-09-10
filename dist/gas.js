@@ -102,21 +102,19 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
+        event.target = event.target || event.srcElement;
         return ofnc.call(obj, event);
     };
     // W3C model
-    if (bubble === undefined) {
-        bubble = false;
-    }
     if (obj.addEventListener) {
         obj.addEventListener(evt, fnc, !!bubble);
         return true;
     }
-    // Microsoft model
+    // M$ft model
     else if (obj.attachEvent) {
         return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, time to go old school
+    // Browser doesn't support W3C or M$ft model. Time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
@@ -132,6 +130,25 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
         obj[evt] = fnc;
         return true;
     }
+};
+
+/**
+ * Cross Browser DomReady function.
+ *
+ * Inspired by: http://dean.edwards.name/weblog/2006/06/again/#comment367184
+ *
+ * @param {function(Event)} callback DOMReady callback.
+ * @return {boolean} Ignore return value.
+ */
+GasHelper.prototype._DOMReady = function(callback) {
+    var cb = function() {
+        if (arguments.callee.done) return;
+        arguments.callee.done = true;
+        callback.apply(this, arguments);
+    };
+    if (/interactive|complete/.test(document.readyState)) return cb();
+    this._addEventListener(document, 'DOMContentLoaded', cb, false);
+    this._addEventListener(window, 'load', cb, false);
 };
 
 /**
@@ -611,15 +628,70 @@ function track_form(form, opt_live) {
 
 _gas.push(['_addHook', '_trackForms', function(opt_live) {
     var scp = this;
-    for (var i = 0; i < document.forms.length; i++) {
+    var forms = document.getElementsByTagName('form');
+    for (var i = 0; i < forms.length; i++) {
         try {
             // I'm not sure why it sometimes fails at Fx4 and ie8
             //FIXME: Fail with type error since it cant found the helpers on
             // 'this' object.
-            track_form.call(scp, document.forms[i], opt_live);
+            track_form.call(scp, forms[i], opt_live);
         }catch (e) {}
         if (opt_live) break;
     }
+    return false;
+}]);
+
+/**
+ * GAS - Google Analytics on Steroids
+ *
+ * HTML5 Video Tracking Plugin
+ *
+ * Copyright 2011, Cardinal Path and Direct Performance
+ * Licensed under the MIT license.
+ *
+ * @author Eduardo Cereto <eduardocereto@gmail.com>
+ */
+
+/**
+ * Triggers the actual video/audio GA events
+ *
+ * To be used as a callback for the HTML5 media events
+ *
+ * @param {Event} e A reference to the HTML event fired.
+ * @this {HTMLMediaElement} The HTML element firing the event
+ */
+function _trackMediaElement(e) {
+    _gas.push(['_trackEvent', this.nodeName, e.type, this.currentSrc]);
+}
+
+/**
+ * Triggers the HTML5 Video Tracking on the page
+ *
+ * @param {String} tag the tagName to search for.
+ * @this {GasHelper} Gas Helper Singleton.
+ */
+function _trackMedia(tag) {
+    var vs = document.getElementsByTagName(tag);
+    for (var i = 0; i < vs.length; i++) {
+        this._addEventListener(vs[i], 'play', _trackMediaElement);
+        this._addEventListener(vs[i], 'ended', _trackMediaElement);
+        this._addEventListener(vs[i], 'pause', _trackMediaElement);
+    }
+}
+
+_gas.push(['_addHook', '_trackVideo', function() {
+    var that = this;
+    this._DOMReady(function() {
+        _trackMedia.call(that, 'video');
+    });
+    return false;
+}]);
+
+_gas.push(['_addHook', '_trackAudio', function() {
+    var gh = this;
+    gh._DOMReady(function() {
+        _trackMedia.call(gh, 'audio');
+    });
     return false;
 }]);
 
@@ -875,13 +947,14 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
 function track_links(event_used) {
     var internal = document.location.hostname,
         gh = this,
-        i, j, el;
+        i, j, el,
+        links = document.getElementsByTagName('a');
     if (event_used !== 'now' && event_used !== 'mousedown') {
         event_used = 'click';
     }
-    for (i = 0; i < document.links.length; i++) {
-        el = document.links[i];
-        if (sindexOf.call(el.href, 'http') == 0) {
+    for (i = 0; i < links.length; i++) {
+        el = links[i];
+        if (sindexOf.call(el.href, 'http') === 0) {
             // Check to see if it's a internal link
             if (el.hostname == internal ||
               sindexOf.call(el.hostname, _internal_domain) >= 0) {
@@ -944,41 +1017,35 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * @this {object} GA Helper object.
  */
 function _trackOutboundLinks() {
-    var links = document.links;
-    for (var i = 0; i < links.length; i++) {
-        if (
-            sindexOf.call(links[i].href, 'http') == 0 &&
-            sindexOf.call(links[i].href, document.location.host) < 0
-       ) {
-            this._addEventListener(
-                links[i],
-                'mousedown',
-                (function(l) {
-                    return function() {
-                        var h = l.href.substring(
-                            sindexOf.call(l.href, '//') + 2
-                        );
-                        var i = sindexOf.call(h, '/') > -1 ?
-                            sindexOf.call(h, '/') : undefined;
-                        var j = sindexOf.call(h, '__utma') > -1 ?
-                            sindexOf.call(h, '__utma') : undefined;
-                        _gas.push(['_trackEvent',
-                            'Outbound',
-                            h.substring(0, i),
-                            h.substring(i, j) || '',
-                            0,
-                            true //non-interactive
-                        ]);
-                    }
-                })(links[i])
-            );
+        this._addEventListener(
+        window,
+        'mousedown',
+        function(e) {
+            var l = e.target;
+            if (l.nodeName === 'A' &&
+                sindexOf.call(l.href, 'http') == 0 &&
+                sindexOf.call(l.href, document.location.host) < 0)
+            {
+                var h = l.href.substring(
+                    sindexOf.call(l.href, '//') + 2
+                );
+                var i = sindexOf.call(h, '/') > -1 ?
+                    sindexOf.call(h, '/') : undefined;
+                var j = sindexOf.call(h, '__utm') > -1 ?
+                    (sindexOf.call(h, '__utm') - 1) : undefined;
+                _gas.push(['_trackEvent',
+                    'Outbound',
+                    h.substring(0, i),
+                    h.substring(i, j) || '',
+                    0,
+                    true //non-interactive
+                ]);
+            }
         }
-    }
+    );
 }
 
-_gas.push(['_addHook', '_trackOutboundLinks', function() {
-    _trackOutboundLinks.call(this);
-}]);
+_gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
 
 /**
  * GAS - Google Analytics on Steroids
@@ -1099,7 +1166,10 @@ function _trackVimeo(force) {
 }
 
 _gas.push(['_addHook', '_trackVimeo', function(force) {
-    _trackVimeo.call(this, force);
+    var gh = this;
+    gh._DOMReady(function() {
+        _trackVimeo.call(gh, force);
+    });
     return false;
 }]);
 
@@ -1206,7 +1276,10 @@ function _trackYoutube(force) {
 }
 
 _gas.push(['_addHook', '_trackYoutube', function(force) {
-    _trackYoutube.call(this, force);
+    var gh = this;
+    gh._DOMReady(function() {
+        _trackYoutube.call(gh, force);
+    });
     return false;
 }]);
 

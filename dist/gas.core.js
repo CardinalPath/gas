@@ -102,21 +102,19 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
+        event.target = event.target || event.srcElement;
         return ofnc.call(obj, event);
     };
     // W3C model
-    if (bubble === undefined) {
-        bubble = false;
-    }
     if (obj.addEventListener) {
         obj.addEventListener(evt, fnc, !!bubble);
         return true;
     }
-    // Microsoft model
+    // M$ft model
     else if (obj.attachEvent) {
         return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, time to go old school
+    // Browser doesn't support W3C or M$ft model. Time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
@@ -132,6 +130,25 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
         obj[evt] = fnc;
         return true;
     }
+};
+
+/**
+ * Cross Browser DomReady function.
+ *
+ * Inspired by: http://dean.edwards.name/weblog/2006/06/again/#comment367184
+ *
+ * @param {function(Event)} callback DOMReady callback.
+ * @return {boolean} Ignore return value.
+ */
+GasHelper.prototype._DOMReady = function(callback) {
+    var cb = function() {
+        if (arguments.callee.done) return;
+        arguments.callee.done = true;
+        callback.apply(this, arguments);
+    };
+    if (/interactive|complete/.test(document.readyState)) return cb();
+    this._addEventListener(document, 'DOMContentLoaded', cb, false);
+    this._addEventListener(window, 'load', cb, false);
 };
 
 /**
