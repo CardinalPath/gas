@@ -120,7 +120,7 @@ _gas.push(['_addHook', '_trackVimeo', function(force) {
     var gh = this;
     gh._DOMReady(function() {
         _trackVimeo.call(gh, force);
-    }
+    });
     return false;
 }]);
 
