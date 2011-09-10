@@ -90,21 +90,19 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
         event = event || window.event;
+        event.target = event.target || event.srcElement;
         return ofnc.call(obj, event);
     };
     // W3C model
-    if (bubble === undefined) {
-        bubble = false;
-    }
     if (obj.addEventListener) {
         obj.addEventListener(evt, fnc, !!bubble);
         return true;
     }
-    // Microsoft model
+    // M$ft model
     else if (obj.attachEvent) {
         return obj.attachEvent('on' + evt, fnc);
     }
-    // Browser don't support W3C or MSFT model, time to go old school
+    // Browser doesn't support W3C or M$ft model. Time to go old school
     else {
         evt = 'on' + evt;
         if (typeof obj[evt] === 'function') {
