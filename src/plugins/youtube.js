@@ -102,7 +102,7 @@ function _trackYoutube(force) {
 
 _gas.push(['_addHook', '_trackYoutube', function(force) {
     var gh = this;
-    gh._DOMReady(function(){
+    gh._DOMReady(function() {
         _trackYoutube.call(gh, force);
     });
     return false;
