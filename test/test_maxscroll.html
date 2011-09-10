@@ -1,0 +1,30 @@
+<html>
+<head>
+    <script type="text/javascript">
+        var _gas = _gas || [];
+        _gas.push(['_setDebug', true]);
+        _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+        _gas.push(['_trackPageview', '/test']);
+        _gas.push(['_trackMaxScroll']);
+        _gas.push(['_addHook', '_trackEvent', function(c,a,l,v,i){
+            alert(c+', '+a+', '+l+', '+v+', '+i);
+        }]);
+
+        (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+<div id="images"><p>Large Images</p>
+        <img src="http://ie.microsoft.com/testdrive/HTML5/DOMContentLoaded/whidbey.jpg" />
+        <img src="http://ie.microsoft.com/testdrive/HTML5/DOMContentLoaded/window.jpg" />
+        <img src="http://ie.microsoft.com/testdrive/HTML5/DOMContentLoaded/whidbey2.jpg" />
+</div>
+</body>
+</html>
