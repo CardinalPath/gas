@@ -21,7 +21,7 @@ _gas._allowAnchor = false;
  * used the same by default
  */
 _gas.push(['_addHook', '_setAllowAnchor', function(val) {
-    _gas._allowAnchor = val;
+    _gas._allowAnchor = !!val;
 }]);
 
 /**
