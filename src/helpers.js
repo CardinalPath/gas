@@ -21,7 +21,7 @@ var GasHelper = function() {
 };
 
 /**
- * Returns true if the element is foun in the Array, false otherwise.
+ * Returns true if the element is found in the Array, false otherwise.
  *
  * @param {Array} obj Array to search at.
  * @param {object} item Item to search form.
