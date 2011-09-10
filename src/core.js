@@ -22,7 +22,7 @@ if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
-//Shortcuts, these speed up the code
+//Shortcuts, these speed up and compress the code
 var document = window.document,
     toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
@@ -31,7 +31,8 @@ var document = window.document,
     trim = String.prototype.trim,
     sindexOf = String.prototype.indexOf,
     aindexOf = Array.prototype.indexOf,
-    url = document.location.href;
+    url = document.location.href,
+    documentElement = document.documentElement;
 
 /**
  * GAS Sigleton
