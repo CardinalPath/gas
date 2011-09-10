@@ -5,10 +5,11 @@
  * Negative values are sent as zero.
  * If val is NaN than it is sent as zero.
  */
-_gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
-    if (val) {
-        val = (val < 0 ? 0 : Math.round(val)) || 0;
+_gas.push(['_addHook', '_trackEvent', function() {
+    var args = slice.call(arguments);
+    if (args[3]) {
+        args[3] = (args[3] < 0 ? 0 : Math.round(args[3])) || 0;
     }
-    return [cat, act, lab, val];
+    return args;
 }]);
 
