@@ -98,13 +98,14 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
 function track_links(event_used) {
     var internal = document.location.hostname,
         gh = this,
-        i, j, el;
+        i, j, el,
+        links = document.getElementsByTagName('a');
     if (event_used !== 'now' && event_used !== 'mousedown') {
         event_used = 'click';
     }
-    for (i = 0; i < document.links.length; i++) {
-        el = document.links[i];
-        if (sindexOf.call(el.href, 'http') == 0) {
+    for (i = 0; i < links.length; i++) {
+        el = links[i];
+        if (sindexOf.call(el.href, 'http') === 0) {
             // Check to see if it's a internal link
             if (el.hostname == internal ||
               sindexOf.call(el.hostname, _internal_domain) >= 0) {

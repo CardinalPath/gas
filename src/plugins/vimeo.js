@@ -117,7 +117,10 @@ function _trackVimeo(force) {
 }
 
 _gas.push(['_addHook', '_trackVimeo', function(force) {
-    _trackVimeo.call(this, force);
+    var gh = this;
+    gh._DOMReady(function(){
+        _trackVimeo.call(gh, force);
+    }
     return false;
 }]);
 
