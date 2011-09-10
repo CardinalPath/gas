@@ -15,39 +15,33 @@
  * @this {object} GA Helper object.
  */
 function _trackOutboundLinks() {
-    var links = document.links;
-    for (var i = 0; i < links.length; i++) {
-        if (
-            sindexOf.call(links[i].href, 'http') == 0 &&
-            sindexOf.call(links[i].href, document.location.host) < 0
-       ) {
-            this._addEventListener(
-                links[i],
-                'mousedown',
-                (function(l) {
-                    return function() {
-                        var h = l.href.substring(
-                            sindexOf.call(l.href, '//') + 2
-                        );
-                        var i = sindexOf.call(h, '/') > -1 ?
-                            sindexOf.call(h, '/') : undefined;
-                        var j = sindexOf.call(h, '__utma') > -1 ?
-                            sindexOf.call(h, '__utma') : undefined;
-                        _gas.push(['_trackEvent',
-                            'Outbound',
-                            h.substring(0, i),
-                            h.substring(i, j) || '',
-                            0,
-                            true //non-interactive
-                        ]);
-                    }
-                })(links[i])
-            );
+        this._addEventListener(
+        window,
+        'mousedown',
+        function(e) {
+            var l = e.target;
+            if (l.nodeName === 'A' &&
+                sindexOf.call(l.href, 'http') == 0 &&
+                sindexOf.call(l.href, document.location.host) < 0)
+            {
+                var h = l.href.substring(
+                    sindexOf.call(l.href, '//') + 2
+                );
+                var i = sindexOf.call(h, '/') > -1 ?
+                    sindexOf.call(h, '/') : undefined;
+                var j = sindexOf.call(h, '__utm') > -1 ?
+                    (sindexOf.call(h, '__utm') - 1) : undefined;
+                _gas.push(['_trackEvent',
+                    'Outbound',
+                    h.substring(0, i),
+                    h.substring(i, j) || '',
+                    0,
+                    true //non-interactive
+                ]);
+            }
         }
-    }
+    );
 }
 
-_gas.push(['_addHook', '_trackOutboundLinks', function() {
-    _trackOutboundLinks.call(this);
-}]);
+_gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
 
