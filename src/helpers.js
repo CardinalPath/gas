@@ -89,8 +89,10 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
  */
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
-        event = event || window.event;
-        event.target = event.target || event.srcElement;
+        if (!event || !event.target) {
+            event = window.event;
+            event.target = event.srcElement;
+        }
         return ofnc.call(obj, event);
     };
     // W3C model
