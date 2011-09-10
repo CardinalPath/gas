@@ -14,7 +14,7 @@
  *
  * @return {number} height.
  */
-function get_window_height() {
+function _get_window_height() {
     return window.innerHeight || documentElement.clientHeight ||
         document.body.clientHeight || 0;
 }
@@ -24,7 +24,7 @@ function get_window_height() {
  *
  * @return {number} YScroll.
  */
-function get_window_Yscroll() {
+function _get_window_Yscroll() {
     return window.pageYOffset || document.body.scrollTop ||
         documentElement.scrollTop || 0;
 }
@@ -34,7 +34,7 @@ function get_window_Yscroll() {
  *
  * @return {number} Current document height.
  */
-function get_doc_height() {
+function _get_doc_height() {
     return Math.max(
         document.body.scrollHeight || 0, documentElement.scrollHeight || 0,
         document.body.offsetHeight || 0, documentElement.offsetHeight || 0,
@@ -48,44 +48,49 @@ function get_doc_height() {
  *
  * @return {number} Current vertical scroll percentage.
  */
-function get_scroll_percentage() {
+function _get_scroll_percentage() {
     return (
-        (get_window_Yscroll() + get_window_height()) / get_doc_height()
+        (_get_window_Yscroll() + _get_window_height()) / _get_doc_height()
     ) * 100;
 }
 
-var t = null;
-var max_scroll = 0;
-function update_scroll_percentage(now) {
-    if (t) {
-        clearTimeout(t);
+var _t = null;
+var _max_scroll = 0;
+function _update_scroll_percentage(now) {
+    if (_t) {
+        clearTimeout(_t);
     }
     if (now === true) {
-        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
+        _max_scroll = Math.max(_get_scroll_percentage(), _max_scroll);
         return;
     }
-    t = setTimeout(function() {
-        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
+    _t = setTimeout(function() {
+        _max_scroll = Math.max(_get_scroll_percentage(), _max_scroll);
     }, 400);
 }
 
-function _trackMaxScroll() {
-    this._addEventListener(window, 'scroll', update_scroll_percentage);
-    this._addEventListener(window, 'beforeunload', function() {
-        update_scroll_percentage(true);
-        var bucket = Math.floor(max_scroll / 10) * 10;
-        if (bucket < 100) {
-            var bucket = String(bucket) + '-' + String(bucket + 9);
-        }
+function _sendMaxScroll() {
+    _update_scroll_percentage(true);
+    _max_scroll = Math.floor(_max_scroll);
+    if (max_scroll <= 0 || max_scroll > 100) return;
+    var bucket = (_max_scroll > 10 ? 1 : 0) * (
+        Math.floor((_max_scroll - 1) / 10) * 10 + 1
+    );
+    bucket = String(bucket) + '-' +
+        String(Math.ceil(_max_scroll / 10) * 10);
 
-        _gas.push(['_trackEvent',
-            'Max Scroll',
-            url,
-            bucket,
-            max_scroll,
-            true // non-interactive
-        ]);
-    });
+    _gas.push(['_trackEvent',
+        'Max Scroll',
+        url,
+        bucket,
+        Math.floor(_max_scroll),
+        true // non-interactive
+    ]);
+}
+
+function _trackMaxScroll() {
+    this._addEventListener(window, 'scroll', _update_scroll_percentage);
+    this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
 
 _gas.push(['_addHook', '_trackMaxScroll', _trackMaxScroll]);
