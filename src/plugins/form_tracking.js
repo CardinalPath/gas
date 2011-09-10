@@ -86,12 +86,13 @@ function track_form(form, opt_live) {
 
 _gas.push(['_addHook', '_trackForms', function(opt_live) {
     var scp = this;
-    for (var i = 0; i < document.forms.length; i++) {
+    var forms = document.getElementsByTagName('form');
+    for (var i = 0; i < forms.length; i++) {
         try {
             // I'm not sure why it sometimes fails at Fx4 and ie8
             //FIXME: Fail with type error since it cant found the helpers on
             // 'this' object.
-            track_form.call(scp, document.forms[i], opt_live);
+            track_form.call(scp, forms[i], opt_live);
         }catch (e) {}
         if (opt_live) break;
     }
