@@ -21,10 +21,10 @@ function track_form(form, opt_live) {
     var scp = this;
 
     function tag_element(e) {
-        var el = e.target || this;
-        var el_name = el.name || el.id || el.type;
+        var el = e.target;
+        var el_name = el.name || el.id || el.type || el.nodeName;
         var action_name = e.type;
-        var form_name = form.name || form.id;
+        var form_name = form.name || form.id || undefined;
 
         form_name = form_name ? ' (' + form_name + ')' : '';
 
@@ -55,7 +55,7 @@ function track_form(form, opt_live) {
                 var el = e.target;
                 if (e.type == 'change' &&
                   scp.inArray(['input', 'select', 'textarea', 'hidden'],
-                    el.tagName.toLowerCase()
+                    el.nodeName.toLowerCase()
                   )
                 ) {
 
