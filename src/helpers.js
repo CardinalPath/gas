@@ -17,7 +17,7 @@
  * @constructor
  */
 var GasHelper = function() {
-    this['tracker'] = window['_gat']['_getTrackerByName']();
+    this['tracker'] = window['_gat']['_getTrackers']()[0];
 };
 
 /**
@@ -136,7 +136,7 @@ GasHelper.prototype._DOMReady = function(callback) {
         arguments.callee.done = true;
         callback.apply(this, arguments);
     };
-    if (/interactive|complete/.test(document.readyState)) return cb();
+    if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
     this._addEventListener(window, 'load', cb, false);
 };
