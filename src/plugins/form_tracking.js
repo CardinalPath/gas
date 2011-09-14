@@ -85,7 +85,7 @@ function track_form(form, opt_live) {
 }
 
 _gas.push(['_addHook', '_trackForms', function(opt_live) {
-    this._DOMReady(function(){
+    this._DOMReady(function() {
         var scp = this;
         var forms = document.getElementsByTagName('form');
         for (var i = 0; i < forms.length; i++) {
