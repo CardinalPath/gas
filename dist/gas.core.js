@@ -29,11 +29,11 @@
  * @constructor
  */
 var GasHelper = function() {
-    this['tracker'] = window['_gat']['_getTrackerByName']();
+    this['tracker'] = window['_gat']['_getTrackers']()[0];
 };
 
 /**
- * Returns true if the element is foun in the Array, false otherwise.
+ * Returns true if the element is found in the Array, false otherwise.
  *
  * @param {Array} obj Array to search at.
  * @param {object} item Item to search form.
@@ -101,8 +101,10 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
  */
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
-        event = event || window.event;
-        event.target = event.target || event.srcElement;
+        if (!event || !event.target) {
+            event = window.event;
+            event.target = event.srcElement;
+        }
         return ofnc.call(obj, event);
     };
     // W3C model
@@ -146,7 +148,7 @@ GasHelper.prototype._DOMReady = function(callback) {
         arguments.callee.done = true;
         callback.apply(this, arguments);
     };
-    if (/interactive|complete/.test(document.readyState)) return cb();
+    if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
     this._addEventListener(window, 'load', cb, false);
 };
@@ -175,7 +177,7 @@ if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
-//Shortcuts, these speed up the code
+//Shortcuts, these speed up and compress the code
 var document = window.document,
     toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
@@ -184,7 +186,8 @@ var document = window.document,
     trim = String.prototype.trim,
     sindexOf = String.prototype.indexOf,
     aindexOf = Array.prototype.indexOf,
-    url = document.location.href;
+    url = document.location.href,
+    documentElement = document.documentElement;
 
 /**
  * GAS Sigleton

@@ -29,11 +29,11 @@
  * @constructor
  */
 var GasHelper = function() {
-    this['tracker'] = window['_gat']['_getTrackerByName']();
+    this['tracker'] = window['_gat']['_getTrackers']()[0];
 };
 
 /**
- * Returns true if the element is foun in the Array, false otherwise.
+ * Returns true if the element is found in the Array, false otherwise.
  *
  * @param {Array} obj Array to search at.
  * @param {object} item Item to search form.
@@ -101,8 +101,10 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
  */
 GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
     var fnc = function(event) {
-        event = event || window.event;
-        event.target = event.target || event.srcElement;
+        if (!event || !event.target) {
+            event = window.event;
+            event.target = event.srcElement;
+        }
         return ofnc.call(obj, event);
     };
     // W3C model
@@ -146,7 +148,7 @@ GasHelper.prototype._DOMReady = function(callback) {
         arguments.callee.done = true;
         callback.apply(this, arguments);
     };
-    if (/interactive|complete/.test(document.readyState)) return cb();
+    if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
     this._addEventListener(window, 'load', cb, false);
 };
@@ -175,7 +177,7 @@ if (_prev_gas._accounts_length >= 0) {
     return;
 }
 
-//Shortcuts, these speed up the code
+//Shortcuts, these speed up and compress the code
 var document = window.document,
     toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
@@ -184,7 +186,8 @@ var document = window.document,
     trim = String.prototype.trim,
     sindexOf = String.prototype.indexOf,
     aindexOf = Array.prototype.indexOf,
-    url = document.location.href;
+    url = document.location.href,
+    documentElement = document.documentElement;
 
 /**
  * GAS Sigleton
@@ -533,11 +536,12 @@ _gas.push(['_addHook', '_trackDownloads', function(extensions) {
  * Negative values are sent as zero.
  * If val is NaN than it is sent as zero.
  */
-_gas.push(['_addHook', '_trackEvent', function(cat, act, lab, val) {
-    if (val) {
-        val = (val < 0 ? 0 : Math.round(val)) || 0;
+_gas.push(['_addHook', '_trackEvent', function() {
+    var args = slice.call(arguments);
+    if (args[3]) {
+        args[3] = (args[3] < 0 ? 0 : Math.round(args[3])) || 0;
     }
-    return [cat, act, lab, val];
+    return args;
 }]);
 
 /**
@@ -563,10 +567,10 @@ function track_form(form, opt_live) {
     var scp = this;
 
     function tag_element(e) {
-        var el = e.target || this;
-        var el_name = el.name || el.id || el.type;
+        var el = e.target;
+        var el_name = el.name || el.id || el.type || el.nodeName;
         var action_name = e.type;
-        var form_name = form.name || form.id;
+        var form_name = form.name || form.id || undefined;
 
         form_name = form_name ? ' (' + form_name + ')' : '';
 
@@ -597,7 +601,7 @@ function track_form(form, opt_live) {
                 var el = e.target;
                 if (e.type == 'change' &&
                   scp.inArray(['input', 'select', 'textarea', 'hidden'],
-                    el.tagName.toLowerCase()
+                    el.nodeName.toLowerCase()
                   )
                 ) {
 
@@ -627,72 +631,20 @@ function track_form(form, opt_live) {
 }
 
 _gas.push(['_addHook', '_trackForms', function(opt_live) {
-    var scp = this;
-    var forms = document.getElementsByTagName('form');
-    for (var i = 0; i < forms.length; i++) {
-        try {
-            // I'm not sure why it sometimes fails at Fx4 and ie8
-            //FIXME: Fail with type error since it cant found the helpers on
-            // 'this' object.
-            track_form.call(scp, forms[i], opt_live);
-        }catch (e) {}
-        if (opt_live) break;
-    }
-    return false;
-}]);
-
-/**
- * GAS - Google Analytics on Steroids
- *
- * HTML5 Video Tracking Plugin
- *
- * Copyright 2011, Cardinal Path and Direct Performance
- * Licensed under the MIT license.
- *
- * @author Eduardo Cereto <eduardocereto@gmail.com>
- */
-
-/**
- * Triggers the actual video/audio GA events
- *
- * To be used as a callback for the HTML5 media events
- *
- * @param {Event} e A reference to the HTML event fired.
- * @this {HTMLMediaElement} The HTML element firing the event
- */
-function _trackMediaElement(e) {
-    _gas.push(['_trackEvent', this.nodeName, e.type, this.currentSrc]);
-}
-
-/**
- * Triggers the HTML5 Video Tracking on the page
- *
- * @param {String} tag the tagName to search for.
- * @this {GasHelper} Gas Helper Singleton.
- */
-function _trackMedia(tag) {
-    var vs = document.getElementsByTagName(tag);
-    for (var i = 0; i < vs.length; i++) {
-        this._addEventListener(vs[i], 'play', _trackMediaElement);
-        this._addEventListener(vs[i], 'ended', _trackMediaElement);
-        this._addEventListener(vs[i], 'pause', _trackMediaElement);
-    }
-}
-
-_gas.push(['_addHook', '_trackVideo', function() {
-    var that = this;
     this._DOMReady(function() {
-        _trackMedia.call(that, 'video');
+        var scp = this;
+        var forms = document.getElementsByTagName('form');
+        for (var i = 0; i < forms.length; i++) {
+            try {
+                // I'm not sure why it sometimes fails at Fx4 and ie8
+                //FIXME: Fail with type error since it cant found the helpers on
+                // 'this' object.
+                track_form.call(scp, forms[i], opt_live);
+            }catch (e) {}
+            if (opt_live) break;
+        }
+        return false;
     });
-    return false;
-}]);
-
-_gas.push(['_addHook', '_trackAudio', function() {
-    var gh = this;
-    gh._DOMReady(function() {
-        _trackMedia.call(gh, 'audio');
-    });
-    return false;
 }]);
 
 /**
@@ -707,74 +659,23 @@ _gas.push(['_addHook', '_trackAudio', function() {
  */
 
 /**
- * Get current windows width and heigtht
+ * Get current browser viewpane heigtht
  *
- * @return {Array.<number>} [width,height].
+ * @return {number} height.
  */
-function get_window_size() {
-    var myWidth = 0, myHeight = 0;
-    if (typeof(window.innerWidth) == 'number') {
-        //Non-IE
-        myWidth = window.innerWidth;
-        myHeight = window.innerHeight;
-    } else if (
-        document.documentElement &&
-        (
-            document.documentElement.clientWidth ||
-            document.documentElement.clientHeight
-        )
-    ) {
-        //IE 6+ in 'standards compliant mode'
-        myWidth = document.documentElement.clientWidth;
-        myHeight = document.documentElement.clientHeight;
-    } else if (
-        document.body &&
-        (
-            document.body.clientWidth ||
-            document.body.clientHeight
-        )
-    ) {
-        //IE 4 compatible
-        myWidth = document.body.clientWidth;
-        myHeight = document.body.clientHeight;
-    }
-
-    return [myWidth, myHeight];
+function _get_window_height() {
+    return window.innerHeight || documentElement.clientHeight ||
+        document.body.clientHeight || 0;
 }
 
 /**
  * Get current absolute window scroll position
  *
- * @return {Array.<number>} [XScroll,YScroll].
+ * @return {number} YScroll.
  */
-function get_window_scroll() {
-    var scrOfX = 0, scrOfY = 0;
-    if (typeof(window.pageYOffset) == 'number') {
-        //Netscape compliant
-        scrOfY = window.pageYOffset;
-        scrOfX = window.pageXOffset;
-    } else if (
-        document.body &&
-        (
-            document.body.scrollLeft ||
-            document.body.scrollTop
-        )
-    ) {
-        //DOM compliant
-        scrOfY = document.body.scrollTop;
-        scrOfX = document.body.scrollLeft;
-    } else if (
-        document.documentElement &&
-        (
-            document.documentElement.scrollLeft ||
-            document.documentElement.scrollTop
-        )
-    ) {
-        //IE6 standards compliant mode
-        scrOfY = document.documentElement.scrollTop;
-        scrOfX = document.documentElement.scrollLeft;
-    }
-    return [scrOfX, scrOfY];
+function _get_window_Yscroll() {
+    return window.pageYOffset || document.body.scrollTop ||
+        documentElement.scrollTop || 0;
 }
 
 /**
@@ -782,12 +683,11 @@ function get_window_scroll() {
  *
  * @return {number} Current document height.
  */
-function get_doc_height() {
-    var D = document;
+function _get_doc_height() {
     return Math.max(
-        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
-        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
-        Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+        document.body.scrollHeight || 0, documentElement.scrollHeight || 0,
+        document.body.offsetHeight || 0, documentElement.offsetHeight || 0,
+        document.body.clientHeight || 0, documentElement.clientHeight || 0
     );
 }
 
@@ -797,55 +697,52 @@ function get_doc_height() {
  *
  * @return {number} Current vertical scroll percentage.
  */
-function get_scroll_percentage() {
-    return ((
-        get_window_scroll()[1] +
-        get_window_size()[1]
-
-    ) / (
-        get_doc_height()
-    )) * 100;
+function _get_scroll_percentage() {
+    return (
+        (_get_window_Yscroll() + _get_window_height()) / _get_doc_height()
+    ) * 100;
 }
 
-var t = null;
-var max_scroll = 0;
-function update_scroll_percentage(now) {
-    if (t) {
-        clearTimeout(t);
+var _t = null;
+var _max_scroll = 0;
+function _update_scroll_percentage(now) {
+    if (_t) {
+        clearTimeout(_t);
     }
     if (now === true) {
-        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
+        _max_scroll = Math.max(_get_scroll_percentage(), _max_scroll);
         return;
     }
-    t = setTimeout(function() {
-        max_scroll = Math.max(get_scroll_percentage(), max_scroll);
+    _t = setTimeout(function() {
+        _max_scroll = Math.max(_get_scroll_percentage(), _max_scroll);
     }, 400);
 }
 
+function _sendMaxScroll() {
+    _update_scroll_percentage(true);
+    _max_scroll = Math.floor(_max_scroll);
+    if (max_scroll <= 0 || max_scroll > 100) return;
+    var bucket = (_max_scroll > 10 ? 1 : 0) * (
+        Math.floor((_max_scroll - 1) / 10) * 10 + 1
+    );
+    bucket = String(bucket) + '-' +
+        String(Math.ceil(_max_scroll / 10) * 10);
 
-function track_max_scroll() {
-    this._addEventListener(window, 'beforeunload', function() {
-        update_scroll_percentage(true);
-        var bucket = Math.floor(max_scroll / 10) * 10;
-        if (bucket < 100) {
-            var bucket = String(bucket) + '-' + String(bucket + 9);
-        }
-
-        _gas.push(['_trackEvent',
-            'Max Scroll',
-            url,
-            String(bucket),
-            Math.round(max_scroll),
-            true // non-interactive
-        ]);
-    });
-
+    _gas.push(['_trackEvent',
+        'Max Scroll',
+        url,
+        bucket,
+        Math.floor(_max_scroll),
+        true // non-interactive
+    ]);
 }
 
-_gas.push(['_addHook', '_trackMaxSrcoll', function() {
-    this._addEventListener(window, 'scroll', update_scroll_percentage);
-    track_max_scroll.call(this);
-}]);
+function _trackMaxScroll() {
+    this._addEventListener(window, 'scroll', _update_scroll_percentage);
+    this._addEventListener(window, 'beforeunload', _sendMaxScroll);
+}
+
+_gas.push(['_addHook', '_trackMaxScroll', _trackMaxScroll]);
 
 /**
  * GAS - Google Analytics on Steroids
@@ -870,7 +767,7 @@ _gas._allowAnchor = false;
  * used the same by default
  */
 _gas.push(['_addHook', '_setAllowAnchor', function(val) {
-    _gas._allowAnchor = val;
+    _gas._allowAnchor = !!val;
 }]);
 
 /**
