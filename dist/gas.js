@@ -721,7 +721,7 @@ function _update_scroll_percentage(now) {
 function _sendMaxScroll() {
     _update_scroll_percentage(true);
     _max_scroll = Math.floor(_max_scroll);
-    if (max_scroll <= 0 || max_scroll > 100) return;
+    if (_max_scroll <= 0 || _max_scroll > 100) return;
     var bucket = (_max_scroll > 10 ? 1 : 0) * (
         Math.floor((_max_scroll - 1) / 10) * 10 + 1
     );
