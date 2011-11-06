@@ -919,23 +919,19 @@ function _trackOutboundLinks() {
         'mousedown',
         function(e) {
             var l = e.target;
-            if (l.nodeName === 'A' &&
-                sindexOf.call(l.href, 'http') == 0 &&
-                sindexOf.call(l.href, document.location.host) < 0)
+            if (l.nodeName == 'A' &&
+                (l.protocol == 'http:' || l.protocol == 'https:') &&
+                sindexOf.call(l.href, document.location.hostname) === -1)
             {
-                var h = l.href.substring(
-                    sindexOf.call(l.href, '//') + 2
-                );
-                var i = sindexOf.call(h, '/') > -1 ?
-                    sindexOf.call(h, '/') : undefined;
-                var j = sindexOf.call(h, '__utm') > -1 ?
-                    (sindexOf.call(h, '__utm') - 1) : undefined;
+                var path = (l.pathname + l.search + ''),
+                    utm = sindexOf.call(path, '__utm');
+                if (utm !== -1) {
+                    path = path.substring(0, utm);
+                }
                 _gas.push(['_trackEvent',
                     'Outbound',
-                    h.substring(0, i),
-                    h.substring(i, j) || '',
-                    0,
-                    true //non-interactive
+                    l.hostname,
+                    path
                 ]);
             }
         }
@@ -943,6 +939,7 @@ function _trackOutboundLinks() {
 }
 
 _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
+
 
 /**
  * GAS - Google Analytics on Steroids
