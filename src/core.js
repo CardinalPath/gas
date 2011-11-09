@@ -48,6 +48,8 @@ function GAS() {
     self._hooks = {
         '_addHook': [self._addHook]
     };
+    // Need to be pushed to make sure tracker is done
+    // Sets up helpers, very first thing pushed into gas
     self.push(function() {
         self.gh = new GasHelper();
     });
@@ -101,6 +103,7 @@ function _gaq_push(arr) {
  */
 GAS.prototype._execute = function() {
     var args = slice.call(arguments),
+        self = this,
         sub = args.shift(),
         gaq_execute = true,
         i, foo, hooks, acct_name, repl_sub;
@@ -108,12 +111,12 @@ GAS.prototype._execute = function() {
     if (typeof sub === 'function') {
         // Pushed functions are executed right away
         return _gaq_push(
-            (function(s) {
+            (function(s, gh) {
                 return function() {
                     // pushed functions receive helpers through this object
-                    s.call(_gas.gh);
+                    s.call(gh);
                 };
-            })(sub)
+            })(sub, self.gh)
         );
 
     }else if (typeof sub === 'object' && sub.length > 0) {
@@ -127,22 +130,23 @@ GAS.prototype._execute = function() {
         }
 
         // Execute hooks
-        hooks = _gas._hooks[foo];
+        hooks = self._hooks[foo];
         if (hooks && hooks.length > 0) {
             for (i = 0; i < hooks.length; i++) {
                 try {
-                    repl_sub = hooks[i].apply(_gas.gh, sub);
+                    repl_sub = hooks[i].apply(self.gh, sub);
                     if (repl_sub === false) {
                         // Returning false from a hook cancel the call
                         gaq_execute = false;
-                    }
-                    if (repl_sub && repl_sub.length > 0) {
-                        // Returning an array changes the call parameters
-                        sub = repl_sub;
+                    }else {
+                        if (repl_sub && repl_sub.length > 0) {
+                            // Returning an array changes the call parameters
+                            sub = repl_sub;
+                        }
                     }
                 }catch (e) {
                     if (foo !== '_trackException') {
-                        _gas.push(['_trackException', e]);
+                        self.push(['_trackException', e]);
                     }
                 }
             }
@@ -154,8 +158,8 @@ GAS.prototype._execute = function() {
         // Intercept _setAccount calls
         if (foo === '_setAccount') {
 
-            for (i in _gas._accounts) {
-                if (_gas._accounts[i] == sub[0]) {
+            for (i in self._accounts) {
+                if (self._accounts[i] == sub[0]) {
                     // Repeated account
                     if (acct_name === undefined) {
                         return 1;
@@ -163,14 +167,14 @@ GAS.prototype._execute = function() {
                 }
             }
             acct_name = acct_name || '_gas' +
-                String(_gas._accounts_length + 1);
+                String(self._accounts_length + 1);
             // Force that the first unamed account is _gas1
-            if (typeof _gas._accounts['_gas1'] == 'undefined' &&
+            if (typeof self._accounts['_gas1'] == 'undefined' &&
                 sindexOf.call(acct_name, '_gas') != -1) {
                 acct_name = '_gas1';
             }
-            _gas._accounts[acct_name] = sub[0];
-            _gas._accounts_length += 1;
+            self._accounts[acct_name] = sub[0];
+            self._accounts_length += 1;
             acct_name = _build_acct_name(acct_name);
             return _gaq_push([acct_name + foo, sub[0]]);
         }
@@ -184,7 +188,7 @@ GAS.prototype._execute = function() {
 
         // If user provides account than trigger event for just that account.
         var acc_foo;
-        if (acct_name && _gas._accounts[acct_name]) {
+        if (acct_name && self._accounts[acct_name]) {
             acc_foo = _build_acct_name(acct_name) + foo;
             args = slice.call(sub);
             args.unshift(acc_foo);
@@ -193,8 +197,8 @@ GAS.prototype._execute = function() {
 
         // Call Original _gaq, for all accounts
         var return_val = 0;
-        for (i in _gas._accounts) {
-            if (hasOwn.call(_gas._accounts, i)) {
+        for (i in self._accounts) {
+            if (hasOwn.call(self._accounts, i)) {
                 acc_foo = _build_acct_name(i) + foo;
                 args = slice.call(sub);
                 args.unshift(acc_foo);
@@ -213,13 +217,14 @@ GAS.prototype._execute = function() {
  * _gas._execute() with the same arguments.
  */
 GAS.prototype.push = function() {
+    var self = this;
     var args = slice.call(arguments);
     for (var i = 0; i < args.length; i++) {
-        (function(arr) {
+        (function(arr, self) {
             window['_gaq'].push(function() {
-                _gas._execute.call(_gas.gh, arr);
+                self._execute.call(self, arr);
             });
-        })(args[i]);
+        })(args[i], self);
     }
 };
 
