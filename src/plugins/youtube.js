@@ -74,7 +74,7 @@ function _trackYoutube(force) {
                     }
                 }else {
                     // We can't track players that don't have api enabled.
-                    break;
+                    continue;
                 }
             }
             youtube_videos.push(iframes[i]);
