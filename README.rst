@@ -262,9 +262,9 @@ Then you can enable this parameter only in the videos you want to track.
 
 .. _Vimeo: http://www.vimeo.com/
 
-YouTube Video Tracking
+Youtube Video Tracking
 ~~~~~~~~~~~~~~~~~~~~~~
-You can track YouTube_ video events. You must be using the iframe method 
+You can track Youtube_ video events. You must be using the iframe method 
 of embedding videos. 
 
 The browser must support HTML5 postMessage. That means it won't work on ie6 
@@ -272,7 +272,7 @@ and ie7.
 
 ::
 
-    _gas.push(['_trackYouTube', 'force']);
+    _gas.push(['_trackYoutube', 'force']);
 
 After you enable it the following events will be tracked. 
 
@@ -297,7 +297,7 @@ If you only want to track some videos (not all) on your site you can omit the
 Then you can enable this parameter only in the videos you want to track.
 
 
-.. _YouTube: http://www.youtube.com/
+.. _Youtube: http://www.youtube.com/
 
 
 .. _gas-license:
