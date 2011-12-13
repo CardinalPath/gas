@@ -67,7 +67,7 @@ var _internal_domain = undefined;
  * used to track external domains with cookie data.
  */
 _gas.push(['_addHook', '_setDomainName', function(domainName) {
-    if (sindexOf.call('.'+document.location.hostname, domainName) < 0) {
+    if (sindexOf.call('.' + document.location.hostname, domainName) < 0) {
         _external_domains.push(domainName);
         return false;
     }
