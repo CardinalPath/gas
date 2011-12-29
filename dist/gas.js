@@ -1163,7 +1163,7 @@ function _ytStartPool(target) {
 
 function _ytPool(target, hash) {
     if (poolMaps[hash] == undefined) {
-        _ytStopPool(target);
+        return false;
     }
     var p = target['getCurrentTime']() / target['getDuration']() * 100;
     if (p >= poolMaps[hash].timeTriggers[0]) {
@@ -1180,7 +1180,8 @@ function _ytPool(target, hash) {
 
 function _ytStopPool(target) {
     var h = target['getVideoData']()['video_id'];
-    if (poolMaps[h]) {
+    if (poolMaps[h] && poolMaps[h].timer) {
+        _ytPool(target, h); // Pool one last time before clearing it.
         clearTimeout(poolMaps[h].timer);
     }
 }
@@ -1205,6 +1206,7 @@ function _ytStateChange(event) {
             break;
         case 2:
             action = 'pause';
+            _ytStopPool(event['target']);
             break;
     }
     if (action) {
