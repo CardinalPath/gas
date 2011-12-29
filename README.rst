@@ -296,6 +296,13 @@ If you only want to track some videos (not all) on your site you can omit the
 `enablejsapi` parameter.
 Then you can enable this parameter only in the videos you want to track.
 
+_trackYoutube also support a second optional parameter. It should be an Array of integers and define percentages to fire an event at:
+
+::
+    
+    _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90]]);
+
+This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish', ...
 
 .. _Youtube: http://www.youtube.com/
 

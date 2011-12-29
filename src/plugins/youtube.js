@@ -10,6 +10,56 @@
  */
 
 /**
+ * Array of percentage to fire events.
+ *
+ */
+var timeTriggers = [];
+
+
+/**
+ * Used to map each vid to a set of timeTriggers and it's pool timer
+ */
+var poolMaps = {};
+
+
+function _ytStartPool(target) {
+    if (timeTriggers && timeTriggers.length) {
+        var h = target['getVideoData']()['video_id'];
+        if (poolMaps[h]) {
+            _ytStopPool(target);
+        }else {
+            poolMaps[h] = {};
+            poolMaps[h].timeTriggers = slice.call(timeTriggers);
+        }
+        poolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
+    }
+}
+
+function _ytPool(target, hash) {
+    if (poolMaps[hash] == undefined) {
+        _ytStopPool(target);
+    }
+    var p = target['getCurrentTime']() / target['getDuration']() * 100;
+    if (p >= poolMaps[hash].timeTriggers[0]) {
+        var action = poolMaps[hash].timeTriggers.shift();
+        _gas.push([
+            '_trackEvent',
+            'YouTube Video',
+            action + '%',
+            target['getVideoUrl']()
+        ]);
+    }
+    poolMaps[hash].timer = setTimeout(_ytPool, 1000, target, hash);
+}
+
+function _ytStopPool(target) {
+    var h = target['getVideoData']()['video_id'];
+    if (poolMaps[h]) {
+        clearTimeout(poolMaps[h].timer);
+    }
+}
+
+/**
  * Called when the Video State changes
  *
  * We are currently tracking only finish, play and pause events
@@ -21,9 +71,11 @@ function _ytStateChange(event) {
     switch (event['data']) {
         case 0:
             action = 'finish';
+            _ytStopPool(event['target']);
             break;
         case 1:
             action = 'play';
+            _ytStartPool(event['target']);
             break;
         case 2:
             action = 'pause';
@@ -58,8 +110,10 @@ function _ytError(event) {
  * @param {(string|boolean)} force evaluates to true if we should force the
  * enablejsapi=1 parameter on the url to activate the api. May cause the player
  * to reload.
+ * @param {Array} opt_timeTriggers Array of integers from 0 to 100 that define
+ * the steps to fire an event. eg: [25, 50, 75, 90].
  */
-function _trackYoutube(force) {
+function _trackYoutube(force, opt_timeTriggers) {
     var youtube_videos = [];
     var iframes = document.getElementsByTagName('iframe');
     for (var i = 0; i < iframes.length; i++) {
@@ -81,6 +135,9 @@ function _trackYoutube(force) {
         }
     }
     if (youtube_videos.length > 0) {
+        if (opt_timeTriggers && opt_timeTriggers.length) {
+            timeTriggers = opt_timeTriggers;
+        }
         // this function will be called when the youtube api loads
         window['onYouTubePlayerAPIReady'] = function() {
             var p;
@@ -100,10 +157,11 @@ function _trackYoutube(force) {
     }
 }
 
-_gas.push(['_addHook', '_trackYoutube', function(force) {
+_gas.push(['_addHook', '_trackYoutube', function() {
+    var args = slice.call(arguments);
     var gh = this;
     gh._DOMReady(function() {
-        _trackYoutube.call(gh, force);
+        _trackYoutube.apply(gh, args);
     });
     return false;
 }]);
