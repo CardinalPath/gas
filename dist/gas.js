@@ -501,22 +501,25 @@ function _checkFile(src, extensions) {
  * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {
-var gh = this;
-    // Uses live tracking to make it faster.
-    this._addEventListener(window, 'mousedown', function(e) {
-        if (e.target && e.target.tagName === 'A') {
-            var ext = _checkFile.call(gh, e.target.href, extensions);
-            if (ext) {
-                _gas.push(['_trackEvent',
-                    'Download', ext, e.target.href
-                ]);
+    var gh = this;
+    var links = document.getElementsByTagName('a');
+    for (var i = 0; i < links.length; i++) {
+        this._addEventListener(links[i], 'mousedown', function(e) {
+            if (e.target && e.target.tagName === 'A') {
+                var ext = _checkFile.call(gh, e.target.href, extensions);
+                if (ext) {
+                    _gas.push(['_trackEvent',
+                        'Download', ext, e.target.href
+                    ]);
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 /**
- * TODO: Write doc
+ * GAA Hook, receive the extensions to extend default extensions. And trigger
+ * the binding of the events.
  *
  * @param {string|Array} extensions additional file extensions to track as
  * downloads.
@@ -971,28 +974,31 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * @this {object} GA Helper object.
  */
 function _trackOutboundLinks() {
+    var links = document.getElementsByTagName('a');
+    for (var i = 0; i < links.length; i++) {
         this._addEventListener(
-        window,
-        'mousedown',
-        function(e) {
-            var l = e.target;
-            if (l.nodeName == 'A' &&
-                (l.protocol == 'http:' || l.protocol == 'https:') &&
-                sindexOf.call(l.href, document.location.hostname) === -1)
-            {
-                var path = (l.pathname + l.search + ''),
-                    utm = sindexOf.call(path, '__utm');
-                if (utm !== -1) {
-                    path = path.substring(0, utm);
+            links[i],
+            'mousedown',
+            function(e) {
+                var l = e.target;
+                if (
+                    (l.protocol == 'http:' || l.protocol == 'https:') &&
+                    sindexOf.call(l.href, document.location.hostname) === -1)
+                {
+                    var path = (l.pathname + l.search + ''),
+                        utm = sindexOf.call(path, '__utm');
+                    if (utm !== -1) {
+                        path = path.substring(0, utm);
+                    }
+                    _gas.push(['_trackEvent',
+                        'Outbound',
+                        l.hostname,
+                        path
+                    ]);
                 }
-                _gas.push(['_trackEvent',
-                    'Outbound',
-                    l.hostname,
-                    path
-                ]);
             }
-        }
-    );
+        );
+    }
 }
 
 _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
@@ -1162,7 +1168,8 @@ function _ytStartPool(target) {
 }
 
 function _ytPool(target, hash) {
-    if (poolMaps[hash] == undefined) {
+    if (poolMaps[hash] == undefined ||
+        poolMaps[hash].timeTriggers.length <= 0) {
         return false;
     }
     var p = target['getCurrentTime']() / target['getDuration']() * 100;

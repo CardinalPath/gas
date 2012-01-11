@@ -41,22 +41,25 @@ function _checkFile(src, extensions) {
  * @param {Array} extensions List of possible extensions for download links.
  */
 function _trackDownloads(extensions) {
-var gh = this;
-    // Uses live tracking to make it faster.
-    this._addEventListener(window, 'mousedown', function(e) {
-        if (e.target && e.target.tagName === 'A') {
-            var ext = _checkFile.call(gh, e.target.href, extensions);
-            if (ext) {
-                _gas.push(['_trackEvent',
-                    'Download', ext, e.target.href
-                ]);
+    var gh = this;
+    var links = document.getElementsByTagName('a');
+    for (var i = 0; i < links.length; i++) {
+        this._addEventListener(links[i], 'mousedown', function(e) {
+            if (e.target && e.target.tagName === 'A') {
+                var ext = _checkFile.call(gh, e.target.href, extensions);
+                if (ext) {
+                    _gas.push(['_trackEvent',
+                        'Download', ext, e.target.href
+                    ]);
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 /**
- * TODO: Write doc
+ * GAA Hook, receive the extensions to extend default extensions. And trigger
+ * the binding of the events.
  *
  * @param {string|Array} extensions additional file extensions to track as
  * downloads.

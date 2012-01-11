@@ -15,28 +15,31 @@
  * @this {object} GA Helper object.
  */
 function _trackOutboundLinks() {
+    var links = document.getElementsByTagName('a');
+    for (var i = 0; i < links.length; i++) {
         this._addEventListener(
-        window,
-        'mousedown',
-        function(e) {
-            var l = e.target;
-            if (l.nodeName == 'A' &&
-                (l.protocol == 'http:' || l.protocol == 'https:') &&
-                sindexOf.call(l.href, document.location.hostname) === -1)
-            {
-                var path = (l.pathname + l.search + ''),
-                    utm = sindexOf.call(path, '__utm');
-                if (utm !== -1) {
-                    path = path.substring(0, utm);
+            links[i],
+            'mousedown',
+            function(e) {
+                var l = e.target;
+                if (
+                    (l.protocol == 'http:' || l.protocol == 'https:') &&
+                    sindexOf.call(l.href, document.location.hostname) === -1)
+                {
+                    var path = (l.pathname + l.search + ''),
+                        utm = sindexOf.call(path, '__utm');
+                    if (utm !== -1) {
+                        path = path.substring(0, utm);
+                    }
+                    _gas.push(['_trackEvent',
+                        'Outbound',
+                        l.hostname,
+                        path
+                    ]);
                 }
-                _gas.push(['_trackEvent',
-                    'Outbound',
-                    l.hostname,
-                    path
-                ]);
             }
-        }
-    );
+        );
+    }
 }
 
 _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);

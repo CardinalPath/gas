@@ -36,7 +36,8 @@ function _ytStartPool(target) {
 }
 
 function _ytPool(target, hash) {
-    if (poolMaps[hash] == undefined) {
+    if (poolMaps[hash] == undefined ||
+        poolMaps[hash].timeTriggers.length <= 0) {
         return false;
     }
     var p = target['getCurrentTime']() / target['getDuration']() * 100;
