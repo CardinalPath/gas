@@ -131,10 +131,11 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * @return {boolean} Ignore return value.
  */
 GasHelper.prototype._DOMReady = function(callback) {
+    var scp = this;
     var cb = function() {
         if (arguments.callee.done) return;
         arguments.callee.done = true;
-        callback.apply(this, arguments);
+        callback.apply(scp, arguments);
     };
     if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
