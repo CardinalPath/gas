@@ -395,7 +395,7 @@ window['_gas'] = _gas = new GAS();
 
 
 /**
- * Hook for _trackExceptions
+ * Hook for _trackException
  *
  * Watchout for circular calls
  */

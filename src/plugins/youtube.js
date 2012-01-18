@@ -105,6 +105,38 @@ function _ytError(event) {
 }
 
 /**
+ * Looks for object/embed youtube videos and migrate them to the iframe method
+ *  so it tries to track them
+ */
+function _ytMigrateObjectEmbed() {
+    var objs = document.getElementsByTagName('object');
+    var pars, ifr, ytid;
+    var r = /(https?:\/\/www\.youtube(-nocookie)?\.com[^/]*).*\/v\/([^&?]+)/;
+    for (var i = 0; i < objs.length; i++) {
+        pars = objs[i].getElementsByTagName('param');
+        for (var j = 0; j < pars.length; j++) {
+            if (pars[j].name == 'movie' && pars[j].value) {
+                // Replace the object with an iframe
+                ytid = pars[j].value.match(r);
+                if (ytid && ytid[1] && ytid[3]) {
+                    ifr = document.createElement('iframe');
+                    ifr.src = ytid[1] + '/embed/' + ytid[3] + '?enablejsapi=1';
+                    ifr.width = objs[i].width;
+                    ifr.height = objs[i].height;
+                    ifr.setAttribute('frameBorder', '0');
+                    ifr.setAttribute('allowfullscreen', '');
+                    objs[i].parentNode.insertBefore(ifr, objs[i]);
+                    objs[i].parentNode.removeChild(objs[i]);
+                    // Since we removed the object the Array changed
+                    i--;
+                }
+                break;
+            }
+        }
+    }
+}
+
+/**
  * Triggers the YouTube Tracking on the page
  *
  * Only works for the iframe tag. The video must have the parameter
@@ -112,11 +144,21 @@ function _ytError(event) {
  *
  * @param {(string|boolean)} force evaluates to true if we should force the
  * enablejsapi=1 parameter on the url to activate the api. May cause the player
- * to reload.
+ * to reload. Also converts object/embedded youtube videos to iframe.
  * @param {Array} opt_timeTriggers Array of integers from 0 to 100 that define
  * the steps to fire an event. eg: [25, 50, 75, 90].
  */
 function _trackYoutube(force, opt_timeTriggers) {
+    if (force) {
+        try {
+            _ytMigrateObjectEmbed();
+        }catch (e) {
+            _gas.push(['_trackException', e,
+                'GAS Error on youtube.js:_ytMigrateObjectEmbed'
+            ]);
+        }
+    }
+
     var youtube_videos = [];
     var iframes = document.getElementsByTagName('iframe');
     for (var i = 0; i < iframes.length; i++) {
@@ -152,7 +194,12 @@ function _trackYoutube(force, opt_timeTriggers) {
         };
         // load the youtube player api
         var tag = document.createElement('script');
-        tag.src = 'http://www.youtube.com/player_api';
+        //XXX use document.location.protocol
+        var protocol = 'http:';
+        if (document.location.protocol === 'https:') {
+            protocol = 'https:';
+        }
+        tag.src = protocol + '//www.youtube.com/player_api';
         tag.type = 'text/javascript';
         tag.async = true;
         var firstScriptTag = document.getElementsByTagName('script')[0];
