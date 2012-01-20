@@ -1,0 +1,32 @@
+<html>
+<head>
+    <script type="text/javascript">
+        var _gas = _gas || [];
+        _gas.push(['_setDebug', true]);
+        _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+        _gas.push(['_setDomainName', 'example.com']);
+        _gas.push(['_setDomainName', 'example2xxx.com']);
+        _gas.push(['_trackPageview', '/test']);
+        _gas.push(['_setAllowLinker', true]);
+        _gas.push(['_setMultiDomain', 'now']);
+
+        (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.min.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+    <ul>
+    <li><a href="/testFakeLink">Internal Link</a></li>
+    <li><a href="http://www.example.com/test">Internal Link</a></li>
+    <li><a href="http://www.example2xxx.com/test">External Link</a></li>
+    <li><a href="//www.example2xxx.com/test">External Link</a></li>
+    <li><a href="http://www.example3.com/test">Outbound Link</a></li>
+    </ul>
+</body>
+</html>
