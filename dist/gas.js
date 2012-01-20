@@ -29,7 +29,16 @@
  * @constructor
  */
 var GasHelper = function() {
-    this['tracker'] = window['_gat']['_getTrackers']()[0];
+    this._setDummyTracker();
+};
+
+GasHelper.prototype._setDummyTracker = function() {
+    if (!this['tracker']) {
+        var trackers = window['_gat']['_getTrackers']();
+        if (trackers.length > 0) {
+            this['tracker'] = trackers[0];
+        }
+    }
 };
 
 /**
@@ -262,7 +271,7 @@ GAS.prototype._execute = function() {
         self = this,
         sub = args.shift(),
         gaq_execute = true,
-        i, foo, hooks, acct_name, repl_sub;
+        i, foo, hooks, acct_name, repl_sub, return_val = 0;
 
     if (typeof sub === 'function') {
         // Pushed functions are executed right away
@@ -332,7 +341,10 @@ GAS.prototype._execute = function() {
             self._accounts[acct_name] = sub[0];
             self._accounts_length += 1;
             acct_name = _build_acct_name(acct_name);
-            return _gaq_push([acct_name + foo, sub[0]]);
+            return_val = _gaq_push([acct_name + foo, sub[0]]);
+            // Must try t get the tracker if it's a _setAccount
+            self.gh._setDummyTracker();
+            return return_val;
         }
 
         // Intercept _linka and _linkByPost
@@ -352,7 +364,6 @@ GAS.prototype._execute = function() {
         }
 
         // Call Original _gaq, for all accounts
-        var return_val = 0;
         for (i in self._accounts) {
             if (hasOwn.call(self._accounts, i)) {
                 acc_foo = _build_acct_name(i) + foo;

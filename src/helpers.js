@@ -17,7 +17,16 @@
  * @constructor
  */
 var GasHelper = function() {
-    this['tracker'] = window['_gat']['_getTrackers']()[0];
+    this._setDummyTracker();
+};
+
+GasHelper.prototype._setDummyTracker = function() {
+    if (!this['tracker']) {
+        var trackers = window['_gat']['_getTrackers']();
+        if (trackers.length > 0) {
+            this['tracker'] = trackers[0];
+        }
+    }
 };
 
 /**
