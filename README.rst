@@ -22,11 +22,11 @@ with Google.
 Installation
 ------------
 
-To install GAS download the script from Download_ Page and put it somewhere on
+To install GAS download the script from dist_ folder and put it somewhere on
 your website. Also install the basic snippet on every page of your website. Be
 sure to change the Account Number (UA) and the correct gas.js file location.
 
-.. _Download: https://bitbucket.org/dpc/gas/downloads
+.. _dist: https://github.com/CardinalPath/gas/tree/master/dist
 
 The basic snippet looks like this:
 
@@ -35,10 +35,13 @@ The basic snippet looks like this:
     <script type="text/javascript">
     var _gas = _gas || [];
     _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
-    _gas.push(['_trackPageview', '/test']);
+    _gas.push(['_trackPageview']);
     _gas.push(['_trackForms']);
     _gas.push(['_trackOutboundLinks']);
+    _gas.push(['_trackMaxScroll']);
     _gas.push(['_trackDownloads']);
+    _gas.push(['_trackYoutube', 'force']);
+    _gas.push(['_trackVimeo', 'force']);
     
     (function() {
     var ga = document.createElement('script');
