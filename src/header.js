@@ -5,7 +5,5 @@
  * https://bitbucket.org/dpc/gas
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * $Revision$
- * $Date$
  * Licensed under the MIT license.
  */

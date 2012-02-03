@@ -5,8 +5,6 @@
  * https://bitbucket.org/dpc/gas
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
- * $Revision$
- * $Date$
  * Licensed under the MIT license.
  */
 (function(window, undefined) {
@@ -205,6 +203,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
+    self['version'] = '1.0.0';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
