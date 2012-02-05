@@ -34,7 +34,8 @@ The basic snippet looks like this:
 
     <script type="text/javascript">
     var _gas = _gas || [];
-    _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+    _gas.push(['_setAccount', 'UA-YYYYYY-Y']); // REPLACE WITH YOUR GA NUMBER
+    _gas.push(['_setDomainName', '.mydomain.com']); // REPLACE WITH YOUR DOMAIN
     _gas.push(['_trackPageview']);
     _gas.push(['_trackForms']);
     _gas.push(['_trackOutboundLinks']);
