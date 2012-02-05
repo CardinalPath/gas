@@ -145,6 +145,7 @@ function. You just need to push all domain names with _setDomainName.
 ::
 
     _gas.push(['_setAccount', 'UA-XXXXX-1']);
+    _gas.push(['_setAllowLinker', true]);
     _gas.push(['_setDomainName', 'mysite.com']);
     _gas.push(['_setDomainName', 'myothersite.com']);
     _gas.push(['_setMultiDomain', 'click']);
