@@ -18,7 +18,7 @@
  * @return {boolean} true if it worked or false otherwise.
  */
 function _vimeoPostMessage(method, params, target) {
-    if (!target.contentWindow || !target.contentWindow.postMessage) {
+    if (!target.contentWindow || !target.contentWindow.postMessage || !JSON) {
         return false;
     }
     var url = target.getAttribute('src').split('?')[0],
