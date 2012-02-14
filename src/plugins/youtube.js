@@ -11,7 +11,6 @@
 
 /**
  * Array of percentage to fire events.
- *
  */
 var timeTriggers = [];
 

@@ -5,14 +5,14 @@
         _gas.push(['_setDebug', true]);
         _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
         _gas.push(['_trackPageview', '/test']);
-        _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90]]);
-        _gas.push(['_trackVimeo', 'force']);
+        _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90, 99, 100]]);
+        _gas.push(['_trackVimeo', 'force', [25, 50, 75, 90, 99, 100]]);
 
         (function() {
         var ga = document.createElement('script');
         ga.type = 'text/javascript';
         ga.async = true;
-        ga.src = '../dist/gas.min.js';
+        ga.src = '../dist/gas.js';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(ga, s);
         })();
