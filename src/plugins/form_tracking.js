@@ -87,16 +87,16 @@ function track_form(form, opts) {
 _gas.push(['_addHook', '_trackForms', function(opts) {
     var scp = this;
     // Support legacy opts as a boolean.
-    if(typeof opts === 'boolean'){
+    if (typeof opts === 'boolean') {
         opts = {'live': opts};
-    } else if(typeof opts !== 'object'){
+    } else if (typeof opts !== 'object') {
         opts = {};
     }
     // Make sure required attrs are defined or fallback to default
     opts['category'] = opts['category'] || 'Form Tracking';
     opts['live'] = opts['live'] || true;
-    
-    
+
+
     this._DOMReady(function() {
         var forms = document.getElementsByTagName('form');
         for (var i = 0; i < forms.length; i++) {

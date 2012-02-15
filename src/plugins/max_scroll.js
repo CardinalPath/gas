@@ -90,9 +90,10 @@ function _sendMaxScroll() {
 
 var _maxScrollOpts;
 /**
- * Tracks the max Scroll on the page. 
- * 
+ * Tracks the max Scroll on the page.
+ *
  * @param {object} opts GAS Options to be used.
+ * @this {GasHelper} The Ga Helper object
  */
 function _trackMaxScroll(opts) {
     _maxScrollOpts = opts || {};

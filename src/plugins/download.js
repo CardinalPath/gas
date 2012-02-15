@@ -38,14 +38,15 @@ function _checkFile(src, extensions) {
  * Register the event to listen to downloads
  *
  * @this {GasHelper} GA Helper object.
- * @param {Array|object} extensions List of possible extensions for download links.
+ * @param {Array|object} opts List of possible extensions for download
+ * links.
  */
 function _trackDownloads(opts) {
     var gh = this;
     var links = document.getElementsByTagName('a');
-    if(!opts){
+    if (!opts) {
         opts = {'extensions': []};
-    } else if(opts.length >= 0){
+    } else if (opts.length >= 0) {
         // support legacy opts as Array of extensions
         opts = {'extensions': opts};
     }
@@ -53,7 +54,7 @@ function _trackDownloads(opts) {
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(links[i], 'mousedown', function(e) {
             if (e.target && e.target.tagName === 'A') {
-                var ext = _checkFile.call(gh, 
+                var ext = _checkFile.call(gh,
                     e.target.href, opts['extensions']
                 );
                 if (ext) {

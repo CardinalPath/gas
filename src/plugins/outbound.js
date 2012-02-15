@@ -13,7 +13,7 @@
  * Triggers the Outbound Link Tracking on the page
  *
  * @this {object} GA Helper object.
- * @param {object} opts Custom options for Outbound Links
+ * @param {object} opts Custom options for Outbound Links.
  */
 function _trackOutboundLinks(opts) {
     if (!opts) {
