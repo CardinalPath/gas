@@ -181,13 +181,14 @@ javascript event
 Changing the Page Title
 ~~~~~~~~~~~~~~~~~~~~~~~ 
 
-GAS supports a second optional parameter to the _trackPageview that parameter
-is sent to Google Analytics as the page title. If you don't provide this 
-parameter the default is to use the current page title.
+GAS support changing the page title.
 
 ::
 
-    _gas.push(['_trackPageview', '/my_page', 'My Page Title']);
+    _gas.push(['_trackPageview', {
+        page: '/my_page', 
+        title: 'My Page Title'
+    }]);
 
 
 
