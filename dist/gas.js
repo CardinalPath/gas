@@ -203,7 +203,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.0.0';
+    self['version'] = '1.1.0';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
@@ -515,13 +515,6 @@ function _checkFile(src, extensions) {
 function _trackDownloads(opts) {
     var gh = this;
     var links = document.getElementsByTagName('a');
-    if (!opts) {
-        opts = {'extensions': []};
-    } else if (opts.length >= 0) {
-        // support legacy opts as Array of extensions
-        opts = {'extensions': opts};
-    }
-    opts['category'] = opts['category'] || 'Download';
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(links[i], 'mousedown', function(e) {
             if (e.target && e.target.tagName === 'A') {
@@ -542,19 +535,27 @@ function _trackDownloads(opts) {
  * GAA Hook, receive the extensions to extend default extensions. And trigger
  * the binding of the events.
  *
- * @param {string|Array} extensions additional file extensions to track as
- * downloads.
+ * @param {string|Array|object} opts GAs Options. Also backward compatible
+ * with array or string of extensions.
  */
-_gas.push(['_addHook', '_trackDownloads', function(extensions) {
+_gas.push(['_addHook', '_trackDownloads', function(opts) {
+    if (!opts) {
+        opts = {'extensions': []};
+    } else if (typeof opts === 'string') {
+        // support legacy opts as String of extensions
+        opts = {'extensions': opts.split(',')};
+    } else if (opts.length >= 1) {
+        // support legacy opts Array of extensions
+        opts = {'extensions': opts};
+    }
+    opts['category'] = opts['category'] || 'Download';
+
     var ext = 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip';
     ext += ',rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv';
     ext = ext.split(',');
-    if (typeof extensions === 'string') {
-        ext = ext.concat(extensions.split(','));
-    }else if (this.isArray(extensions)) {
-        ext = ext.concat(extensions);
-    }
-    _trackDownloads.call(this, ext);
+    opts['extensions'] = opts['extensions'].concat(ext);
+
+    _trackDownloads.call(this, opts);
     return false;
 }]);
 
