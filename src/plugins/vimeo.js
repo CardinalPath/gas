@@ -69,8 +69,7 @@ function _vimeoPostMessage(method, params, target) {
  */
 var _has_vimeo_window_event = false;
 
-var _vimeoForce = undefined;
-var _vimeoPartials = undefined;
+var _vimeoOpts;
 
 /**
  * postMessage Listener
@@ -88,7 +87,7 @@ function _vimeoPostMessageListener(event) {
         } else if (data.event === 'playProgress') {
             _vimeoPool(data);
         } else {
-            _gas.push(['_trackEvent', 'Vimeo Video',
+            _gas.push(['_trackEvent', _vimeoOpts['category'],
                 data.event, _vimeo_urls[data.player_id]]);
         }
     }
@@ -102,11 +101,6 @@ function _vimeoPostMessageListener(event) {
  * the parameter api=1 on the url in order to make the tracking work.
  *
  * @this {GasHelper} GA Helper object.
- * @param {(string|boolean)} force evaluates to true if we should force the
- * api=1 parameter on the url to activate the api. May cause the player to
- * reload.
- * @param {Array} partials Conteins the percentages to be tracked in addition
- * to the standard events.
  */
 function _trackVimeo() {
     var iframes = document.getElementsByTagName('iframe');
@@ -114,8 +108,8 @@ function _trackVimeo() {
     var player_id;
     var player_src;
     var separator;
-    var force = _vimeoForce;
-    var partials = _vimeoPartials;
+    var force = _vimeoOpts['force'];
+    var partials = _vimeoOpts['percentages'];
     for (var i = 0; i < iframes.length; i++) {
         if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > -1) {
             player_id = 'gas_vimeo_' + i;
@@ -164,10 +158,17 @@ function _trackVimeo() {
     }
 }
 
-_gas.push(['_addHook', '_trackVimeo', function(force, partials) {
+_gas.push(['_addHook', '_trackVimeo', function(opts) {
     var gh = this;
-    _vimeoForce = force;
-    _vimeoPartials = partials;
+    // Support
+    if (typeof opts === 'boolean' || opts === 'force') {
+        opts = {'force': !!opts};
+    }
+    opts = opts || {};
+    opts['category'] = opts['category'] || 'Vimeo Video';
+    opts['percentages'] = opts['percentages'] || [];
+    opts['force'] = opts['force'] || false;
+    _vimeoOpts = opts;
     gh._DOMReady(function() {
         _trackVimeo.call(gh);
     });
