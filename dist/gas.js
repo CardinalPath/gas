@@ -509,18 +509,28 @@ function _checkFile(src, extensions) {
  * Register the event to listen to downloads
  *
  * @this {GasHelper} GA Helper object.
- * @param {Array} extensions List of possible extensions for download links.
+ * @param {Array|object} opts List of possible extensions for download
+ * links.
  */
-function _trackDownloads(extensions) {
+function _trackDownloads(opts) {
     var gh = this;
     var links = document.getElementsByTagName('a');
+    if (!opts) {
+        opts = {'extensions': []};
+    } else if (opts.length >= 0) {
+        // support legacy opts as Array of extensions
+        opts = {'extensions': opts};
+    }
+    opts['category'] = opts['category'] || 'Download';
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(links[i], 'mousedown', function(e) {
             if (e.target && e.target.tagName === 'A') {
-                var ext = _checkFile.call(gh, e.target.href, extensions);
+                var ext = _checkFile.call(gh,
+                    e.target.href, opts['extensions']
+                );
                 if (ext) {
                     _gas.push(['_trackEvent',
-                        'Download', ext, e.target.href
+                        opts['category'], ext, e.target.href
                     ]);
                 }
             }
@@ -579,10 +589,10 @@ _gas.push(['_addHook', '_trackEvent', function() {
  *
  * @this {GasHelper} The Ga Helper object
  * @param {HTMLFormElement} form The form element to be tagged.
- * @param {boolean=} opt_live if we should use live binding. Defaults to false.
+ * @param {object=} opts if we should use live binding. Defaults to false.
  * @return {boolean} false if the form has no elements.
  */
-function track_form(form, opt_live) {
+function track_form(form, opts) {
     var scp = this;
 
     function tag_element(e) {
@@ -594,14 +604,14 @@ function track_form(form, opt_live) {
         form_name = form_name ? ' (' + form_name + ')' : '';
 
         _gas.push(['_trackEvent',
-            'Form Tracking', //category
+            opts['category'], //category
             'form' + form_name, //action
             el_name + ' (' + action_name + ')' //label
         ]);
     }
 
 
-    if (opt_live) {
+    if (opts['live']) {
         scp._addEventListener(window, 'click', function(e) {
             try {
                 var el = e.target;
@@ -649,15 +659,26 @@ function track_form(form, opt_live) {
     }
 }
 
-_gas.push(['_addHook', '_trackForms', function(opt_live) {
+_gas.push(['_addHook', '_trackForms', function(opts) {
     var scp = this;
+    // Support legacy opts as a boolean.
+    if (typeof opts === 'boolean') {
+        opts = {'live': opts};
+    } else if (typeof opts !== 'object') {
+        opts = {};
+    }
+    // Make sure required attrs are defined or fallback to default
+    opts['category'] = opts['category'] || 'Form Tracking';
+    opts['live'] = opts['live'] || true;
+
+
     this._DOMReady(function() {
         var forms = document.getElementsByTagName('form');
         for (var i = 0; i < forms.length; i++) {
             try {
-                track_form.call(scp, forms[i], opt_live);
+                track_form.call(scp, forms[i], opts);
             }catch (e) {}
-            if (opt_live) break;
+            if (opts['live']) break;
         }
         return false;
     });
@@ -797,7 +818,7 @@ function _sendMaxScroll() {
         String(Math.ceil(_max_scroll / 10) * 10);
 
     _gas.push(['_trackEvent',
-        'Max Scroll',
+        _maxScrollOpts['category'],
         url,
         bucket,
         Math.floor(_max_scroll),
@@ -805,7 +826,17 @@ function _sendMaxScroll() {
     ]);
 }
 
-function _trackMaxScroll() {
+var _maxScrollOpts;
+/**
+ * Tracks the max Scroll on the page.
+ *
+ * @param {object} opts GAS Options to be used.
+ * @this {GasHelper} The Ga Helper object
+ */
+function _trackMaxScroll(opts) {
+    _maxScrollOpts = opts || {};
+    _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';
+
     this._addEventListener(window, 'scroll', _update_scroll_percentage);
     this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
@@ -980,8 +1011,14 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * Triggers the Outbound Link Tracking on the page
  *
  * @this {object} GA Helper object.
+ * @param {object} opts Custom options for Outbound Links.
  */
-function _trackOutboundLinks() {
+function _trackOutboundLinks(opts) {
+    if (!opts) {
+        opts = {};
+    }
+    opts['categpry'] = opts['categpry'] || 'Outbound';
+
     var links = document.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(
@@ -999,7 +1036,7 @@ function _trackOutboundLinks() {
                         path = path.substring(0, utm);
                     }
                     _gas.push(['_trackEvent',
-                        'Outbound',
+                        opts['category'],
                         l.hostname,
                         path
                     ]);
@@ -1202,7 +1239,7 @@ _gas.push(['_addHook', '_trackVimeo', function(force, partials) {
 /**
  * Array of percentage to fire events.
  */
-var timeTriggers = [];
+var _ytTimeTriggers = [];
 
 
 /**
@@ -1212,13 +1249,13 @@ var poolMaps = {};
 
 
 function _ytStartPool(target) {
-    if (timeTriggers && timeTriggers.length) {
+    if (_ytTimeTriggers && _ytTimeTriggers.length) {
         var h = target['getVideoData']()['video_id'];
         if (poolMaps[h]) {
             _ytStopPool(target);
         }else {
             poolMaps[h] = {};
-            poolMaps[h].timeTriggers = slice.call(timeTriggers);
+            poolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }
         poolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
     }
@@ -1370,7 +1407,7 @@ function _trackYoutube(force, opt_timeTriggers) {
     }
     if (youtube_videos.length > 0) {
         if (opt_timeTriggers && opt_timeTriggers.length) {
-            timeTriggers = opt_timeTriggers;
+            _ytTimeTriggers = opt_timeTriggers;
         }
         // this function will be called when the youtube api loads
         window['onYouTubePlayerAPIReady'] = function() {
