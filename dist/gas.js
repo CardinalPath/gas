@@ -450,23 +450,20 @@ _gas.push(['_addHook', '_setDefaultTracker', function(tname) {
     _gas._default_tracker = tname;
 }]);
 /**
- * Enables setting of page Title on _trackPageview.
- *
- * This Hook cancels the execution of the current pageview and fires a new one.
- * for this reason this hook must be inserted early on the hook list,
- * so other hooks don't fire twice.
+ * This is kept just for backward compatibility since it's now supported
+ * natively in _gaq.
  */
-_gas.push(['_addHook', '_trackPageview', function(url, title) {
-    if (title && typeof title === 'string') {
-        var oTitle = document.title;
-        window._gas.push(
-            function() {document.title = title;},
-            ['_trackPageview', url],
-            function() {document.title = oTitle;}
-        );
-        return false;
+_gas.push(['_addHook', '_trackPageview', function() {
+    var args = slice.call(arguments);
+    if (args.length >= 2 &&
+        typeof args[0] === 'string' && typeof args[1] === 'string')
+    {
+        return [{
+            'page': args[0],
+            'title': args[1]
+        }];
     }
-    return [url];
+    return args;
 }]);
 
 /**
