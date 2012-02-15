@@ -16,11 +16,11 @@
  * @param {object} opts Custom options for Outbound Links
  */
 function _trackOutboundLinks(opts) {
-    if (opts === undefined) {
-        opts = {
-            title: 'Outbound'
-        }
+    if (!opts) {
+        opts = {};
     }
+    opts['categpry'] = opts['categpry'] || 'Outbound';
+
     var links = document.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(
@@ -38,7 +38,7 @@ function _trackOutboundLinks(opts) {
                         path = path.substring(0, utm);
                     }
                     _gas.push(['_trackEvent',
-                        opts.title,
+                        opts['category'],
                         l.hostname,
                         path
                     ]);
