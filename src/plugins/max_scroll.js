@@ -80,7 +80,7 @@ function _sendMaxScroll() {
         String(Math.ceil(_max_scroll / 10) * 10);
 
     _gas.push(['_trackEvent',
-        'Max Scroll',
+        _maxScrollOpts['category'],
         url,
         bucket,
         Math.floor(_max_scroll),
@@ -88,7 +88,17 @@ function _sendMaxScroll() {
     ]);
 }
 
-function _trackMaxScroll() {
+var _maxScrollOpts;
+/**
+ * Tracks the max Scroll on the page.
+ *
+ * @param {object} opts GAS Options to be used.
+ * @this {GasHelper} The Ga Helper object
+ */
+function _trackMaxScroll(opts) {
+    _maxScrollOpts = opts || {};
+    _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';
+
     this._addEventListener(window, 'scroll', _update_scroll_percentage);
     this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
