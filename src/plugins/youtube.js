@@ -11,9 +11,8 @@
 
 /**
  * Array of percentage to fire events.
- *
  */
-var timeTriggers = [];
+var _ytTimeTriggers = [];
 
 
 /**
@@ -23,13 +22,13 @@ var poolMaps = {};
 
 
 function _ytStartPool(target) {
-    if (timeTriggers && timeTriggers.length) {
+    if (_ytTimeTriggers && _ytTimeTriggers.length) {
         var h = target['getVideoData']()['video_id'];
         if (poolMaps[h]) {
             _ytStopPool(target);
         }else {
             poolMaps[h] = {};
-            poolMaps[h].timeTriggers = slice.call(timeTriggers);
+            poolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }
         poolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
     }
@@ -181,7 +180,7 @@ function _trackYoutube(force, opt_timeTriggers) {
     }
     if (youtube_videos.length > 0) {
         if (opt_timeTriggers && opt_timeTriggers.length) {
-            timeTriggers = opt_timeTriggers;
+            _ytTimeTriggers = opt_timeTriggers;
         }
         // this function will be called when the youtube api loads
         window['onYouTubePlayerAPIReady'] = function() {

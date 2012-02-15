@@ -509,18 +509,28 @@ function _checkFile(src, extensions) {
  * Register the event to listen to downloads
  *
  * @this {GasHelper} GA Helper object.
- * @param {Array} extensions List of possible extensions for download links.
+ * @param {Array|object} opts List of possible extensions for download
+ * links.
  */
-function _trackDownloads(extensions) {
+function _trackDownloads(opts) {
     var gh = this;
     var links = document.getElementsByTagName('a');
+    if (!opts) {
+        opts = {'extensions': []};
+    } else if (opts.length >= 0) {
+        // support legacy opts as Array of extensions
+        opts = {'extensions': opts};
+    }
+    opts['category'] = opts['category'] || 'Download';
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(links[i], 'mousedown', function(e) {
             if (e.target && e.target.tagName === 'A') {
-                var ext = _checkFile.call(gh, e.target.href, extensions);
+                var ext = _checkFile.call(gh,
+                    e.target.href, opts['extensions']
+                );
                 if (ext) {
                     _gas.push(['_trackEvent',
-                        'Download', ext, e.target.href
+                        opts['category'], ext, e.target.href
                     ]);
                 }
             }
@@ -579,10 +589,10 @@ _gas.push(['_addHook', '_trackEvent', function() {
  *
  * @this {GasHelper} The Ga Helper object
  * @param {HTMLFormElement} form The form element to be tagged.
- * @param {boolean=} opt_live if we should use live binding. Defaults to false.
+ * @param {object=} opts if we should use live binding. Defaults to false.
  * @return {boolean} false if the form has no elements.
  */
-function track_form(form, opt_live) {
+function track_form(form, opts) {
     var scp = this;
 
     function tag_element(e) {
@@ -594,14 +604,14 @@ function track_form(form, opt_live) {
         form_name = form_name ? ' (' + form_name + ')' : '';
 
         _gas.push(['_trackEvent',
-            'Form Tracking', //category
+            opts['category'], //category
             'form' + form_name, //action
             el_name + ' (' + action_name + ')' //label
         ]);
     }
 
 
-    if (opt_live) {
+    if (opts['live']) {
         scp._addEventListener(window, 'click', function(e) {
             try {
                 var el = e.target;
@@ -649,15 +659,26 @@ function track_form(form, opt_live) {
     }
 }
 
-_gas.push(['_addHook', '_trackForms', function(opt_live) {
+_gas.push(['_addHook', '_trackForms', function(opts) {
     var scp = this;
+    // Support legacy opts as a boolean.
+    if (typeof opts === 'boolean') {
+        opts = {'live': opts};
+    } else if (typeof opts !== 'object') {
+        opts = {};
+    }
+    // Make sure required attrs are defined or fallback to default
+    opts['category'] = opts['category'] || 'Form Tracking';
+    opts['live'] = opts['live'] || true;
+
+
     this._DOMReady(function() {
         var forms = document.getElementsByTagName('form');
         for (var i = 0; i < forms.length; i++) {
             try {
-                track_form.call(scp, forms[i], opt_live);
+                track_form.call(scp, forms[i], opts);
             }catch (e) {}
-            if (opt_live) break;
+            if (opts['live']) break;
         }
         return false;
     });
@@ -797,7 +818,7 @@ function _sendMaxScroll() {
         String(Math.ceil(_max_scroll / 10) * 10);
 
     _gas.push(['_trackEvent',
-        'Max Scroll',
+        _maxScrollOpts['category'],
         url,
         bucket,
         Math.floor(_max_scroll),
@@ -805,7 +826,17 @@ function _sendMaxScroll() {
     ]);
 }
 
-function _trackMaxScroll() {
+var _maxScrollOpts;
+/**
+ * Tracks the max Scroll on the page.
+ *
+ * @param {object} opts GAS Options to be used.
+ * @this {GasHelper} The Ga Helper object
+ */
+function _trackMaxScroll(opts) {
+    _maxScrollOpts = opts || {};
+    _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';
+
     this._addEventListener(window, 'scroll', _update_scroll_percentage);
     this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
@@ -980,8 +1011,14 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * Triggers the Outbound Link Tracking on the page
  *
  * @this {object} GA Helper object.
+ * @param {object} opts Custom options for Outbound Links.
  */
-function _trackOutboundLinks() {
+function _trackOutboundLinks(opts) {
+    if (!opts) {
+        opts = {};
+    }
+    opts['categpry'] = opts['categpry'] || 'Outbound';
+
     var links = document.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {
         this._addEventListener(
@@ -999,7 +1036,7 @@ function _trackOutboundLinks() {
                         path = path.substring(0, utm);
                     }
                     _gas.push(['_trackEvent',
-                        'Outbound',
+                        opts['category'],
                         l.hostname,
                         path
                     ]);
@@ -1023,6 +1060,38 @@ _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
 
+var _vimeoTimeTriggers = [];
+var _vimeoPoolMaps = {};
+
+/**
+ * Cached urls for vimeo players on the page.
+ *
+ * @type {object}
+ */
+var _vimeo_urls = {};
+
+function _vimeoPool(data) {
+    if (!_vimeoPoolMaps[data.player_id]) {
+        _vimeoPoolMaps[data.player_id] = {};
+        _vimeoPoolMaps[data.player_id].timeTriggers = slice.call(
+            _vimeoTimeTriggers
+        );
+    }
+    if (_vimeoPoolMaps[data.player_id].timeTriggers.length > 0) {
+        if (data.data.percent * 100 >=
+            _vimeoPoolMaps[data.player_id].timeTriggers[0])
+        {
+            var action = _vimeoPoolMaps[data.player_id].timeTriggers.shift();
+            _gas.push([
+                '_trackEvent',
+                'Vimeo Video',
+                action + '%',
+                _vimeo_urls[data.player_id]
+            ]);
+        }
+    }
+}
+
 /**
  * Helper function to post messages to a vimeo player
  *
@@ -1032,7 +1101,7 @@ _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
  * @return {boolean} true if it worked or false otherwise.
  */
 function _vimeoPostMessage(method, params, target) {
-    if (!target.contentWindow || !target.contentWindow.postMessage) {
+    if (!target.contentWindow || !target.contentWindow.postMessage || !JSON) {
         return false;
     }
     var url = target.getAttribute('src').split('?')[0],
@@ -1044,18 +1113,38 @@ function _vimeoPostMessage(method, params, target) {
     return true;
 }
 
-/**
- * Cached urls for vimeo players on the page.
- *
- * @type {object}
- */
-var _vimeo_urls = {};
 
 /**
  * Flag that indicates if the global listener has been bind to the window
  * @type {boolean}
  */
 var _has_vimeo_window_event = false;
+
+var _vimeoForce = undefined;
+var _vimeoPartials = undefined;
+
+/**
+ * postMessage Listener
+ * @param {Object} event The Vimeo API return event.
+ */
+function _vimeoPostMessageListener(event) {
+    if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
+        var data = JSON.parse(event.data);
+        if (data.event === 'ready') {
+            _trackVimeo.call(_gas.gh); // Force rerun since a player is ready
+        }else if (data.method) {
+            if (data.method == 'getVideoUrl') {
+                _vimeo_urls[data.player_id] = data.value;
+            }
+        } else if (data.event === 'playProgress') {
+            _vimeoPool(data);
+        } else {
+            _gas.push(['_trackEvent', 'Vimeo Video',
+                data.event, _vimeo_urls[data.player_id]]);
+        }
+    }
+
+}
 
 /**
  * Triggers the Vimeo Tracking on the page
@@ -1067,13 +1156,17 @@ var _has_vimeo_window_event = false;
  * @param {(string|boolean)} force evaluates to true if we should force the
  * api=1 parameter on the url to activate the api. May cause the player to
  * reload.
+ * @param {Array} partials Conteins the percentages to be tracked in addition
+ * to the standard events.
  */
-function _trackVimeo(force) {
+function _trackVimeo() {
     var iframes = document.getElementsByTagName('iframe');
     var vimeo_videos = 0;
     var player_id;
     var player_src;
     var separator;
+    var force = _vimeoForce;
+    var partials = _vimeoPartials;
     for (var i = 0; i < iframes.length; i++) {
         if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > -1) {
             player_id = 'gas_vimeo_' + i;
@@ -1088,7 +1181,7 @@ function _trackVimeo(force) {
                     player_src += separator + 'api=1&player_id=' + player_id;
                 }else {
                     // We won't track players that don't have api enabled.
-                    break;
+                    continue;
                 }
             }else {
                 if (sindexOf.call(player_src, 'player_id=') < -1) {
@@ -1107,33 +1200,27 @@ function _trackVimeo(force) {
             _vimeoPostMessage('addEventListener', 'play', iframes[i]);
             _vimeoPostMessage('addEventListener', 'pause', iframes[i]);
             _vimeoPostMessage('addEventListener', 'finish', iframes[i]);
+            if (partials) {
+                _vimeoTimeTriggers = partials;
+                _vimeoPostMessage('addEventListener', 'playProgress',
+                    iframes[i]);
+            }
         }
     }
     if (vimeo_videos > 0 && _has_vimeo_window_event === false) {
-        this._addEventListener(window, 'message', function(event) {
-            if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
-                var data = JSON.parse(event.data);
-                if (data.event === 'ready') {
-                    _trackVimeo(); // Force rerun since a player is ready
-                }else if (data.method) {
-                    if (data.method == 'getVideoUrl') {
-                        _vimeo_urls[data.player_id] = data.value;
-                    }
-                } else {
-                    _gas.push(['_trackEvent', 'Vimeo Video',
-                        data.event, _vimeo_urls[data.player_id]]);
-                }
-            }
-
-        }, false);
+        this._addEventListener(window, 'message',
+            _vimeoPostMessageListener, false
+        );
         _has_vimeo_window_event = true;
     }
 }
 
-_gas.push(['_addHook', '_trackVimeo', function(force) {
+_gas.push(['_addHook', '_trackVimeo', function(force, partials) {
     var gh = this;
+    _vimeoForce = force;
+    _vimeoPartials = partials;
     gh._DOMReady(function() {
-        _trackVimeo.call(gh, force);
+        _trackVimeo.call(gh);
     });
     return false;
 }]);
@@ -1151,9 +1238,8 @@ _gas.push(['_addHook', '_trackVimeo', function(force) {
 
 /**
  * Array of percentage to fire events.
- *
  */
-var timeTriggers = [];
+var _ytTimeTriggers = [];
 
 
 /**
@@ -1163,13 +1249,13 @@ var poolMaps = {};
 
 
 function _ytStartPool(target) {
-    if (timeTriggers && timeTriggers.length) {
+    if (_ytTimeTriggers && _ytTimeTriggers.length) {
         var h = target['getVideoData']()['video_id'];
         if (poolMaps[h]) {
             _ytStopPool(target);
         }else {
             poolMaps[h] = {};
-            poolMaps[h].timeTriggers = slice.call(timeTriggers);
+            poolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }
         poolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
     }
@@ -1321,7 +1407,7 @@ function _trackYoutube(force, opt_timeTriggers) {
     }
     if (youtube_videos.length > 0) {
         if (opt_timeTriggers && opt_timeTriggers.length) {
-            timeTriggers = opt_timeTriggers;
+            _ytTimeTriggers = opt_timeTriggers;
         }
         // this function will be called when the youtube api loads
         window['onYouTubePlayerAPIReady'] = function() {
