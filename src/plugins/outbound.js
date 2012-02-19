@@ -19,7 +19,7 @@ function _trackOutboundLinks(opts) {
     if (!opts) {
         opts = {};
     }
-    opts['categpry'] = opts['categpry'] || 'Outbound';
+    opts['category'] = opts['category'] || 'Outbound';
 
     var links = document.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {

@@ -13,6 +13,7 @@
  * Array of percentage to fire events.
  */
 var _ytTimeTriggers = [];
+var _ytOpts;
 
 
 /**
@@ -44,7 +45,7 @@ function _ytPool(target, hash) {
         var action = _ytPoolMaps[hash].timeTriggers.shift();
         _gas.push([
             '_trackEvent',
-            'YouTube Video',
+            _ytOpts['category'],
             action + '%',
             target['getVideoUrl']()
         ]);
@@ -85,7 +86,7 @@ function _ytStateChange(event) {
     }
     if (action) {
         _gas.push(['_trackEvent',
-            'YouTube Video', action, event['target']['getVideoUrl']()
+            _ytOpts['category'], action, event['target']['getVideoUrl']()
         ]);
     }
 }
@@ -97,7 +98,7 @@ function _ytStateChange(event) {
  */
 function _ytError(event) {
     _gas.push(['_trackEvent',
-        'YouTube Video',
+        _ytOpts['category'],
         'error (' + event['data'] + ')',
         event['target']['getVideoUrl']()
     ]);
@@ -141,13 +142,11 @@ function _ytMigrateObjectEmbed() {
  * Only works for the iframe tag. The video must have the parameter
  * enablejsapi=1 on the url in order to make the tracking work.
  *
- * @param {(string|boolean)} force evaluates to true if we should force the
- * enablejsapi=1 parameter on the url to activate the api. May cause the player
- * to reload. Also converts object/embedded youtube videos to iframe.
- * @param {Array} opt_timeTriggers Array of integers from 0 to 100 that define
- * the steps to fire an event. eg: [25, 50, 75, 90].
+ * @param {(object)} opts GAS Options object.
  */
-function _trackYoutube(force, opt_timeTriggers) {
+function _trackYoutube(opts) {
+    var force = opts['force'];
+    var opt_timeTriggers = opts['percentages'];
     if (force) {
         try {
             _ytMigrateObjectEmbed();
@@ -206,11 +205,26 @@ function _trackYoutube(force, opt_timeTriggers) {
     }
 }
 
-_gas.push(['_addHook', '_trackYoutube', function() {
+_gas.push(['_addHook', '_trackYoutube', function(opts) {
+    // Support for legacy parameters
     var args = slice.call(arguments);
+    if (args[0] && (typeof args[0] === 'boolean' || args[0] === 'force')) {
+        opts = {'force': !!args[0]};
+    }else {
+        opts = {};
+    }
+    if (args[1] && args[1].length) {
+        opts['percentages'] = args[1];
+    }
+    opts = opts || {};
+    opts['force'] = opts['force'] || false;
+    opts['category'] = opts['category'] || 'YouTube Video';
+    opts['percentages'] = opts['percentages'] || [];
+
+    _ytOpts = opts;
     var gh = this;
     gh._DOMReady(function() {
-        _trackYoutube.apply(gh, args);
+        _trackYoutube.call(gh, opts);
     });
     return false;
 }]);
