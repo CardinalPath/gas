@@ -3,6 +3,7 @@
 CLOSURE_COMPILER = java -jar ~/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS
 #CLOSURE_COMPILER = java -jar ~/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --formatting PRETTY_PRINT
 #CLOSURE_COMPILER = java -jar ~/compiler.jar --formatting PRETTY_PRINT
+UGLIFYJS = uglifyjs -v 
 
 # http://code.google.com/closure/utilities/index.html
 CLOSURE_LINTER = gjslint
@@ -35,10 +36,12 @@ gas.core.js: $(COREJSFILES) $(WRAPUP)
 	# $(CLOSURE_LINTER) dist/$@
 
 gas.min.js: gas.js
-	$(CLOSURE_COMPILER) --js dist/$< --js_output_file dist/$@
+	#$(CLOSURE_COMPILER) --js dist/$< --js_output_file dist/$@
+	$(UGLIFYJS) -o dist/$@ dist/$<
 
 gas.core.min.js: gas.core.js
-	$(CLOSURE_COMPILER) --js dist/$< --js_output_file dist/$@
+	#$(CLOSURE_COMPILER) --js dist/$< --js_output_file dist/$@
+	$(UGLIFYJS) -o dist/$@ dist/$<
 
 lint: $(JSFILES)
 	$(FIXJSSTYLE) -r src

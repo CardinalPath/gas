@@ -43,21 +43,14 @@ function _checkFile(src, extensions) {
  */
 function _trackDownloads(opts) {
     var gh = this;
-    var links = document.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        this._addEventListener(links[i], 'mousedown', function(e) {
-            if (e.target && e.target.tagName === 'A') {
-                var ext = _checkFile.call(gh,
-                    e.target.href, opts['extensions']
-                );
-                if (ext) {
-                    _gas.push(['_trackEvent',
-                        opts['category'], ext, e.target.href
-                    ]);
-                }
-            }
-        });
-    }
+    this._liveEvent('A', 'mousedown', function(e) {
+        var ext = _checkFile.call(gh, this.href, opts['extensions']);
+        if (ext) {
+            _gas.push(['_trackEvent',
+                opts['category'], ext, this.href
+            ]);
+        }
+    });
 }
 
 /**
