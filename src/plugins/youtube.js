@@ -18,30 +18,30 @@ var _ytTimeTriggers = [];
 /**
  * Used to map each vid to a set of timeTriggers and it's pool timer
  */
-var poolMaps = {};
+var _ytPoolMaps = {};
 
 
 function _ytStartPool(target) {
     if (_ytTimeTriggers && _ytTimeTriggers.length) {
         var h = target['getVideoData']()['video_id'];
-        if (poolMaps[h]) {
+        if (_ytPoolMaps[h]) {
             _ytStopPool(target);
         }else {
-            poolMaps[h] = {};
-            poolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
+            _ytPoolMaps[h] = {};
+            _ytPoolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }
-        poolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
+        _ytPoolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
     }
 }
 
 function _ytPool(target, hash) {
-    if (poolMaps[hash] == undefined ||
-        poolMaps[hash].timeTriggers.length <= 0) {
+    if (_ytPoolMaps[hash] == undefined ||
+        _ytPoolMaps[hash].timeTriggers.length <= 0) {
         return false;
     }
     var p = target['getCurrentTime']() / target['getDuration']() * 100;
-    if (p >= poolMaps[hash].timeTriggers[0]) {
-        var action = poolMaps[hash].timeTriggers.shift();
+    if (p >= _ytPoolMaps[hash].timeTriggers[0]) {
+        var action = _ytPoolMaps[hash].timeTriggers.shift();
         _gas.push([
             '_trackEvent',
             'YouTube Video',
@@ -49,14 +49,14 @@ function _ytPool(target, hash) {
             target['getVideoUrl']()
         ]);
     }
-    poolMaps[hash].timer = setTimeout(_ytPool, 1000, target, hash);
+    _ytPoolMaps[hash].timer = setTimeout(_ytPool, 1000, target, hash);
 }
 
 function _ytStopPool(target) {
     var h = target['getVideoData']()['video_id'];
-    if (poolMaps[h] && poolMaps[h].timer) {
+    if (_ytPoolMaps[h] && _ytPoolMaps[h].timer) {
         _ytPool(target, h); // Pool one last time before clearing it.
-        clearTimeout(poolMaps[h].timer);
+        clearTimeout(_ytPoolMaps[h].timer);
     }
 }
 
