@@ -14,10 +14,10 @@
  *
  * @this {GasHelper} The Ga Helper object
  * @param {HTMLFormElement} form The form element to be tagged.
- * @param {boolean=} opt_live if we should use live binding. Defaults to false.
+ * @param {object=} opts if we should use live binding. Defaults to false.
  * @return {boolean} false if the form has no elements.
  */
-function track_form(form, opt_live) {
+function track_form(form, opts) {
     var scp = this;
 
     function tag_element(e) {
@@ -29,14 +29,14 @@ function track_form(form, opt_live) {
         form_name = form_name ? ' (' + form_name + ')' : '';
 
         _gas.push(['_trackEvent',
-            'Form Tracking', //category
+            opts['category'], //category
             'form' + form_name, //action
             el_name + ' (' + action_name + ')' //label
         ]);
     }
 
 
-    if (opt_live) {
+    if (opts['live']) {
         scp._addEventListener(window, 'click', function(e) {
             try {
                 var el = e.target;
@@ -84,15 +84,26 @@ function track_form(form, opt_live) {
     }
 }
 
-_gas.push(['_addHook', '_trackForms', function(opt_live) {
+_gas.push(['_addHook', '_trackForms', function(opts) {
     var scp = this;
+    // Support legacy opts as a boolean.
+    if (typeof opts === 'boolean') {
+        opts = {'live': opts};
+    } else if (typeof opts !== 'object') {
+        opts = {};
+    }
+    // Make sure required attrs are defined or fallback to default
+    opts['category'] = opts['category'] || 'Form Tracking';
+    opts['live'] = opts['live'] || true;
+
+
     this._DOMReady(function() {
         var forms = document.getElementsByTagName('form');
         for (var i = 0; i < forms.length; i++) {
             try {
-                track_form.call(scp, forms[i], opt_live);
+                track_form.call(scp, forms[i], opts);
             }catch (e) {}
-            if (opt_live) break;
+            if (opts['live']) break;
         }
         return false;
     });

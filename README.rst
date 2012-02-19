@@ -41,8 +41,8 @@ The basic snippet looks like this:
     _gas.push(['_trackOutboundLinks']);
     _gas.push(['_trackMaxScroll']);
     _gas.push(['_trackDownloads']);
-    _gas.push(['_trackYoutube', 'force']);
-    _gas.push(['_trackVimeo', 'force']);
+    _gas.push(['_trackYoutube', {force:true}]);
+    _gas.push(['_trackVimeo', {force:true}]);
     
     (function() {
     var ga = document.createElement('script');
@@ -82,6 +82,16 @@ form field.
     _gas.push(['_trackForms']);
 
 This is all you need to enable it.
+
+Form tracking accepts a paramter to customize the event category. If you
+don't set this parameter it will use the default category "Form Tracking".
+The paramter must be a javascript object.
+
+eg:
+
+::
+
+    _gas.push(['_trackForms', {category: 'Form Events'}]);
 
 Hooks for _gaq Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,6 +176,15 @@ user views.
 
     _gas.push(['_trackMaxScroll']);
     
+Max-Scroll tracking accepts a paramter to customize the event category. If you
+don't set this parameter it will use the default category "Max Scroll".
+The paramter must be a javascript object.
+
+eg:
+
+::
+
+    _gas.push(['_trackMaxScroll', {category: 'Scroll Tracking'}]);
 
 Outbound Link Tracking
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -178,16 +197,27 @@ javascript event
 
     _gas.push(['_trackOutboundLinks']);
 
-Changing the Page Title
-~~~~~~~~~~~~~~~~~~~~~~~ 
+Outbaound tracking accepts a paramter to customize the event category. If you
+don't set this parameter it will use the default category "Outbound".
+The paramter must be a javascript object.
 
-GAS supports a second optional parameter to the _trackPageview that parameter
-is sent to Google Analytics as the page title. If you don't provide this 
-parameter the default is to use the current page title.
+eg:
 
 ::
 
-    _gas.push(['_trackPageview', '/my_page', 'My Page Title']);
+    _gas.push(['_trackOutboundLinks', {category: 'External Link'}]);
+
+Changing the Page Title
+~~~~~~~~~~~~~~~~~~~~~~~ 
+
+GAS support changing the page title.
+
+::
+
+    _gas.push(['_trackPageview', {
+        page: '/my_page', 
+        title: 'My Page Title'
+    }]);
 
 
 
@@ -222,11 +252,15 @@ GAS will track the following extensions by default:
 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip,rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv'
 
 You can set additional extensions to be tracked if you want by passing a 
-parameter to `_trackDownloads`.
+parameter to `_trackDownloads`. You can also customize the category for the 
+Download events, otherwise the default "Download" category will be used.
 
 ::
 
-    _gas.push(['_trackDownloads', 'torrent,gz,mp4,wav']);
+    _gas.push(['_trackDownloads', {
+        category: 'File Downloads',
+        extensions: 'torrent,gz,mp4,wav'
+    }]);
 
 
 
@@ -240,7 +274,7 @@ and ie7.
 
 ::
 
-    _gas.push(['_trackVimeo', 'force']);
+    _gas.push(['_trackVimeo', {force: true}]);
 
 After you enable it the following events will be tracked. 
 
@@ -277,7 +311,7 @@ and ie7.
 
 ::
 
-    _gas.push(['_trackYoutube', 'force']);
+    _gas.push(['_trackYoutube', {force: true}]);
 
 After you enable it the following events will be tracked. 
 
@@ -305,7 +339,10 @@ _trackYoutube also support a second optional parameter. It should be an Array of
 
 ::
     
-    _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90]]);
+    _gas.push(['_trackYoutube', {
+        force: true,
+        percentages: [25, 50, 75, 90]
+    }]);
 
 This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish', ...
 

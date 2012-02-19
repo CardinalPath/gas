@@ -9,6 +9,38 @@
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
 
+var _vimeoTimeTriggers = [];
+var _vimeoPoolMaps = {};
+
+/**
+ * Cached urls for vimeo players on the page.
+ *
+ * @type {object}
+ */
+var _vimeo_urls = {};
+
+function _vimeoPool(data) {
+    if (!_vimeoPoolMaps[data.player_id]) {
+        _vimeoPoolMaps[data.player_id] = {};
+        _vimeoPoolMaps[data.player_id].timeTriggers = slice.call(
+            _vimeoTimeTriggers
+        );
+    }
+    if (_vimeoPoolMaps[data.player_id].timeTriggers.length > 0) {
+        if (data.data.percent * 100 >=
+            _vimeoPoolMaps[data.player_id].timeTriggers[0])
+        {
+            var action = _vimeoPoolMaps[data.player_id].timeTriggers.shift();
+            _gas.push([
+                '_trackEvent',
+                'Vimeo Video',
+                action + '%',
+                _vimeo_urls[data.player_id]
+            ]);
+        }
+    }
+}
+
 /**
  * Helper function to post messages to a vimeo player
  *
@@ -18,7 +50,7 @@
  * @return {boolean} true if it worked or false otherwise.
  */
 function _vimeoPostMessage(method, params, target) {
-    if (!target.contentWindow || !target.contentWindow.postMessage) {
+    if (!target.contentWindow || !target.contentWindow.postMessage || !JSON) {
         return false;
     }
     var url = target.getAttribute('src').split('?')[0],
@@ -30,18 +62,37 @@ function _vimeoPostMessage(method, params, target) {
     return true;
 }
 
-/**
- * Cached urls for vimeo players on the page.
- *
- * @type {object}
- */
-var _vimeo_urls = {};
 
 /**
  * Flag that indicates if the global listener has been bind to the window
  * @type {boolean}
  */
 var _has_vimeo_window_event = false;
+
+var _vimeoOpts;
+
+/**
+ * postMessage Listener
+ * @param {Object} event The Vimeo API return event.
+ */
+function _vimeoPostMessageListener(event) {
+    if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
+        var data = JSON.parse(event.data);
+        if (data.event === 'ready') {
+            _trackVimeo.call(_gas.gh); // Force rerun since a player is ready
+        }else if (data.method) {
+            if (data.method == 'getVideoUrl') {
+                _vimeo_urls[data.player_id] = data.value;
+            }
+        } else if (data.event === 'playProgress') {
+            _vimeoPool(data);
+        } else {
+            _gas.push(['_trackEvent', _vimeoOpts['category'],
+                data.event, _vimeo_urls[data.player_id]]);
+        }
+    }
+
+}
 
 /**
  * Triggers the Vimeo Tracking on the page
@@ -50,16 +101,15 @@ var _has_vimeo_window_event = false;
  * the parameter api=1 on the url in order to make the tracking work.
  *
  * @this {GasHelper} GA Helper object.
- * @param {(string|boolean)} force evaluates to true if we should force the
- * api=1 parameter on the url to activate the api. May cause the player to
- * reload.
  */
-function _trackVimeo(force) {
+function _trackVimeo() {
     var iframes = document.getElementsByTagName('iframe');
     var vimeo_videos = 0;
     var player_id;
     var player_src;
     var separator;
+    var force = _vimeoOpts['force'];
+    var partials = _vimeoOpts['percentages'];
     for (var i = 0; i < iframes.length; i++) {
         if (sindexOf.call(iframes[i].src, '//player.vimeo.com') > -1) {
             player_id = 'gas_vimeo_' + i;
@@ -74,7 +124,7 @@ function _trackVimeo(force) {
                     player_src += separator + 'api=1&player_id=' + player_id;
                 }else {
                     // We won't track players that don't have api enabled.
-                    break;
+                    continue;
                 }
             }else {
                 if (sindexOf.call(player_src, 'player_id=') < -1) {
@@ -93,33 +143,34 @@ function _trackVimeo(force) {
             _vimeoPostMessage('addEventListener', 'play', iframes[i]);
             _vimeoPostMessage('addEventListener', 'pause', iframes[i]);
             _vimeoPostMessage('addEventListener', 'finish', iframes[i]);
+            if (partials) {
+                _vimeoTimeTriggers = partials;
+                _vimeoPostMessage('addEventListener', 'playProgress',
+                    iframes[i]);
+            }
         }
     }
     if (vimeo_videos > 0 && _has_vimeo_window_event === false) {
-        this._addEventListener(window, 'message', function(event) {
-            if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
-                var data = JSON.parse(event.data);
-                if (data.event === 'ready') {
-                    _trackVimeo(); // Force rerun since a player is ready
-                }else if (data.method) {
-                    if (data.method == 'getVideoUrl') {
-                        _vimeo_urls[data.player_id] = data.value;
-                    }
-                } else {
-                    _gas.push(['_trackEvent', 'Vimeo Video',
-                        data.event, _vimeo_urls[data.player_id]]);
-                }
-            }
-
-        }, false);
+        this._addEventListener(window, 'message',
+            _vimeoPostMessageListener, false
+        );
         _has_vimeo_window_event = true;
     }
 }
 
-_gas.push(['_addHook', '_trackVimeo', function(force) {
+_gas.push(['_addHook', '_trackVimeo', function(opts) {
     var gh = this;
+    // Support
+    if (typeof opts === 'boolean' || opts === 'force') {
+        opts = {'force': !!opts};
+    }
+    opts = opts || {};
+    opts['category'] = opts['category'] || 'Vimeo Video';
+    opts['percentages'] = opts['percentages'] || [];
+    opts['force'] = opts['force'] || false;
+    _vimeoOpts = opts;
     gh._DOMReady(function() {
-        _trackVimeo.call(gh, force);
+        _trackVimeo.call(gh);
     });
     return false;
 }]);
