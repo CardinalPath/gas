@@ -6,7 +6,10 @@
         _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
         _gas.push(['_trackPageview', '/test']);
         _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90, 99, 100]]);
-        _gas.push(['_trackVimeo', 'force', [25, 50, 75, 90, 99, 100]]);
+        _gas.push(['_trackVimeo', {
+            force:'force', 
+            percentages: [25, 50, 75, 90, 99, 100]
+        }]);
 
         (function() {
         var ga = document.createElement('script');
