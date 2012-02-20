@@ -203,7 +203,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.2.0';
+    self['version'] = '1.2.1';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;

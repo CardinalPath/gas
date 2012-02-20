@@ -71,13 +71,18 @@ function track_form(form, opts) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (scp.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
-                //Button
-                scp._addEventListener(el, 'click', tag_element);
-            }
-            else {
-                //Text field
-                scp._addEventListener(el, 'change', tag_element);
+            // For some reason fieldsets are form elements.
+            if (el.type && el.nodeName !== 'FIELDSET') {
+                if (scp.inArray(['button', 'submit', 'image', 'reset'],
+                    el.type)
+                ) {
+                    //Button
+                    scp._addEventListener(el, 'click', tag_element);
+                }
+                else {
+                    // changable field
+                    scp._addEventListener(el, 'change', tag_element);
+                }
             }
         }
         scp._addEventListener(form, 'submit', tag_element);
