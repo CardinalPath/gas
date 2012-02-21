@@ -203,7 +203,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.1.0';
+    self['version'] = '1.3.1';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
@@ -511,21 +511,14 @@ function _checkFile(src, extensions) {
  */
 function _trackDownloads(opts) {
     var gh = this;
-    var links = document.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        this._addEventListener(links[i], 'mousedown', function(e) {
-            if (e.target && e.target.tagName === 'A') {
-                var ext = _checkFile.call(gh,
-                    e.target.href, opts['extensions']
-                );
-                if (ext) {
-                    _gas.push(['_trackEvent',
-                        opts['category'], ext, e.target.href
-                    ]);
-                }
-            }
-        });
-    }
+    this._liveEvent('A', 'mousedown', function(e) {
+        var ext = _checkFile.call(gh, this.href, opts['extensions']);
+        if (ext) {
+            _gas.push(['_trackEvent',
+                opts['category'], ext, this.href
+            ]);
+        }
+    });
 }
 
 /**
@@ -644,13 +637,18 @@ function track_form(form, opts) {
         }
         for (i = 0; i < form.elements.length; i++) {
             el = form.elements[i];
-            if (scp.inArray(['button', 'submit', 'image', 'reset'], el.type)) {
-                //Button
-                scp._addEventListener(el, 'click', tag_element);
-            }
-            else {
-                //Text field
-                scp._addEventListener(el, 'change', tag_element);
+            // For some reason fieldsets are form elements.
+            if (el.type && el.nodeName !== 'FIELDSET') {
+                if (scp.inArray(['button', 'submit', 'image', 'reset'],
+                    el.type)
+                ) {
+                    //Button
+                    scp._addEventListener(el, 'click', tag_element);
+                }
+                else {
+                    // changable field
+                    scp._addEventListener(el, 'change', tag_element);
+                }
             }
         }
         scp._addEventListener(form, 'submit', tag_element);
