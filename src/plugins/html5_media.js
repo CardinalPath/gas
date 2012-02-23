@@ -29,14 +29,9 @@ function _trackMediaElement(e) {
  */
 function _trackMedia(tag) {
     var self = this;
-    self._DOMReady(function() {
-        var vs = document.getElementsByTagName(tag);
-        for (var i = 0; i < vs.length; i++) {
-            self._addEventListener(vs[i], 'play', _trackMediaElement);
-            self._addEventListener(vs[i], 'ended', _trackMediaElement);
-            self._addEventListener(vs[i], 'pause', _trackMediaElement);
-        }
-    });
+    self._liveEvent(tag, 'play', _trackMediaElement);
+    self._liveEvent(tag, 'pause', _trackMediaElement);
+    self._liveEvent(tag, 'ended', _trackMediaElement);
 }
 
 function _trackVideo() {
