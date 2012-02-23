@@ -16,36 +16,31 @@
  * @param {object} opts Custom options for Outbound Links.
  */
 function _trackOutboundLinks(opts) {
+    var gh = this;
     if (!opts) {
         opts = {};
     }
     opts['category'] = opts['category'] || 'Outbound';
 
-    var links = document.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        this._addEventListener(
-            links[i],
-            'mousedown',
-            function(e) {
-                var l = e.target;
-                if (
-                    (l.protocol == 'http:' || l.protocol == 'https:') &&
-                    sindexOf.call(l.href, document.location.hostname) === -1)
-                {
-                    var path = (l.pathname + l.search + ''),
-                        utm = sindexOf.call(path, '__utm');
-                    if (utm !== -1) {
-                        path = path.substring(0, utm);
-                    }
-                    _gas.push(['_trackEvent',
-                        opts['category'],
-                        l.hostname,
-                        path
-                    ]);
-                }
+    gh._liveEvent('a', 'mousedown', function(e) {
+        var l = this;
+        if (
+            (l.protocol == 'http:' || l.protocol == 'https:') &&
+            sindexOf.call(l.href, document.location.hostname) === -1)
+        {
+            var path = (l.pathname + l.search + ''),
+                utm = sindexOf.call(path, '__utm');
+            if (utm !== -1) {
+                path = path.substring(0, utm);
             }
-        );
-    }
+            _gas.push(['_trackEvent',
+                opts['category'],
+                l.hostname,
+                path
+            ]);
+        }
+
+    });
 }
 
 _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);

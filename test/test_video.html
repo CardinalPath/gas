@@ -5,6 +5,7 @@
         _gas.push(['_setDebug', true]);
         _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
         _gas.push(['_trackPageview', '/test']);
+        _gas.push(['_trackVideo']);
         _gas.push(['_trackYoutube', 'force', [25, 50, 75, 90, 99, 100]]);
         _gas.push(['_trackVimeo', {
             force:'force', 
@@ -44,6 +45,12 @@
     <div>
     <h2>Vimeo iframed</h2>
     <iframe src="http://player.vimeo.com/video/7100569" width="400" height="300" frameborder="0"></iframe>
+    </div>
+    <div>
+    <h2>HTML5 Video</h2>
+    <video poster="http://www.html5rocks.com/en/tutorials/video/basics/star.png" controls="">
+        <source src="http://www.html5rocks.com/en/tutorials/video/basics/Chrome_ImF.mp4" type="video/mp4; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;">
+      </video>
     </div>
 </body>
 </html>

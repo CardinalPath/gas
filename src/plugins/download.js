@@ -43,12 +43,17 @@ function _checkFile(src, extensions) {
  */
 function _trackDownloads(opts) {
     var gh = this;
-    this._liveEvent('A', 'mousedown', function(e) {
-        var ext = _checkFile.call(gh, this.href, opts['extensions']);
-        if (ext) {
-            _gas.push(['_trackEvent',
-                opts['category'], ext, this.href
-            ]);
+    gh._liveEvent('a', 'mousedown', function(e) {
+        var el = this;
+        if (el.href) {
+            var ext = _checkFile.call(gh,
+                el.href, opts['extensions']
+            );
+            if (ext) {
+                _gas.push(['_trackEvent',
+                    opts['category'], ext, el.href
+                ]);
+            }
         }
     });
 }

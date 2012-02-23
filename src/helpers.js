@@ -132,6 +132,30 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
 };
 
 /**
+ * Cross Browser Helper to emulate jQuery.live
+ *
+ * Binds to the document root. Listens to all events of the specific type.
+ * If event don't bubble it won't catch
+ */
+GasHelper.prototype._liveEvent = function(type, evt, ofunc) {
+    type = type.toUpperCase();
+
+    this._addEventListener(document, evt, function(me) {
+        for (var el = me.srcElement; el.nodeName !== 'HTML';
+            el = el.parentNode)
+        {
+            if (el.nodeName === type || el.parentNode === null) {
+                break;
+            }
+        }
+        if (el && el.nodeName === type) {
+            ofunc.call(el, me);
+        }
+
+    }, true);
+};
+
+/**
  * Cross Browser DomReady function.
  *
  * Inspired by: http://dean.edwards.name/weblog/2006/06/again/#comment367184

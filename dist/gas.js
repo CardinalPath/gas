@@ -142,6 +142,30 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
 };
 
 /**
+ * Cross Browser Helper to emulate jQuery.live
+ *
+ * Binds to the document root. Listens to all events of the specific type.
+ * If event don't bubble it won't catch
+ */
+GasHelper.prototype._liveEvent = function(type, evt, ofunc) {
+    type = type.toUpperCase();
+
+    this._addEventListener(document, evt, function(me) {
+        for (var el = me.srcElement; el.nodeName !== 'HTML';
+            el = el.parentNode)
+        {
+            if (el.nodeName === type || el.parentNode === null) {
+                break;
+            }
+        }
+        if (el && el.nodeName === type) {
+            ofunc.call(el, me);
+        }
+
+    }, true);
+};
+
+/**
  * Cross Browser DomReady function.
  *
  * Inspired by: http://dean.edwards.name/weblog/2006/06/again/#comment367184
@@ -511,12 +535,17 @@ function _checkFile(src, extensions) {
  */
 function _trackDownloads(opts) {
     var gh = this;
-    this._liveEvent('A', 'mousedown', function(e) {
-        var ext = _checkFile.call(gh, this.href, opts['extensions']);
-        if (ext) {
-            _gas.push(['_trackEvent',
-                opts['category'], ext, this.href
-            ]);
+    gh._liveEvent('a', 'mousedown', function(e) {
+        var el = this;
+        if (el.href) {
+            var ext = _checkFile.call(gh,
+                el.href, opts['extensions']
+            );
+            if (ext) {
+                _gas.push(['_trackEvent',
+                    opts['category'], ext, el.href
+                ]);
+            }
         }
     });
 }
@@ -711,14 +740,9 @@ function _trackMediaElement(e) {
  */
 function _trackMedia(tag) {
     var self = this;
-    self._DOMReady(function() {
-        var vs = document.getElementsByTagName(tag);
-        for (var i = 0; i < vs.length; i++) {
-            self._addEventListener(vs[i], 'play', _trackMediaElement);
-            self._addEventListener(vs[i], 'ended', _trackMediaElement);
-            self._addEventListener(vs[i], 'pause', _trackMediaElement);
-        }
-    });
+    self._liveEvent(tag, 'play', _trackMediaElement);
+    self._liveEvent(tag, 'pause', _trackMediaElement);
+    self._liveEvent(tag, 'ended', _trackMediaElement);
 }
 
 function _trackVideo() {
@@ -1010,36 +1034,31 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * @param {object} opts Custom options for Outbound Links.
  */
 function _trackOutboundLinks(opts) {
+    var gh = this;
     if (!opts) {
         opts = {};
     }
     opts['category'] = opts['category'] || 'Outbound';
 
-    var links = document.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        this._addEventListener(
-            links[i],
-            'mousedown',
-            function(e) {
-                var l = e.target;
-                if (
-                    (l.protocol == 'http:' || l.protocol == 'https:') &&
-                    sindexOf.call(l.href, document.location.hostname) === -1)
-                {
-                    var path = (l.pathname + l.search + ''),
-                        utm = sindexOf.call(path, '__utm');
-                    if (utm !== -1) {
-                        path = path.substring(0, utm);
-                    }
-                    _gas.push(['_trackEvent',
-                        opts['category'],
-                        l.hostname,
-                        path
-                    ]);
-                }
+    gh._liveEvent('a', 'mousedown', function(e) {
+        var l = this;
+        if (
+            (l.protocol == 'http:' || l.protocol == 'https:') &&
+            sindexOf.call(l.href, document.location.hostname) === -1)
+        {
+            var path = (l.pathname + l.search + ''),
+                utm = sindexOf.call(path, '__utm');
+            if (utm !== -1) {
+                path = path.substring(0, utm);
             }
-        );
-    }
+            _gas.push(['_trackEvent',
+                opts['category'],
+                l.hostname,
+                path
+            ]);
+        }
+
+    });
 }
 
 _gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
