@@ -98,7 +98,7 @@ GAS will track the following extensions by default:
 
 **parameters**
 
-- _String_ _opts.category_ : The event category (default value is: "Outbound")
+- _String_ _opts.category_ : The event category (default value is: "Download")
 - _String_ _opts.extensions_ : Comma separated list of additional extensions to track.
 
 eg:
