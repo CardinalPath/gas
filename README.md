@@ -46,7 +46,7 @@ s.parentNode.insertBefore(ga, s);
 There's no need to include the ga.js file. GAS will load that file for you.
 That snippet will enable the common features of GAS.
 
-## Documentation
+## API
 
 GAS is based on `_gas` from Google and as such supports all methods and 
 directives it supports. So go check [official documentation][gajs] for the GA 
@@ -121,11 +121,7 @@ of embedding videos.
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
 
-After you enable it the following events will be tracked. 
-
-* play
-* pause
-* finish
+After you enable it the following events will be tracked. 'play', 'pause' and 'finish'.
 
 You should append to the video URL the parameter `api=1`. 
 The embedding code should look like this:
@@ -153,12 +149,7 @@ of embedding videos.
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
 
-After you enable it the following events will be tracked. 
-
-* play
-* pause
-* finish
-* error
+After you enable it the following events will be tracked: 'play', 'pause', 'finish' and 'error'.
 
 You should append to the video URL the parameter `enablejsapi=1`. 
 The embedding code should look like this:
@@ -185,6 +176,58 @@ _gas.push(['_trackYoutube', {
 ```
 
 This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish'.
+
+## Other GAS Features
+
+### Cross-domain 
+
+This feature help you implementing cross-domain setups. It will find and tag
+all links to other domains and mark them with the `_link` or `_linkByPost`
+function. You just need to push all domain names with `_setDomainName`. 
+
+
+``` javascript
+_gas.push(['_setAccount', 'UA-XXXXX-1']);
+_gas.push(['_setAllowLinker', true]);
+_gas.push(['_setDomainName', 'mysite.com']);
+_gas.push(['_setDomainName', 'myothersite.com']);
+_gas.push(['_setMultiDomain', 'click']);
+```
+
+The above snippet can be used in either `mysite.com` or `myothersite.com`. 
+It will know the right one to use for each case and all other domains pushed to
+`_setDomainName` will be used to discover links between the sites. 
+The nice side effect is that you can have the same snippet for both websites.
+
+### Multi-Account Tracking
+
+Easier handling of multi-account setups. You can fire an event to all accounts
+or just to one of the accounts you configured,
+
+
+``` javascript
+_gas.push(['_setAccount', 'UA-XXXXX-1']);
+_gas.push(['_setAccount', 'UA-XXXXX-2']);
+_gas.push(['custom._setAccount', 'UA-XXXXX-3']);
+
+// This will be sent to all 3 accounts
+_gas.push(['_trackPageview']);
+
+// This pageview goes only to account UA-XXXXX-3
+_gas.push(['custom._trackPageview']);
+```
+
+### Changing the Page Title
+
+GAS support changing the page title.
+
+
+``` javascript
+_gas.push(['_trackPageview', {
+    page: '/my_page', 
+    title: 'My Page Title'
+}]);
+```
 
 ### Hooks for \_gaq Functions
 
@@ -239,54 +282,3 @@ _gas.push(['_addHook', '_setVar', function(val){
 The above Hook will intercept and cancel any call to the, now deprecated, 
 `_setVar`. It will then trigger a call to `_setCustomVar` with an
 equivalent value.
-
-### Changing the Page Title
-
-GAS support changing the page title.
-
-
-``` javascript
-_gas.push(['_trackPageview', {
-    page: '/my_page', 
-    title: 'My Page Title'
-}]);
-```
-
-### Cross-domain 
-
-This feature help you implementing cross-domain setups. It will find and tag
-all links to other domains and mark them with the `_link` or `_linkByPost`
-function. You just need to push all domain names with `_setDomainName`. 
-
-
-``` javascript
-_gas.push(['_setAccount', 'UA-XXXXX-1']);
-_gas.push(['_setAllowLinker', true]);
-_gas.push(['_setDomainName', 'mysite.com']);
-_gas.push(['_setDomainName', 'myothersite.com']);
-_gas.push(['_setMultiDomain', 'click']);
-```
-
-The above snippet can be used in either `mysite.com` or `myothersite.com`. 
-It will know the right one to use for each case and all other domains pushed to
-`_setDomainName` will be used to discover links between the sites. 
-The nice side effect is that you can have the same snippet for both websites.
-
-### Multi-Account Tracking
-
-Easier handling of multi-account setups. You can fire an event to all accounts
-or just to one of the accounts you configured,
-
-
-``` javascript
-_gas.push(['_setAccount', 'UA-XXXXX-1']);
-_gas.push(['_setAccount', 'UA-XXXXX-2']);
-_gas.push(['custom._setAccount', 'UA-XXXXX-3']);
-
-// This will be sent to all 3 accounts
-_gas.push(['_trackPageview']);
-
-// This pageview goes only to account UA-XXXXX-3
-_gas.push(['custom._trackPageview']);
-```
-
