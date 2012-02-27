@@ -59,7 +59,7 @@ Additionally GAS support a couple more features.
 Form Tracking will trigger events every time a user submits a form or changes a
 form field.
 
-```javascript
+``` javascript
 _gas.push(['_trackForms']);
 ```
 
@@ -71,7 +71,7 @@ The paramter must be a javascript object.
 
 eg:
 
-```javascript
+``` javascript
 _gas.push(['_trackForms', {category: 'Form Events'}]);
 ```
 
@@ -83,7 +83,7 @@ or to trigger events to another tool every time a pageView is fired. You can
 assign multiple Hooks.
 
 
-```javascript
+``` javascript
 _gas.push(['_addHook', '_trackPageview', function(page){
     console.log(page);
     if(page.toLowerCase){
@@ -104,7 +104,7 @@ values. The Hook bellow will try to round floats or convert strings to integers
 when possible. This should avoid a bad value from canceling the Event.
 
 
-```javascript
+``` javascript
 _gas.push(['_addHook', '_trackEvent', function(cat,act,lab,val){
     if(typeof val == 'string'){
         val = parseInt(val, 10);
@@ -118,7 +118,7 @@ _gas.push(['_addHook', '_trackEvent', function(cat,act,lab,val){
 You can also cancel a call returning `false` from a Hook.
 
 
-```javascript
+``` javascript
 _gas.push(['_addHook', '_setVar', function(val){
     _gas.push(['_setCustomVar', 1, 'userType', val, 1]);
     return false;
@@ -136,7 +136,7 @@ all links to other domains and mark them with the `_link` or `_linkByPost`
 function. You just need to push all domain names with _setDomainName. 
 
 
-```javascript
+``` javascript
 _gas.push(['_setAccount', 'UA-XXXXX-1']);
 _gas.push(['_setAllowLinker', true]);
 _gas.push(['_setDomainName', 'mysite.com']);
@@ -156,7 +156,7 @@ This will fire events with the Max-Scroll percentage value for every page the
 user views.
 
 
-```javascript
+``` javascript
 _gas.push(['_trackMaxScroll']);
 ```
     
@@ -167,7 +167,7 @@ The paramter must be a javascript object.
 eg:
 
 
-```javascript
+``` javascript
 _gas.push(['_trackMaxScroll', {category: 'Scroll Tracking'}]);
 ```
 
@@ -177,7 +177,7 @@ This function will look for any outbound links on the current page and will
 trigger an event when the link is clicked. It bounds to the `mousedown` 
 javascript event
 
-```javascript
+``` javascript
 _gas.push(['_trackOutboundLinks']);
 ```
 
@@ -187,7 +187,7 @@ The paramter must be a javascript object.
 
 eg:
 
-```javascript
+``` javascript
 _gas.push(['_trackOutboundLinks', {category: 'External Link'}]);
 ```
 
@@ -196,7 +196,7 @@ _gas.push(['_trackOutboundLinks', {category: 'External Link'}]);
 GAS support changing the page title.
 
 
-```javascript
+``` javascript
 _gas.push(['_trackPageview', {
     page: '/my_page', 
     title: 'My Page Title'
@@ -210,7 +210,7 @@ Easier handling of multi-account setups. You can fire an event to all accounts
 or just to one of the accounts you configured,
 
 
-```javascript
+``` javascript
 _gas.push(['_setAccount', 'UA-XXXXX-1']);
 _gas.push(['_setAccount', 'UA-XXXXX-2']);
 _gas.push(['custom._setAccount', 'UA-XXXXX-3']);
@@ -226,7 +226,7 @@ _gas.push(['custom._trackPageview']);
 ### Download Tracking
 To enable Download Tracking just include the following call on your snippet.
 
-```javascript
+``` javascript
 _gas.push(['_trackDownloads']);
 ```
 
@@ -237,7 +237,7 @@ You can set additional extensions to be tracked if you want by passing a
 parameter to `_trackDownloads`. You can also customize the category for the 
 Download events, otherwise the default "Download" category will be used.
 
-```javascript
+``` javascript
 _gas.push(['_trackDownloads', {
     category: 'File Downloads',
     extensions: 'torrent,gz,mp4,wav'
@@ -251,7 +251,7 @@ of embedding videos.
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
 
-```javascript
+``` javascript
 _gas.push(['_trackVimeo', {force: true}]);
 ```
 
@@ -264,7 +264,7 @@ After you enable it the following events will be tracked.
 You should append to the video URL the parameter `api=1`. 
 The embedding code should look like this:
 
-```html
+``` html
 <iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
 ```
 
@@ -288,7 +288,7 @@ of embedding videos.
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
 
-```javascript
+``` javascript
 _gas.push(['_trackYoutube', {force: true}]);
 ```
 
@@ -303,7 +303,7 @@ You should append to the video URL the parameter `enablejsapi=1`.
 The embedding code should look like this:
 
 
-```html
+``` html
 <iframe width="640" height="510" src="http://www.youtube.com/embed/u1zgFlCw8Aw?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
 ```
 
@@ -317,7 +317,7 @@ Then you can enable this parameter only in the videos you want to track.
 
 _trackYoutube also support a second optional parameter. It should be an Array of integers and define percentages to fire an event at:
 
-```javascript
+``` javascript
 _gas.push(['_trackYoutube', {
     force: true,
     percentages: [25, 50, 75, 90]
