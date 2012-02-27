@@ -18,27 +18,29 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 The basic snippet looks like this:
 
-    <script type="text/javascript">
-    var _gas = _gas || [];
-    _gas.push(['_setAccount', 'UA-YYYYYY-Y']); // REPLACE WITH YOUR GA NUMBER
-    _gas.push(['_setDomainName', '.mydomain.com']); // REPLACE WITH YOUR DOMAIN
-    _gas.push(['_trackPageview']);
-    _gas.push(['_trackForms']);
-    _gas.push(['_trackOutboundLinks']);
-    _gas.push(['_trackMaxScroll']);
-    _gas.push(['_trackDownloads']);
-    _gas.push(['_trackYoutube', {force:true}]);
-    _gas.push(['_trackVimeo', {force:true}]);
-    
-    (function() {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-    ga.src = '/gas.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-    })();
-    </script> 
+```html
+<script type="text/javascript">
+var _gas = _gas || [];
+_gas.push(['_setAccount', 'UA-YYYYYY-Y']); // REPLACE WITH YOUR GA NUMBER
+_gas.push(['_setDomainName', '.mydomain.com']); // REPLACE WITH YOUR DOMAIN
+_gas.push(['_trackPageview']);
+_gas.push(['_trackForms']);
+_gas.push(['_trackOutboundLinks']);
+_gas.push(['_trackMaxScroll']);
+_gas.push(['_trackDownloads']);
+_gas.push(['_trackYoutube', {force:true}]);
+_gas.push(['_trackVimeo', {force:true}]);
+
+(function() {
+var ga = document.createElement('script');
+ga.type = 'text/javascript';
+ga.async = true;
+ga.src = '/gas.js';
+var s = document.getElementsByTagName('script')[0];
+s.parentNode.insertBefore(ga, s);
+})();
+</script> 
+```
     
 
 There's no need to include the ga.js file. GAS will load that file for you.
