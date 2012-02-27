@@ -147,18 +147,19 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * Binds to the document root. Listens to all events of the specific type.
  * If event don't bubble it won't catch
  */
-GasHelper.prototype._liveEvent = function(type, evt, ofunc) {
-    type = type.toUpperCase();
+GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
+    tag = tag.toUpperCase();
+    tag = tag.split(',');
 
     this._addEventListener(document, evt, function(me) {
         for (var el = me.srcElement; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
-            if (el.nodeName === type || el.parentNode === null) {
+            if (~tag.indexOf(el.nodeName) || el.parentNode === null) {
                 break;
             }
         }
-        if (el && el.nodeName === type) {
+        if (el && ~tag.indexOf(el.nodeName)) {
             ofunc.call(el, me);
         }
 
@@ -227,7 +228,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.3.1';
+    self['version'] = '1.3.3';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
@@ -605,108 +606,47 @@ _gas.push(['_addHook', '_trackEvent', function() {
  */
 
 /**
- * Enable form tracking for 1 form
+ * get the form name for a specific elemet
  *
- * @this {GasHelper} The Ga Helper object
- * @param {HTMLFormElement} form The form element to be tagged.
- * @param {object=} opts if we should use live binding. Defaults to false.
- * @return {boolean} false if the form has no elements.
+ * @param {DOMElemet} el Dom Element.
+ * @return {String} Form Name or Id.
  */
-function track_form(form, opts) {
-    var scp = this;
-
-    function tag_element(e) {
-        var el = e.target;
-        var el_name = el.name || el.id || el.type || el.nodeName;
-        var action_name = e.type;
-        var form_name = form.name || form.id || undefined;
-
-        form_name = form_name ? ' (' + form_name + ')' : '';
-
-        _gas.push(['_trackEvent',
-            opts['category'], //category
-            'form' + form_name, //action
-            el_name + ' (' + action_name + ')' //label
-        ]);
+function getFormName(el) {
+    while (el && el.nodeName !== 'HTML') {
+      if (el.nodeName === 'FORM') {break;}
+      el = el.parentNode;
     }
-
-
-    if (opts['live']) {
-        scp._addEventListener(window, 'click', function(e) {
-            try {
-                var el = e.target;
-                if (e.type == 'click' &&
-                  scp.inArray(['button', 'submit', 'image', 'reset'],
-                    el.type.toLowerCase()
-                  )
-                ) {
-
-                    tag_element(e);
-                }
-            }catch (e) {} //Ignore errors here.
-        });
-        scp._addEventListener(document.body, 'change', function(e) {
-            try {
-                var el = e.target;
-                if (e.type == 'change' &&
-                  scp.inArray(['input', 'select', 'textarea', 'hidden'],
-                    el.nodeName.toLowerCase()
-                  )
-                ) {
-
-                    tag_element(e);
-                }
-            }catch (e) {} //Ignore errors here.
-        });
-        //TODO: Track the submit on live binding
-    }else {
-        var i, el;
-        if (!form.elements || !form.elements.length) {
-            return false;
-        }
-        for (i = 0; i < form.elements.length; i++) {
-            el = form.elements[i];
-            // For some reason fieldsets are form elements.
-            if (el.type && el.nodeName !== 'FIELDSET') {
-                if (scp.inArray(['button', 'submit', 'image', 'reset'],
-                    el.type)
-                ) {
-                    //Button
-                    scp._addEventListener(el, 'click', tag_element);
-                }
-                else {
-                    // changable field
-                    scp._addEventListener(el, 'change', tag_element);
-                }
-            }
-        }
-        scp._addEventListener(form, 'submit', tag_element);
+    if (el.nodeName === 'FORM') {
+        return el.name || el.id || 'none';
     }
+    return 'none';
 }
 
 _gas.push(['_addHook', '_trackForms', function(opts) {
     var scp = this;
-    // Support legacy opts as a boolean.
-    if (typeof opts === 'boolean') {
-        opts = {'live': opts};
-    } else if (typeof opts !== 'object') {
+    if (typeof opts !== 'object') {
         opts = {};
     }
+
     // Make sure required attrs are defined or fallback to default
     opts['category'] = opts['category'] || 'Form Tracking';
-    opts['live'] = opts['live'] || true;
+    //opts['live'] = opts['live'] || true; //Ignored
+
+    var trackField = function(e) {
+        var el = e.target,
+            el_name = el.name || el.id || el.type || el.nodeName,
+            form_name = getFormName(el),
+            action = 'form (' + form_name + ')',
+            label = el_name + ' (' + e.type + ')';
+
+        _gas.push(['_trackEvent', opts['category'], action, label]);
+    }
+
+    scp._liveEvent('input,select,textarea,hidden', 'change', trackField);
+    //scp._liveEvent('button,submit,image,reset', 'click', trackField);
+    scp._liveEvent('form', 'submit', trackField);
 
 
-    this._DOMReady(function() {
-        var forms = document.getElementsByTagName('form');
-        for (var i = 0; i < forms.length; i++) {
-            try {
-                track_form.call(scp, forms[i], opts);
-            }catch (e) {}
-            if (opts['live']) break;
-        }
-        return false;
-    });
 }]);
 
 /**

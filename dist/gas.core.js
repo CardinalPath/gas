@@ -147,18 +147,19 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * Binds to the document root. Listens to all events of the specific type.
  * If event don't bubble it won't catch
  */
-GasHelper.prototype._liveEvent = function(type, evt, ofunc) {
-    type = type.toUpperCase();
+GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
+    tag = tag.toUpperCase();
+    tag = tag.split(',');
 
     this._addEventListener(document, evt, function(me) {
         for (var el = me.srcElement; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
-            if (el.nodeName === type || el.parentNode === null) {
+            if (~tag.indexOf(el.nodeName) || el.parentNode === null) {
                 break;
             }
         }
-        if (el && el.nodeName === type) {
+        if (el && ~tag.indexOf(el.nodeName)) {
             ofunc.call(el, me);
         }
 
@@ -227,7 +228,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.3.1';
+    self['version'] = '1.3.3';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
