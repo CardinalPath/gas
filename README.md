@@ -1,6 +1,6 @@
 # GAS - Google Analytics on Steroids
 
-## Synopsis
+## Overview
 
 GAS is a wrapper around the Google Analytics Tracking API from Google. It tries
 to add new functionality while keeping the same API.
@@ -10,7 +10,7 @@ with Google.
 
 ## Installation
 
-To install GAS download the script from [dist][dist] folder and put it somewhere on
+To install GAS download the script from [dist][] folder and put it somewhere on
 your website. Also install the basic snippet on every page of your website. Be
 sure to change the Account Number (UA) and the correct gas.js file location.
 
@@ -28,8 +28,8 @@ _gas.push(['_trackForms']);
 _gas.push(['_trackOutboundLinks']);
 _gas.push(['_trackMaxScroll']);
 _gas.push(['_trackDownloads']);
-_gas.push(['_trackYoutube', {force:true}]);
-_gas.push(['_trackVimeo', {force:true}]);
+_gas.push(['_trackYoutube']);
+_gas.push(['_trackVimeo']);
 
 (function() {
 var ga = document.createElement('script');
@@ -56,26 +56,14 @@ Tracker.
 
 Additionally GAS support a couple more features.
 
-### Form Tracking
+### \_trackForms
+`_gas.push(['_trackForms', opts]);`
 
 Form Tracking will trigger events every time a user submits a form or changes a
 form field.
 
-``` javascript
-_gas.push(['_trackForms']);
-```
-
-This is all you need to enable it.
-
-Form tracking accepts a paramter to customize the event category. If you
-don't set this parameter it will use the default category "Form Tracking".
-The paramter must be a javascript object.
-
-eg:
-
-``` javascript
-_gas.push(['_trackForms', {category: 'Form Events'}]);
-```
+**parameters**
+_String_ _opts.category_ : The event category _(defaults to: "Form Tracking")_
 
 ### Hooks for _gaq Functions
 
@@ -247,8 +235,10 @@ _gas.push(['_trackDownloads', {
 ```
 
 ### Vimeo Video Tracking
-You can track [Vimeo][Vimeo] video events. You must be using the iframe method 
+You can track [Vimeo][] video events. You must be using the iframe method 
 of embedding videos. 
+
+[Vimeo]: http://www.vimeo.com/
 
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
@@ -279,13 +269,12 @@ parameter.
 Then you can enable this parameter only in the videos you want to track.
 
 
-
-[Vimeo]: http://www.vimeo.com/
-
 ### Youtube Video Tracking
 
-You can track [Youtube][Youtube] video events. You must be using the iframe method 
+You can track [Youtube][] video events. You must be using the iframe method 
 of embedding videos. 
+
+[Youtube]: http://www.youtube.com/
 
 The browser must support HTML5 postMessage. That means it won't work on ie6 
 and ie7.
@@ -328,6 +317,5 @@ _gas.push(['_trackYoutube', {
 
 This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish'.
 
-[Youtube]: http://www.youtube.com/
 
 
