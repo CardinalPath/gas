@@ -49,9 +49,8 @@ That snippet will enable the common features of GAS.
 
 ## API
 
-GAS is based on `_gas` from Google and as such supports all methods and 
-directives it supports. So go check [official documentation][gajs] for the GA 
-Tracker.
+GAS is based on `_gaq` from Google and as such supports all methods it supports. 
+So go check [official documentation][gajs] for the GA Tracker.
 
 [gajs]: http://code.google.com/apis/analytics/docs/gaJS/gaJSApi.html
 
@@ -189,6 +188,8 @@ This will setup Youtube Video Tracking so that events will be fired at 25%, 50%,
 
 ## Other GAS Features
 
+GAS changes the behaiour of some functions that are defined on the [official documentation][gajs] to make it easier to implement some very common cases.
+
 ### Cross-domain 
 
 This feature help you implementing cross-domain setups. It will find and tag
@@ -208,6 +209,8 @@ The above snippet can be used in either `mysite.com` or `myothersite.com`.
 It will know the right one to use for each case and all other domains pushed to
 `_setDomainName` will be used to discover links between the sites. 
 The nice side effect is that you can have the same snippet for both websites.
+
+Note that calling `_setDomainName` multiple times is not supported by _gaq. 
 
 ### Multi-Account Tracking
 
