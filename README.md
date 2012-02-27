@@ -64,7 +64,7 @@ form field.
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "Form Tracking")
+- _String_ _opts.category_ : The event category (default value is: "Form Tracking")
 
 
 
@@ -76,7 +76,7 @@ user views.
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "MaxScroll")
+- _String_ _opts.category_ : The event category (default value is: "MaxScroll")
 
 ### _trackOutboundLinks
 `_gas.push(['_trackOutboundLinks', opts])`
@@ -87,7 +87,7 @@ javascript event
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "Outbound")
+- _String_ _opts.category_ : The event category (default value is: "Outbound")
 
 
 ### _trackDownloads
@@ -98,8 +98,8 @@ GAS will track the following extensions by default:
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "Outbound")
-_String_ _opts.extensions_ : Comma separated list of additional extensions to track.
+- _String_ _opts.category_ : The event category (default value is: "Outbound")
+- _String_ _opts.extensions_ : Comma separated list of additional extensions to track.
 
 eg:
 
@@ -139,8 +139,8 @@ iframe adding this parameter.
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "Vimeo Video")
-_boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
+- _String_ _opts.category_ : The event category (default value is: "Vimeo Video")
+- _boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
 
 ### _trackYoutube
 `_gas.push(['_trackYoutube', opts])`
@@ -172,9 +172,9 @@ reload on the iframe adding this parameter.
 
 **parameters**
 
-_String_ _opts.category_ : The event category (default value is: "Youtube Video")
-_boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
-_Array_ _opts.percentages_ : Percentages to track in addition to the default events.
+- _String_ _opts.category_ : The event category (default value is: "Youtube Video")
+- _boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
+- _Array_ _opts.percentages_ : Percentages to track in addition to the default events.
 
 eg: 
 
