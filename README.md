@@ -30,6 +30,7 @@ _gas.push(['_trackMaxScroll']);
 _gas.push(['_trackDownloads']);
 _gas.push(['_trackYoutube']);
 _gas.push(['_trackVimeo']);
+_gas.push(['_trackMailto']);
 
 (function() {
 var ga = document.createElement('script');
@@ -109,6 +110,15 @@ _gas.push(['_trackDownloads', {
     extensions: 'torrent,gz,mp4,wav'
 }]);
 ```
+
+### _trackMailto
+`_gas.push(['_trackMailto', opts]);`
+
+Tracks clicks on links with `href="mailto:..."`.
+
+**parameters**
+
+- _String_ _opts.category_ : The event category (default value is: "Mailto")
 
 ### _trackVimeo
 `_gas.push(['_trackVimeo', opts])`
