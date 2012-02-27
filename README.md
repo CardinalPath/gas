@@ -18,7 +18,7 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 The basic snippet looks like this:
 
-```html
+``` html
 <script type="text/javascript">
 var _gas = _gas || [];
 _gas.push(['_setAccount', 'UA-YYYYYY-Y']); // REPLACE WITH YOUR GA NUMBER
@@ -48,7 +48,7 @@ That snippet will enable the common features of GAS.
 
 ## Documentation
 
-GAS is based on `_gaq` from Google and as such supports all methods and 
+GAS is based on `_gas` from Google and as such supports all methods and 
 directives it supports. So go check [official documentation][gajs] for the GA 
 Tracker.
 
@@ -57,15 +57,136 @@ Tracker.
 Additionally GAS support a couple more features.
 
 ### \_trackForms
-`_gas.push(['_trackForms', opts]);`
+`_gas.push(['_trackForms', opts])`
 
 Form Tracking will trigger events every time a user submits a form or changes a
 form field.
 
 **parameters**
-_String_ _opts.category_ : The event category _(defaults to: "Form Tracking")_
 
-### Hooks for _gaq Functions
+_String_ _opts.category_ : The event category (default value is: "Form Tracking")
+
+
+
+### \_trackMaxScroll
+`_gas.push(['_trackMaxScroll', opts])`
+
+Fire events with the Max-Scroll percentage value for every page the
+user views.
+
+**parameters**
+
+_String_ _opts.category_ : The event category (default value is: "MaxScroll")
+
+### _trackOutboundLinks
+`_gas.push(['_trackOutboundLinks', opts])`
+
+This function will look for any outbound links on the current page and will
+trigger an event when the link is clicked. It bounds to the `mousedown` 
+javascript event
+
+**parameters**
+
+_String_ _opts.category_ : The event category (default value is: "Outbound")
+
+
+### _trackDownloads
+`_gas.push(['_trackDownloads', opts])`
+
+GAS will track the following extensions by default:
+'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip,rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv'
+
+**parameters**
+
+_String_ _opts.category_ : The event category (default value is: "Outbound")
+_String_ _opts.extensions_ : Comma separated list of additional extensions to track.
+
+eg:
+
+``` javascript
+_gas.push(['_trackDownloads', {
+    category: 'File Downloads',
+    extensions: 'torrent,gz,mp4,wav'
+}]);
+```
+
+### _trackVimeo
+`_gas.push(['_trackVimeo', opts])`
+
+You can track [Vimeo][] video events. You must be using the iframe method 
+of embedding videos. 
+
+[Vimeo]: http://www.vimeo.com/
+
+The browser must support HTML5 postMessage. That means it won't work on ie6 
+and ie7.
+
+After you enable it the following events will be tracked. 
+
+* play
+* pause
+* finish
+
+You should append to the video URL the parameter `api=1`. 
+The embedding code should look like this:
+
+``` html
+<iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
+```
+
+If you don't provide the `api` parameter than GAS will *force* a reload on the 
+iframe adding this parameter. 
+
+**parameters**
+
+_String_ _opts.category_ : The event category (default value is: "Vimeo Video")
+_boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
+
+### _trackYoutube
+`_gas.push(['_trackYoutube', opts])`
+
+You can track [Youtube][] video events. You must be using the iframe method 
+of embedding videos. 
+
+[Youtube]: http://www.youtube.com/
+
+The browser must support HTML5 postMessage. That means it won't work on ie6 
+and ie7.
+
+After you enable it the following events will be tracked. 
+
+* play
+* pause
+* finish
+* error
+
+You should append to the video URL the parameter `enablejsapi=1`. 
+The embedding code should look like this:
+
+``` html
+<iframe width="640" height="510" src="http://www.youtube.com/embed/u1zgFlCw8Aw?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
+```
+
+If you don't provide the `enablejsapi` parameter than GAS will *force* a 
+reload on the iframe adding this parameter. 
+
+**parameters**
+
+_String_ _opts.category_ : The event category (default value is: "Youtube Video")
+_boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
+_Array_ _opts.percentages_ : Percentages to track in addition to the default events.
+
+eg: 
+
+``` javascript
+_gas.push(['_trackYoutube', {
+    percentages: [25, 50, 75, 90]
+}]);
+```
+
+This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish'.
+
+### Hooks for \_gaq Functions
 
 Hooks are a handy feature if you want to monitor or change values of a call to
 one of the function from _gaq. You can use it as a filter to lowercase values,
@@ -119,11 +240,23 @@ The above Hook will intercept and cancel any call to the, now deprecated,
 `_setVar`. It will then trigger a call to `_setCustomVar` with an
 equivalent value.
 
-### Multi-domain setup helpers
+### Changing the Page Title
 
-This feature help you implementing Multi-domain setups. It will find and tag
+GAS support changing the page title.
+
+
+``` javascript
+_gas.push(['_trackPageview', {
+    page: '/my_page', 
+    title: 'My Page Title'
+}]);
+```
+
+### Cross-domain 
+
+This feature help you implementing cross-domain setups. It will find and tag
 all links to other domains and mark them with the `_link` or `_linkByPost`
-function. You just need to push all domain names with _setDomainName. 
+function. You just need to push all domain names with `_setDomainName`. 
 
 
 ``` javascript
@@ -138,61 +271,6 @@ The above snippet can be used in either `mysite.com` or `myothersite.com`.
 It will know the right one to use for each case and all other domains pushed to
 `_setDomainName` will be used to discover links between the sites. 
 The nice side effect is that you can have the same snippet for both websites.
-
-
-### Max-Scroll Tracking
-
-This will fire events with the Max-Scroll percentage value for every page the
-user views.
-
-
-``` javascript
-_gas.push(['_trackMaxScroll']);
-```
-    
-Max-Scroll tracking accepts a paramter to customize the event category. If you
-don't set this parameter it will use the default category "Max Scroll".
-The paramter must be a javascript object.
-
-eg:
-
-
-``` javascript
-_gas.push(['_trackMaxScroll', {category: 'Scroll Tracking'}]);
-```
-
-### Outbound Link Tracking
-
-This function will look for any outbound links on the current page and will
-trigger an event when the link is clicked. It bounds to the `mousedown` 
-javascript event
-
-``` javascript
-_gas.push(['_trackOutboundLinks']);
-```
-
-Outbaound tracking accepts a paramter to customize the event category. If you
-don't set this parameter it will use the default category "Outbound".
-The paramter must be a javascript object.
-
-eg:
-
-``` javascript
-_gas.push(['_trackOutboundLinks', {category: 'External Link'}]);
-```
-
-### Changing the Page Title
-
-GAS support changing the page title.
-
-
-``` javascript
-_gas.push(['_trackPageview', {
-    page: '/my_page', 
-    title: 'My Page Title'
-}]);
-```
-
 
 ### Multi-Account Tracking
 
@@ -211,111 +289,4 @@ _gas.push(['_trackPageview']);
 // This pageview goes only to account UA-XXXXX-3
 _gas.push(['custom._trackPageview']);
 ```
-
-
-### Download Tracking
-To enable Download Tracking just include the following call on your snippet.
-
-``` javascript
-_gas.push(['_trackDownloads']);
-```
-
-GAS will track the following extensions by default:
-'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip,rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv'
-
-You can set additional extensions to be tracked if you want by passing a 
-parameter to `_trackDownloads`. You can also customize the category for the 
-Download events, otherwise the default "Download" category will be used.
-
-``` javascript
-_gas.push(['_trackDownloads', {
-    category: 'File Downloads',
-    extensions: 'torrent,gz,mp4,wav'
-}]);
-```
-
-### Vimeo Video Tracking
-You can track [Vimeo][] video events. You must be using the iframe method 
-of embedding videos. 
-
-[Vimeo]: http://www.vimeo.com/
-
-The browser must support HTML5 postMessage. That means it won't work on ie6 
-and ie7.
-
-``` javascript
-_gas.push(['_trackVimeo', {force: true}]);
-```
-
-After you enable it the following events will be tracked. 
-
-* play
-* pause
-* finish
-
-You should append to the video URL the parameter `api=1`. 
-The embedding code should look like this:
-
-``` html
-<iframe id="player_1" src="http://player.vimeo.com/video/7100569?api=1" width="540" height="304" frameborder="0" webkitallowfullscreen></iframe> 
-```
-
-If you don't provide the `api` parameter than GAS will *force* a reload on the 
-iframe adding this parameter. 
-
-If you only want to track some videos (not all) on your site you can omit the 
-`'force'` parameter and GAS will only track the Videos that already have the api 
-parameter.
-Then you can enable this parameter only in the videos you want to track.
-
-
-### Youtube Video Tracking
-
-You can track [Youtube][] video events. You must be using the iframe method 
-of embedding videos. 
-
-[Youtube]: http://www.youtube.com/
-
-The browser must support HTML5 postMessage. That means it won't work on ie6 
-and ie7.
-
-``` javascript
-_gas.push(['_trackYoutube', {force: true}]);
-```
-
-After you enable it the following events will be tracked. 
-
-* play
-* pause
-* finish
-* error
-
-You should append to the video URL the parameter `enablejsapi=1`. 
-The embedding code should look like this:
-
-
-``` html
-<iframe width="640" height="510" src="http://www.youtube.com/embed/u1zgFlCw8Aw?enablejsapi=1" frameborder="0" allowfullscreen></iframe>
-```
-
-If you don't provide the `enablejsapi` parameter than GAS will *force* a 
-reload on the iframe adding this parameter. 
-
-If you only want to track some videos (not all) on your site you can omit the 
-`'force'` parameter and GAS will only track the Videos that already have the 
-`enablejsapi` parameter.
-Then you can enable this parameter only in the videos you want to track.
-
-_trackYoutube also support a second optional parameter. It should be an Array of integers and define percentages to fire an event at:
-
-``` javascript
-_gas.push(['_trackYoutube', {
-    force: true,
-    percentages: [25, 50, 75, 90]
-}]);
-```
-
-This will setup Youtube Video Tracking so that events will be fired at 25%, 50%, 75% and 90% in addition to the other standard events, 'play', 'pause', 'finish'.
-
-
 
