@@ -148,18 +148,19 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * If event don't bubble it won't catch
  */
 GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
+    var gh = this;
     tag = tag.toUpperCase();
     tag = tag.split(',');
 
-    this._addEventListener(document, evt, function(me) {
+    gh._addEventListener(document, evt, function(me) {
         for (var el = me.srcElement; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
-            if (~tag.indexOf(el.nodeName) || el.parentNode === null) {
+            if (gh.inArray(tag, el.nodeName) || el.parentNode === null) {
                 break;
             }
         }
-        if (el && ~tag.indexOf(el.nodeName)) {
+        if (el && gh.inArray(tag, el.nodeName)) {
             ofunc.call(el, me);
         }
 
@@ -228,7 +229,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.3.4';
+    self['version'] = '1.3.5';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;

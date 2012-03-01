@@ -16,6 +16,12 @@
  * @param {object} opts Custom options for Outbound Links.
  */
 function _trackOutboundLinks(opts) {
+    if (!this._outboundTracked) {
+        this._outboundTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var gh = this;
     if (!opts) {
         opts = {};

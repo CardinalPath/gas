@@ -148,18 +148,19 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * If event don't bubble it won't catch
  */
 GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
+    var gh = this;
     tag = tag.toUpperCase();
     tag = tag.split(',');
 
-    this._addEventListener(document, evt, function(me) {
+    gh._addEventListener(document, evt, function(me) {
         for (var el = me.srcElement; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
-            if (~tag.indexOf(el.nodeName) || el.parentNode === null) {
+            if (gh.inArray(tag, el.nodeName) || el.parentNode === null) {
                 break;
             }
         }
-        if (el && ~tag.indexOf(el.nodeName)) {
+        if (el && gh.inArray(tag, el.nodeName)) {
             ofunc.call(el, me);
         }
 
@@ -228,7 +229,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.3.4';
+    self['version'] = '1.3.5';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
@@ -559,6 +560,12 @@ function _trackDownloads(opts) {
  * with array or string of extensions.
  */
 _gas.push(['_addHook', '_trackDownloads', function(opts) {
+    if (!this._downloadTracked) {
+        this._downloadTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     if (!opts) {
         opts = {'extensions': []};
     } else if (typeof opts === 'string') {
@@ -623,6 +630,12 @@ function getFormName(el) {
 }
 
 _gas.push(['_addHook', '_trackForms', function(opts) {
+    if (!this._formTracked) {
+        this._formTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var scp = this;
     if (typeof opts !== 'object') {
         opts = {};
@@ -686,10 +699,22 @@ function _trackMedia(tag) {
 }
 
 function _trackVideo() {
+    if (!this._videoTracked) {
+        this._videoTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     _trackMedia.call(this, 'video');
 }
 
 function _trackAudio() {
+    if (!this._audioTracked) {
+        this._audioTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     _trackMedia.call(this, 'audio');
 }
 
@@ -711,6 +736,13 @@ _gas.push(['_addHook', '_trackAudio', _trackAudio]);
  * @param {object} opts GAS Options.
  */
 _gas.push(['_addHook', '_trackMailto', function(opts) {
+    if (!this._mailtoTracked) {
+        this._mailtoTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
+
     if (!opts) {
         opts = {};
     }
@@ -823,6 +855,12 @@ var _maxScrollOpts;
  * @this {GasHelper} The Ga Helper object
  */
 function _trackMaxScroll(opts) {
+    if (!this._maxScrollTracked) {
+        this._maxScrollTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     _maxScrollOpts = opts || {};
     _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';
 
@@ -930,6 +968,12 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
  * @return {boolean} Returns false to avoid this is puhed to _gaq.
  */
 function track_links(event_used) {
+    if (!this._multidomainTracked) {
+        this._multidomainTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var internal = document.location.hostname,
         gh = this,
         i, j, el,
@@ -963,6 +1007,7 @@ function track_links(event_used) {
                                     e.preventDefault();
                                 else
                                     e.returnValue = false;
+                                return false; //needed for ie7
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {
@@ -1003,6 +1048,12 @@ _gas.push(['_addHook', '_setMultiDomain', track_links]);
  * @param {object} opts Custom options for Outbound Links.
  */
 function _trackOutboundLinks(opts) {
+    if (!this._outboundTracked) {
+        this._outboundTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var gh = this;
     if (!opts) {
         opts = {};

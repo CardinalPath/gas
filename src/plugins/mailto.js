@@ -13,6 +13,13 @@
  * @param {object} opts GAS Options.
  */
 _gas.push(['_addHook', '_trackMailto', function(opts) {
+    if (!this._mailtoTracked) {
+        this._mailtoTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
+
     if (!opts) {
         opts = {};
     }

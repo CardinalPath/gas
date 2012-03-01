@@ -96,6 +96,12 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
  * @return {boolean} Returns false to avoid this is puhed to _gaq.
  */
 function track_links(event_used) {
+    if (!this._multidomainTracked) {
+        this._multidomainTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var internal = document.location.hostname,
         gh = this,
         i, j, el,
@@ -129,6 +135,7 @@ function track_links(event_used) {
                                     e.preventDefault();
                                 else
                                     e.returnValue = false;
+                                return false; //needed for ie7
                             });
                         }else {
                             this._addEventListener(el, event_used, function() {

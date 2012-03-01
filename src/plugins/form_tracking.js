@@ -27,6 +27,12 @@ function getFormName(el) {
 }
 
 _gas.push(['_addHook', '_trackForms', function(opts) {
+    if (!this._formTracked) {
+        this._formTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     var scp = this;
     if (typeof opts !== 'object') {
         opts = {};

@@ -96,6 +96,12 @@ var _maxScrollOpts;
  * @this {GasHelper} The Ga Helper object
  */
 function _trackMaxScroll(opts) {
+    if (!this._maxScrollTracked) {
+        this._maxScrollTracked = true;
+    }else {
+        //Oops double tracking detected.
+        return;
+    }
     _maxScrollOpts = opts || {};
     _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';
 
