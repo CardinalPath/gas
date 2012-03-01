@@ -66,6 +66,12 @@ function _trackDownloads(opts) {
  * with array or string of extensions.
  */
 _gas.push(['_addHook', '_trackDownloads', function(opts) {
+    if(!this._downloadTracked){
+        this._downloadTracked = true;
+    }else{
+        //Oops double tracking detected.
+        return;
+    }
     if (!opts) {
         opts = {'extensions': []};
     } else if (typeof opts === 'string') {

@@ -35,10 +35,22 @@ function _trackMedia(tag) {
 }
 
 function _trackVideo() {
+    if(!this._videoTracked){
+        this._videoTracked = true;
+    }else{
+        //Oops double tracking detected.
+        return;
+    }
     _trackMedia.call(this, 'video');
 }
 
 function _trackAudio() {
+    if(!this._audioTracked){
+        this._audioTracked = true;
+    }else{
+        //Oops double tracking detected.
+        return;
+    }
     _trackMedia.call(this, 'audio');
 }
 
