@@ -52,9 +52,24 @@ _gas.push(['_addHook', '_trackForms', function(opts) {
         _gas.push(['_trackEvent', opts['category'], action, label]);
     }
 
-    scp._liveEvent('input,select,textarea,hidden', 'change', trackField);
-    //scp._liveEvent('button,submit,image,reset', 'click', trackField);
-    scp._liveEvent('form', 'submit', trackField);
+    scp._DOMReady(function() {
+        var changeTags = ['input', 'select', 'textarea', 'hidden'];
+        var submitTags = ['form'];
+        var elements = [];
+        var i, j;
+        for (i = 0; i < changeTags.length; i++) {
+            elements = document.getElementsByTagName(changeTags[i]);
+            for (j = 0; j < elements.length; j++) {
+                scp._addEventListener(elements[j], 'change', trackField);
+            }
+        }
+        for (i = 0; i < submitTags.length; i++) {
+            elements = document.getElementsByTagName(submitTags[i]);
+            for (j = 0; j < elements.length; j++) {
+                scp._addEventListener(elements[j], 'submit', trackField);
+            }
+        }
+    });
 
 
 }]);
