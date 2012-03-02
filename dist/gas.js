@@ -229,7 +229,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.3.5';
+    self['version'] = '1.4.0';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
