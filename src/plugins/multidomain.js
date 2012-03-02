@@ -156,5 +156,11 @@ function track_links(event_used) {
 /**
  * Registers Hook to _setMultiDomain
  */
-_gas.push(['_addHook', '_setMultiDomain', track_links]);
+_gas.push(['_addHook', '_setMultiDomain', function() {
+    var gh = this;
+    var args = slice.call(arguments);
+    gh._DOMReady(function() {
+        track_links.apply(gh, args);
+    });
+}]);
 
