@@ -6,7 +6,8 @@ GAS Changelog
 
 - fixed #4 Use live Bindings for most plugins
 - fixed #1 Permits multiple invocations of all plugins without causing double tracking.
-- fixed #12 New plugin to track `_gasMailTo` links. Enabled by default. 
+- fixed #12 New plugin to track mailto: links. `_gas.push(['_trackMailto']);`
+- Uses uglifyjs to compile code. Less variable mangling.
 
 1.2.1
 -----
