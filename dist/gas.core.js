@@ -153,7 +153,7 @@ GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
     tag = tag.split(',');
 
     gh._addEventListener(document, evt, function(me) {
-        for (var el = me.srcElement; el.nodeName !== 'HTML';
+        for (var el = me.target; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
             if (gh.inArray(tag, el.nodeName) || el.parentNode === null) {
@@ -229,7 +229,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.4.0';
+    self['version'] = '1.4.1';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
