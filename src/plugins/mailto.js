@@ -12,7 +12,7 @@
  *
  * @param {object} opts GAS Options.
  */
-_gas.push(['_addHook', '_trackMailto', function(opts) {
+var _gasTrackMailto = function(opts) {
     if (!this._mailtoTracked) {
         this._mailtoTracked = true;
     }else {
@@ -32,5 +32,9 @@ _gas.push(['_addHook', '_trackMailto', function(opts) {
         }
     });
     return false;
-}]);
+};
+_gas.push(['_addHook', '_gasTrackMailto', _gasTrackMailto]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackMailto', _gasTrackMailto]);
 
