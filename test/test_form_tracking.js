@@ -28,7 +28,7 @@ test('Test Fields (Won\'t pass)', function() {
     _gas._accounts_length = 0;
     _gas.push(['_setAccount', 'UA-XXXXX-X']);
     _gas.push(['_trackPageview']);
-    _gas.push(['_trackForms', true]);
+    _gas.push(['_gasTrackForms', true]);
 
 
     _gas.push(['_addHook', '_trackEvent', function(cat, act, lab) {

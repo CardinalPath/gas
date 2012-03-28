@@ -1,7 +1,7 @@
 
 module('multidomain');
 
-test('_setMultiDomain now', function() {
+test('_gasMultiDomain now', function() {
     //This test should run on domain www.example.com
     expect(4);
 
@@ -18,7 +18,7 @@ test('_setMultiDomain now', function() {
     _gas.push(['_setAllowHash', false]);
     _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
-    _gas.push(['_setMultiDomain', 'now']);
+    _gas.push(['_gasMultiDomain', 'now']);
 
     _gas.push(function() {
         $('#testlinks1 a').each(function(i, v) {
@@ -63,7 +63,7 @@ test('Don\'t Tag subdomain', function() {
     _gas.push(['_setAllowHash', false]);
     _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
-    _gas.push(['_setMultiDomain', 'now']);
+    _gas.push(['_gasMultiDomain', 'now']);
 
     _gas.push(function() {
         $('#testlinks2 a').each(function(i, v) {
@@ -100,7 +100,7 @@ test('Tag subdomain', function() {
     _gas.push(['_setAllowHash', false]);
     _gas.push(['_setAllowLinker', true]);
     _gas.push(['_trackPageview']);
-    _gas.push(['_setMultiDomain', 'now']);
+    _gas.push(['_gasMultiDomain', 'now']);
 
     _gas.push(function() {
         $('#testlinks3 a').each(function(i, v) {
@@ -126,7 +126,7 @@ test('Tag subdomain', function() {
     });
 });
 
-test('_setMultiDomain click', function() {
+test('_gasMultiDomain click', function() {
     //This test should run on domain www.example.com
     expect(3);
 
@@ -141,7 +141,7 @@ test('_setMultiDomain click', function() {
     _gas.push(['_trackPageview']);
     _gas.push(['_setAllowHash', false]);
     _gas.push(['_setAllowLinker', true]);
-    _gas.push(['_setMultiDomain', 'click']);
+    _gas.push(['_gasMultiDomain', 'click']);
 
     _gas.push(['_addHook', '_link', function(url, hash) {
         ok(true, '_link url:' + url + ' opt_anchor:' + hash);
