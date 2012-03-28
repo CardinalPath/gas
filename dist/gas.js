@@ -535,33 +535,11 @@ function _checkFile(src, extensions) {
  * @param {Array|object} opts List of possible extensions for download
  * links.
  */
-function _trackDownloads(opts) {
+var _trackDownloads = function(opts) {
     var gh = this;
-    gh._liveEvent('a', 'mousedown', function(e) {
-        var el = this;
-        if (el.href) {
-            var ext = _checkFile.call(gh,
-                el.href, opts['extensions']
-            );
-            if (ext) {
-                _gas.push(['_trackEvent',
-                    opts['category'], ext, el.href
-                ]);
-            }
-        }
-    });
-}
 
-/**
- * GAA Hook, receive the extensions to extend default extensions. And trigger
- * the binding of the events.
- *
- * @param {string|Array|object} opts GAs Options. Also backward compatible
- * with array or string of extensions.
- */
-_gas.push(['_addHook', '_trackDownloads', function(opts) {
-    if (!this._downloadTracked) {
-        this._downloadTracked = true;
+    if (!gh._downloadTracked) {
+        gh._downloadTracked = true;
     }else {
         //Oops double tracking detected.
         return;
@@ -582,9 +560,33 @@ _gas.push(['_addHook', '_trackDownloads', function(opts) {
     ext = ext.split(',');
     opts['extensions'] = opts['extensions'].concat(ext);
 
-    _trackDownloads.call(this, opts);
+    gh._liveEvent('a', 'mousedown', function(e) {
+        var el = this;
+        if (el.href) {
+            var ext = _checkFile.call(gh,
+                el.href, opts['extensions']
+            );
+            if (ext) {
+                _gas.push(['_trackEvent',
+                    opts['category'], ext, el.href
+                ]);
+            }
+        }
+    });
     return false;
-}]);
+};
+
+/**
+ * GAA Hook, receive the extensions to extend default extensions. And trigger
+ * the binding of the events.
+ *
+ * @param {string|Array|object} opts GAs Options. Also backward compatible
+ * with array or string of extensions.
+ */
+_gas.push(['_addHook', '_gasTrackDownloads', _trackDownloads]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackDownloads', _trackDownloads]);
 
 /**
  * Hook to sanity check trackEvents
@@ -629,7 +631,7 @@ function getFormName(el) {
     return 'none';
 }
 
-_gas.push(['_addHook', '_trackForms', function(opts) {
+var _gasTrackForms = function(opts) {
     if (!this._formTracked) {
         this._formTracked = true;
     }else {
@@ -673,10 +675,12 @@ _gas.push(['_addHook', '_trackForms', function(opts) {
             }
         }
     });
+};
 
+_gas.push(['_addHook', '_gasTrackForms', _gasTrackForms]);
 
-}]);
-
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackForms', _gasTrackForms]);
 /**
  * GAS - Google Analytics on Steroids
  *
@@ -706,14 +710,14 @@ function _trackMediaElement(e) {
  * @param {String} tag Either 'audio' or 'video'.
  * @this {GasHelper} GA Helper object.
  */
-function _trackMedia(tag) {
+var _trackMedia = function(tag) {
     var self = this;
     self._liveEvent(tag, 'play', _trackMediaElement);
     self._liveEvent(tag, 'pause', _trackMediaElement);
     self._liveEvent(tag, 'ended', _trackMediaElement);
-}
+};
 
-function _trackVideo() {
+var _trackVideo = function() {
     if (!this._videoTracked) {
         this._videoTracked = true;
     }else {
@@ -721,9 +725,9 @@ function _trackVideo() {
         return;
     }
     _trackMedia.call(this, 'video');
-}
+};
 
-function _trackAudio() {
+var _trackAudio = function() {
     if (!this._audioTracked) {
         this._audioTracked = true;
     }else {
@@ -731,8 +735,12 @@ function _trackAudio() {
         return;
     }
     _trackMedia.call(this, 'audio');
-}
+};
 
+_gas.push(['_addHook', '_gasTrackVideo', _trackVideo]);
+_gas.push(['_addHook', '_gasTrackAudio', _trackAudio]);
+
+// Old API to be deprecated on v2.0
 _gas.push(['_addHook', '_trackVideo', _trackVideo]);
 _gas.push(['_addHook', '_trackAudio', _trackAudio]);
 
@@ -750,7 +758,7 @@ _gas.push(['_addHook', '_trackAudio', _trackAudio]);
  *
  * @param {object} opts GAS Options.
  */
-_gas.push(['_addHook', '_trackMailto', function(opts) {
+var _gasTrackMailto = function(opts) {
     if (!this._mailtoTracked) {
         this._mailtoTracked = true;
     }else {
@@ -770,7 +778,11 @@ _gas.push(['_addHook', '_trackMailto', function(opts) {
         }
     });
     return false;
-}]);
+};
+_gas.push(['_addHook', '_gasTrackMailto', _gasTrackMailto]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackMailto', _gasTrackMailto]);
 
 /**
  * GAS - Google Analytics on Steroids
@@ -883,6 +895,9 @@ function _trackMaxScroll(opts) {
     this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
 
+_gas.push(['_addHook', '_gasTrackMaxScroll', _trackMaxScroll]);
+
+// Old API to be deprecated on v2.0
 _gas.push(['_addHook', '_trackMaxScroll', _trackMaxScroll]);
 
 /**
@@ -1040,16 +1055,21 @@ function track_links(event_used) {
     return false;
 }
 
-/**
- * Registers Hook to _setMultiDomain
- */
-_gas.push(['_addHook', '_setMultiDomain', function() {
+var _gasMultiDomain = function() {
     var gh = this;
     var args = slice.call(arguments);
     gh._DOMReady(function() {
         track_links.apply(gh, args);
     });
-}]);
+};
+
+/**
+ * Registers Hook to _setMultiDomain
+ */
+_gas.push(['_addHook', '_gasMultiDomain', _gasMultiDomain]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_setMultiDomain', _gasMultiDomain]);
 
 /**
  * GAS - Google Analytics on Steroids
@@ -1068,7 +1088,7 @@ _gas.push(['_addHook', '_setMultiDomain', function() {
  * @this {object} GA Helper object.
  * @param {object} opts Custom options for Outbound Links.
  */
-function _trackOutboundLinks(opts) {
+var _gasTrackOutboundLinks = function(opts) {
     if (!this._outboundTracked) {
         this._outboundTracked = true;
     }else {
@@ -1100,9 +1120,12 @@ function _trackOutboundLinks(opts) {
         }
 
     });
-}
+};
 
-_gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
+_gas.push(['_addHook', '_gasTrackOutboundLinks', _gasTrackOutboundLinks]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackOutboundLinks', _gasTrackOutboundLinks]);
 
 
 /**
@@ -1265,7 +1288,7 @@ function _trackVimeo() {
     }
 }
 
-_gas.push(['_addHook', '_trackVimeo', function(opts) {
+var _gasTrackVimeo = function(opts) {
     var gh = this;
     // Support
     if (typeof opts === 'boolean' || opts === 'force') {
@@ -1280,7 +1303,12 @@ _gas.push(['_addHook', '_trackVimeo', function(opts) {
         _trackVimeo.call(gh);
     });
     return false;
-}]);
+};
+
+_gas.push(['_addHook', '_gasTrackVimeo', _gasTrackVimeo]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackVimeo', _gasTrackVimeo]);
 
 /**
  * GAS - Google Analytics on Steroids
@@ -1489,7 +1517,7 @@ function _trackYoutube(opts) {
     }
 }
 
-_gas.push(['_addHook', '_trackYoutube', function(opts) {
+var _gasTrackYoutube = function(opts) {
     // Support for legacy parameters
     var args = slice.call(arguments);
     if (args[0] && (typeof args[0] === 'boolean' || args[0] === 'force')) {
@@ -1511,7 +1539,12 @@ _gas.push(['_addHook', '_trackYoutube', function(opts) {
         _trackYoutube.call(gh, opts);
     });
     return false;
-}]);
+};
+
+_gas.push(['_addHook', '_gasTrackYoutube', _gasTrackYoutube]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackYoutube', _gasTrackYoutube]);
 
 /**
  * Wrap-up

@@ -27,14 +27,14 @@ function _trackMediaElement(e) {
  * @param {String} tag Either 'audio' or 'video'.
  * @this {GasHelper} GA Helper object.
  */
-function _trackMedia(tag) {
+var _trackMedia = function(tag) {
     var self = this;
     self._liveEvent(tag, 'play', _trackMediaElement);
     self._liveEvent(tag, 'pause', _trackMediaElement);
     self._liveEvent(tag, 'ended', _trackMediaElement);
-}
+};
 
-function _trackVideo() {
+var _trackVideo = function() {
     if (!this._videoTracked) {
         this._videoTracked = true;
     }else {
@@ -42,9 +42,9 @@ function _trackVideo() {
         return;
     }
     _trackMedia.call(this, 'video');
-}
+};
 
-function _trackAudio() {
+var _trackAudio = function() {
     if (!this._audioTracked) {
         this._audioTracked = true;
     }else {
@@ -52,8 +52,12 @@ function _trackAudio() {
         return;
     }
     _trackMedia.call(this, 'audio');
-}
+};
 
+_gas.push(['_addHook', '_gasTrackVideo', _trackVideo]);
+_gas.push(['_addHook', '_gasTrackAudio', _trackAudio]);
+
+// Old API to be deprecated on v2.0
 _gas.push(['_addHook', '_trackVideo', _trackVideo]);
 _gas.push(['_addHook', '_trackAudio', _trackAudio]);
 

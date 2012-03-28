@@ -24,13 +24,13 @@ var _gas = _gas || [];
 _gas.push(['_setAccount', 'UA-YYYYYY-Y']); // REPLACE WITH YOUR GA NUMBER
 _gas.push(['_setDomainName', '.mydomain.com']); // REPLACE WITH YOUR DOMAIN
 _gas.push(['_trackPageview']);
-_gas.push(['_trackForms']);
-_gas.push(['_trackOutboundLinks']);
-_gas.push(['_trackMaxScroll']);
-_gas.push(['_trackDownloads']);
-_gas.push(['_trackYoutube']);
-_gas.push(['_trackVimeo']);
-_gas.push(['_trackMailto']);
+_gas.push(['_gasTrackForms']);
+_gas.push(['_gasTrackOutboundLinks']);
+_gas.push(['_gasTrackMaxScroll']);
+_gas.push(['_gasTrackDownloads']);
+_gas.push(['_gasTrackYoutube']);
+_gas.push(['_gasTrackVimeo']);
+_gas.push(['_gasTrackMailto']);
 
 (function() {
 var ga = document.createElement('script');
@@ -56,8 +56,8 @@ So go check [official documentation][gajs] for the GA Tracker.
 
 Additionally GAS support a couple more features.
 
-### \_trackForms
-`_gas.push(['_trackForms', opts])`
+### \_gasTrackForms
+`_gas.push(['_gasTrackForms', opts])`
 
 Form Tracking will trigger events every time a user submits a form or changes a
 form field.
@@ -68,8 +68,8 @@ form field.
 
 
 
-### \_trackMaxScroll
-`_gas.push(['_trackMaxScroll', opts])`
+### \_gasTrackMaxScroll
+`_gas.push(['_gasTrackMaxScroll', opts])`
 
 Fire events with the Max-Scroll percentage value for every page the
 user views.
@@ -78,8 +78,8 @@ user views.
 
 - _String_ _opts.category_ : The event category (default value is: "MaxScroll")
 
-### _trackOutboundLinks
-`_gas.push(['_trackOutboundLinks', opts])`
+### _gasTrackOutboundLinks
+`_gas.push(['_gasTrackOutboundLinks', opts])`
 
 This function will look for any outbound links on the current page and will
 trigger an event when the link is clicked. It bounds to the `mousedown` 
@@ -90,8 +90,8 @@ javascript event
 - _String_ _opts.category_ : The event category (default value is: "Outbound")
 
 
-### _trackDownloads
-`_gas.push(['_trackDownloads', opts])`
+### _gasTrackDownloads
+`_gas.push(['_gasTrackDownloads', opts])`
 
 GAS will track the following extensions by default:
 'xls,xlsx,doc,docx,ppt,pptx,pdf,txt,zip,rar,7z,exe,wma,mov,avi,wmv,mp3,csv,tsv'
@@ -104,14 +104,14 @@ GAS will track the following extensions by default:
 eg:
 
 ``` javascript
-_gas.push(['_trackDownloads', {
+_gas.push(['_gasTrackDownloads', {
     category: 'File Downloads',
     extensions: 'torrent,gz,mp4,wav'
 }]);
 ```
 
-### _trackMailto
-`_gas.push(['_trackMailto', opts]);`
+### _gasTrackMailto
+`_gas.push(['_gasTrackMailto', opts]);`
 
 Tracks clicks on links with `href="mailto:..."`.
 
@@ -119,8 +119,8 @@ Tracks clicks on links with `href="mailto:..."`.
 
 - _String_ _opts.category_ : The event category (default value is: "Mailto")
 
-### _trackVimeo
-`_gas.push(['_trackVimeo', opts])`
+### _gasTrackVimeo
+`_gas.push(['_gasTrackVimeo', opts])`
 
 You can track [Vimeo][] video events. You must be using the iframe method 
 of embedding videos. 
@@ -147,8 +147,8 @@ iframe adding this parameter.
 - _String_ _opts.category_ : The event category (default value is: "Vimeo Video")
 - _boolean_ _opts.force_ : Add required parameters to video "src" causing the video iframe to reload. (default value is: true)
 
-### _trackYoutube
-`_gas.push(['_trackYoutube', opts])`
+### _gasTrackYoutube
+`_gas.push(['_gasTrackYoutube', opts])`
 
 You can track [Youtube][] video events. You must be using the iframe method 
 of embedding videos. 
@@ -179,7 +179,7 @@ reload on the iframe adding this parameter.
 eg: 
 
 ``` javascript
-_gas.push(['_trackYoutube', {
+_gas.push(['_gasTrackYoutube', {
     percentages: [25, 50, 75, 90]
 }]);
 ```
@@ -194,7 +194,8 @@ GAS changes the behaiour of some functions that are defined on the [official doc
 
 This feature help you implementing cross-domain setups. It will find and tag
 all links to other domains and mark them with the `_link` or `_linkByPost`
-function. You just need to push all domain names with `_setDomainName`. 
+function. You just need to push all domain names with `_setDomainName` and then
+call `_gasMultiDomain`
 
 
 ``` javascript
@@ -202,7 +203,7 @@ _gas.push(['_setAccount', 'UA-XXXXX-1']);
 _gas.push(['_setAllowLinker', true]);
 _gas.push(['_setDomainName', 'mysite.com']);
 _gas.push(['_setDomainName', 'myothersite.com']);
-_gas.push(['_setMultiDomain', 'click']);
+_gas.push(['_gasMultiDomain', 'click']);
 ```
 
 The above snippet can be used in either `mysite.com` or `myothersite.com`. 

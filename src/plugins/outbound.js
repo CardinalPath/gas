@@ -15,7 +15,7 @@
  * @this {object} GA Helper object.
  * @param {object} opts Custom options for Outbound Links.
  */
-function _trackOutboundLinks(opts) {
+var _gasTrackOutboundLinks = function(opts) {
     if (!this._outboundTracked) {
         this._outboundTracked = true;
     }else {
@@ -47,8 +47,11 @@ function _trackOutboundLinks(opts) {
         }
 
     });
-}
+};
 
-_gas.push(['_addHook', '_trackOutboundLinks', _trackOutboundLinks]);
+_gas.push(['_addHook', '_gasTrackOutboundLinks', _gasTrackOutboundLinks]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackOutboundLinks', _gasTrackOutboundLinks]);
 
 
