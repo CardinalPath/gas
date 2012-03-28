@@ -183,8 +183,8 @@ GAS.prototype._execute = function() {
             return return_val;
         }
 
-        // Intercept _linka and _linkByPost
-        if (foo === '_link' || foo === '_linkByPost') {
+        // Intercept _link and _linkByPost and _require. They can only be called once.
+        if (foo === '_link' || foo === '_linkByPost' || foo === '_require') {
             args = slice.call(sub);
             args.unshift(foo);
             return _gaq_push(args);
@@ -200,13 +200,20 @@ GAS.prototype._execute = function() {
         }
 
         // Call Original _gaq, for all accounts
-        for (i in self._accounts) {
-            if (hasOwn.call(self._accounts, i)) {
-                acc_foo = _build_acct_name(i) + foo;
-                args = slice.call(sub);
-                args.unshift(acc_foo);
-                return_val += _gaq_push(args);
+        if (self._accounts_length > 0) {
+            for (i in self._accounts) {
+                if (hasOwn.call(self._accounts, i)) {
+                    acc_foo = _build_acct_name(i) + foo;
+                    args = slice.call(sub);
+                    args.unshift(acc_foo);
+                    return_val += _gaq_push(args);
+                }
             }
+        } else {
+            // If there are no accounts we just push it to _gaq
+            args = slice.call(sub);
+            args.unshift(foo);
+            return _gaq_push(args);
         }
         return return_val ? 1 : 0;
     }
@@ -283,6 +290,7 @@ _gas.push(['_addHook', '_popHook', function(func) {
  *
  * The default tracker is the nameless tracker that is pushed into _gaq_push
  */
-_gas.push(['_addHook', '_setDefaultTracker', function(tname) {
+_gas.push(['_addHook', '_gasSetDefaultTracker', function(tname) {
     _gas._default_tracker = tname;
+    return false;
 }]);
