@@ -10,11 +10,11 @@ with Google.
 
 ## Installation
 
-To install GAS download the script from [dist][] folder and put it somewhere on
+To install GAS download the script from [download page][download] and put it somewhere on
 your website. Also install the basic snippet on every page of your website. Be
 sure to change the Account Number (UA) and the correct gas.js file location.
 
-[dist]: https://github.com/CardinalPath/gas/tree/master/dist
+[download]: https://github.com/CardinalPath/gas/downloads
 
 The basic snippet looks like this:
 
