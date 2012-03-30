@@ -48,16 +48,6 @@ GasHelper.prototype.inArray = function(obj, item) {
 };
 
 /**
- * Checks if the object is an Array
- *
- * @param {object} obj Object to check.
- * @return {boolean} true if the object is an Array.
- */
-GasHelper.prototype.isArray = function(obj) {
-    return toString.call(obj) === '[object Array]';
-};
-
-/**
  * Removes special characters and Lowercase String
  *
  * @param {string} str to be sanitized.
