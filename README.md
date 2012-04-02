@@ -212,6 +212,22 @@ The nice side effect is that you can have the same snippet for both websites.
 
 Note that calling `_setDomainName` multiple times is not supported by _gaq. 
 
+GAS respects the settings for `_setAllowAnchor` that you set. 
+So if you set it to true all future calls to `_getLinkerUrl`, `_link` and 
+`_linkByPost` used by gas will include the boolean `true` for the 
+`opt_useAnchor` parameter.
+
+```javascript
+_gas.push(['_setAccount', 'UA-XXXXX-1']);
+_gas.push(['_setAllowLinker', true]);
+_gas.push(['_setAllowAnchor', true]);
+_gas.push(['_setDomainName', 'mysite.com']);
+_gas.push(['_setDomainName', 'myothersite.com']);
+_gas.push(['_setMultiDomain', 'click']);
+
+```
+
+
 ### Multi-Account Tracking
 
 Easier handling of multi-account setups. You can fire an event to all accounts
