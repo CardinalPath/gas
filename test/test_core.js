@@ -257,7 +257,7 @@ test('_gaq execution with default tracker name', function() {
         i += 1;
         equals(arr[0], foo, 'Multiple _setAccount');
     };
-    _gas.push(['_setDefaultTracker', 'custom']);
+    _gas.push(['_gasSetDefaultTracker', 'custom']);
     _gas.push(['_setAccount', 'UA-XXXXX-1']);
     _gas.push(['_setAccount', 'UA-XXXXX-2']);
     _gas.push(['custom._setAccount', 'UA-XXXXX-3']);

@@ -6,9 +6,9 @@
         _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
         _gas.push(['_trackPageview', '/test']);
         if(document.location.search.indexOf('live=true') >= 0){
-            _gas.push(['_trackForms', true]);
+            _gas.push(['_gasTrackForms', true]);
         }else{
-            _gas.push(['_trackForms']);
+            _gas.push(['_gasTrackForms']);
         }
         
         (function() {

@@ -158,7 +158,7 @@ function _trackVimeo() {
     }
 }
 
-_gas.push(['_addHook', '_trackVimeo', function(opts) {
+var _gasTrackVimeo = function(opts) {
     var gh = this;
     // Support
     if (typeof opts === 'boolean' || opts === 'force') {
@@ -173,5 +173,10 @@ _gas.push(['_addHook', '_trackVimeo', function(opts) {
         _trackVimeo.call(gh);
     });
     return false;
-}]);
+};
+
+_gas.push(['_addHook', '_gasTrackVimeo', _gasTrackVimeo]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackVimeo', _gasTrackVimeo]);
 

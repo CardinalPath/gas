@@ -205,7 +205,7 @@ function _trackYoutube(opts) {
     }
 }
 
-_gas.push(['_addHook', '_trackYoutube', function(opts) {
+var _gasTrackYoutube = function(opts) {
     // Support for legacy parameters
     var args = slice.call(arguments);
     if (args[0] && (typeof args[0] === 'boolean' || args[0] === 'force')) {
@@ -227,5 +227,10 @@ _gas.push(['_addHook', '_trackYoutube', function(opts) {
         _trackYoutube.call(gh, opts);
     });
     return false;
-}]);
+};
+
+_gas.push(['_addHook', '_gasTrackYoutube', _gasTrackYoutube]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackYoutube', _gasTrackYoutube]);
 

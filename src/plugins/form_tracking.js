@@ -26,7 +26,7 @@ function getFormName(el) {
     return 'none';
 }
 
-_gas.push(['_addHook', '_trackForms', function(opts) {
+var _gasTrackForms = function(opts) {
     if (!this._formTracked) {
         this._formTracked = true;
     }else {
@@ -70,7 +70,9 @@ _gas.push(['_addHook', '_trackForms', function(opts) {
             }
         }
     });
+};
 
+_gas.push(['_addHook', '_gasTrackForms', _gasTrackForms]);
 
-}]);
-
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_trackForms', _gasTrackForms]);

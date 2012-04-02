@@ -153,14 +153,19 @@ function track_links(event_used) {
     return false;
 }
 
-/**
- * Registers Hook to _setMultiDomain
- */
-_gas.push(['_addHook', '_setMultiDomain', function() {
+var _gasMultiDomain = function() {
     var gh = this;
     var args = slice.call(arguments);
     gh._DOMReady(function() {
         track_links.apply(gh, args);
     });
-}]);
+};
+
+/**
+ * Registers Hook to _setMultiDomain
+ */
+_gas.push(['_addHook', '_gasMultiDomain', _gasMultiDomain]);
+
+// Old API to be deprecated on v2.0
+_gas.push(['_addHook', '_setMultiDomain', _gasMultiDomain]);
 

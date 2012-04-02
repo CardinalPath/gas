@@ -109,5 +109,8 @@ function _trackMaxScroll(opts) {
     this._addEventListener(window, 'beforeunload', _sendMaxScroll);
 }
 
+_gas.push(['_addHook', '_gasTrackMaxScroll', _trackMaxScroll]);
+
+// Old API to be deprecated on v2.0
 _gas.push(['_addHook', '_trackMaxScroll', _trackMaxScroll]);
 

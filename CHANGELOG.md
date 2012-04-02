@@ -1,6 +1,10 @@
 GAS Changelog
 =============
 
+1.6.0
+-----
+- fixed #16 API changed to make it more clear when we're calling GAS functions.
+
 1.4.0
 -----
 
