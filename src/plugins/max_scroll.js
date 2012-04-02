@@ -4,7 +4,7 @@
  * Max-Scroll Tracking Plugin
  *
  * Copyright 2011, Cardinal Path and Direct Performance
- * Licensed under the MIT license.
+ * Licensed under the GPLv3 license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */

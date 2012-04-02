@@ -4,7 +4,7 @@
  * HTML5 Video Tracking Plugin
  *
  * Copyright 2011, Cardinal Path
- * Licensed under the MIT license.
+ * Licensed under the GPLv3 license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
