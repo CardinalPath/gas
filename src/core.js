@@ -30,7 +30,6 @@ var document = window.document,
     slice = Array.prototype.slice,
     trim = String.prototype.trim,
     sindexOf = String.prototype.indexOf,
-    aindexOf = Array.prototype.indexOf,
     url = document.location.href,
     documentElement = document.documentElement;
 
