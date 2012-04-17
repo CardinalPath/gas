@@ -2,6 +2,7 @@
 Thumbs.db
 Icon?
 *.swp
+*.swo
 *~
 *.zip
 _site
