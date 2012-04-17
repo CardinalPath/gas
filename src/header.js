@@ -1,5 +1,5 @@
 /**
- * @preserve Copyright 2011, Cardinal Path and DigitalInc
+ * @preserve Copyright 2011, Cardinal Path and DigitalInc.
  *
  * GAS - Google Analytics on Steroids
  * https://github.com/CardinalPath/gas
