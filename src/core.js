@@ -30,7 +30,6 @@ var document = window.document,
     slice = Array.prototype.slice,
     trim = String.prototype.trim,
     sindexOf = String.prototype.indexOf,
-    aindexOf = Array.prototype.indexOf,
     url = document.location.href,
     documentElement = document.documentElement;
 
@@ -40,7 +39,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.6';
+    self['version'] = '1.7';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
