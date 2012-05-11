@@ -32,7 +32,7 @@ var _gasTrackOutboundLinks = function(opts) {
         var l = this;
         if (
             (l.protocol == 'http:' || l.protocol == 'https:') &&
-            sindexOf.call(l.href, document.location.hostname) === -1)
+            sindexOf.call(l.hostname, document.location.hostname) === -1)
         {
             var path = (l.pathname + l.search + ''),
                 utm = sindexOf.call(path, '__utm');

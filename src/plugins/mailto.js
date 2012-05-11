@@ -27,7 +27,8 @@ var _gasTrackMailto = function(opts) {
 
     this._liveEvent('a', 'mousedown', function(e) {
         var el = e.target;
-        if (el && el.href && el.href.toLowerCase().indexOf('mailto:') === 0) {
+        if (el && el.href && el.href.toLowerCase &&
+          sindexOf.call(el.href.toLowerCase(), 'mailto:') === 0) {
             _gas.push(['_trackEvent', opts['category'], el.href.substr(7)]);
         }
     });
