@@ -210,12 +210,11 @@ var _gasTrackYoutube = function(opts) {
     var args = slice.call(arguments);
     if (args[0] && (typeof args[0] === 'boolean' || args[0] === 'force')) {
         opts = {'force': !!args[0]};
-    }else {
-        opts = {};
+        if (args[1] && args[1].length) {
+            opts['percentages'] = args[1];
+        }
     }
-    if (args[1] && args[1].length) {
-        opts['percentages'] = args[1];
-    }
+
     opts = opts || {};
     opts['force'] = opts['force'] || false;
     opts['category'] = opts['category'] || 'YouTube Video';

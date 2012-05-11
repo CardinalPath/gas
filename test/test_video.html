@@ -6,7 +6,7 @@
         _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
         _gas.push(['_trackPageview', '/test']);
         _gas.push(['_gasTrackVideo']);
-        _gas.push(['_gasTrackYoutube', 'force', [25, 50, 75, 90, 99, 100]]);
+        _gas.push(['_gasTrackYoutube', {force:true, percentages: [25, 50, 75, 90, 99, 100]}]);
         _gas.push(['_gasTrackVimeo', {
             force:'force', 
             percentages: [25, 50, 75, 90, 99, 100]
