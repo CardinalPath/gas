@@ -128,9 +128,17 @@ function track_links(event_used) {
                     }else {
                         if (event_used === 'click') {
                             this._addEventListener(el, event_used, function(e) {
-                                _gas.push(
-                                    ['_link', this.href, _gas._allowAnchor]
-                                );
+                                if (this.target && this.target=='_blank'){
+                                    window.open(
+                                        gh['tracker']['_getLinkerUrl'](
+                                            this.href, _gas._allowAnchor
+                                        )
+                                    );
+                                }else{
+                                    _gas.push(
+                                        ['_link', this.href, _gas._allowAnchor]
+                                    );
+                                }
                                 if (e.preventDefault)
                                     e.preventDefault();
                                 else
