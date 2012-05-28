@@ -28,8 +28,8 @@ _gas.push(['_gasTrackForms']);
 _gas.push(['_gasTrackOutboundLinks']);
 _gas.push(['_gasTrackMaxScroll']);
 _gas.push(['_gasTrackDownloads']);
-_gas.push(['_gasTrackYoutube']);
-_gas.push(['_gasTrackVimeo']);
+_gas.push(['_gasTrackYoutube', {force: true}]);
+_gas.push(['_gasTrackVimeo', {force: true}]);
 _gas.push(['_gasTrackMailto']);
 
 (function() {
