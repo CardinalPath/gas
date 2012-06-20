@@ -157,13 +157,14 @@ GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
  */
 GasHelper.prototype._DOMReady = function(callback) {
     var scp = this;
-    var cb = function() {
-        if (arguments.callee.done) return;
-        arguments.callee.done = true;
-        callback.apply(scp, arguments);
-    };
     if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
     this._addEventListener(window, 'load', cb, false);
+
+    function cb() {
+        if (cb.done) return;
+        cb.done = true;
+        callback.apply(scp, arguments);
+    }
 };
 
