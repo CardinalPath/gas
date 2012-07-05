@@ -128,13 +128,13 @@ function track_links(event_used) {
                     }else {
                         if (event_used === 'click') {
                             this._addEventListener(el, event_used, function(e) {
-                                if (this.target && this.target=='_blank'){
+                                if (this.target && this.target == '_blank') {
                                     window.open(
                                         gh['tracker']['_getLinkerUrl'](
                                             this.href, _gas._allowAnchor
                                         )
                                     );
-                                }else{
+                                }else {
                                     _gas.push(
                                         ['_link', this.href, _gas._allowAnchor]
                                     );
@@ -164,9 +164,11 @@ function track_links(event_used) {
 var _gasMultiDomain = function() {
     var gh = this;
     var args = slice.call(arguments);
-    gh._DOMReady(function() {
-        track_links.apply(gh, args);
-    });
+    if (gh && gh._DOMReady) {
+        gh._DOMReady(function() {
+            track_links.apply(gh, args);
+        });
+    }
 };
 
 /**
