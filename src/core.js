@@ -50,7 +50,7 @@ function GAS() {
     };
     // Need to be pushed to make sure tracker is done
     // Sets up helpers, very first thing pushed into gas
-    self.push(function() {
+    self.push(function () {
         self.gh = new GasHelper();
     });
 }
@@ -63,7 +63,7 @@ function GAS() {
  * @param {function()} cb The callback function to be appended to hooks.
  * @return {boolean} Always false.
  */
-GAS.prototype._addHook = function(fn, cb) {
+GAS.prototype._addHook = function (fn, cb) {
     if (typeof fn === 'string' && typeof cb === 'function') {
         if (typeof _gas._hooks[fn] === 'undefined') {
             _gas._hooks[fn] = [];
@@ -101,7 +101,7 @@ function _gaq_push(arr) {
  * This function should not be called directly. Instead use _gas.push
  * @return {number} This is the same return as _gaq.push calls.
  */
-GAS.prototype._execute = function() {
+GAS.prototype._execute = function () {
     var args = slice.call(arguments),
         self = this,
         sub = args.shift(),
@@ -111,21 +111,21 @@ GAS.prototype._execute = function() {
     if (typeof sub === 'function') {
         // Pushed functions are executed right away
         return _gaq_push(
-            (function(s, gh) {
-                return function() {
+            (function (s, gh) {
+                return function () {
                     // pushed functions receive helpers through this object
                     s.call(gh);
                 };
-            })(sub, self.gh)
+            }(sub, self.gh))
         );
 
-    }else if (typeof sub === 'object' && sub.length > 0) {
+    } else if (typeof sub === 'object' && sub.length > 0) {
         foo = sub.shift();
 
         if (sindexOf.call(foo, '.') >= 0) {
             acct_name = foo.split('.')[0];
             foo = foo.split('.')[1];
-        }else {
+        } else {
             acct_name = undefined;
         }
 
@@ -138,13 +138,13 @@ GAS.prototype._execute = function() {
                     if (repl_sub === false) {
                         // Returning false from a hook cancel the call
                         gaq_execute = false;
-                    }else {
+                    } else {
                         if (repl_sub && repl_sub.length > 0) {
                             // Returning an array changes the call parameters
                             sub = repl_sub;
                         }
                     }
-                }catch (e) {
+                } catch (e) {
                     if (foo !== '_trackException') {
                         self.push(['_trackException', e]);
                     }
@@ -159,7 +159,7 @@ GAS.prototype._execute = function() {
         if (foo === '_setAccount') {
 
             for (i in self._accounts) {
-                if (self._accounts[i] == sub[0]) {
+                if (self._accounts[i] === sub[0]) {
                     // Repeated account
                     if (acct_name === undefined) {
                         return 1;
@@ -169,8 +169,8 @@ GAS.prototype._execute = function() {
             acct_name = acct_name || '_gas' +
                 String(self._accounts_length + 1);
             // Force that the first unamed account is _gas1
-            if (typeof self._accounts['_gas1'] == 'undefined' &&
-                sindexOf.call(acct_name, '_gas') != -1) {
+            if (typeof self._accounts['_gas1'] === 'undefined' &&
+                sindexOf.call(acct_name, '_gas') !== -1) {
                 acct_name = '_gas1';
             }
             self._accounts[acct_name] = sub[0];
@@ -225,15 +225,15 @@ GAS.prototype._execute = function() {
  * ready for hooks. This creates _gaq as a series of functions that call
  * _gas._execute() with the same arguments.
  */
-GAS.prototype.push = function() {
+GAS.prototype.push = function () {
     var self = this;
     var args = slice.call(arguments);
     for (var i = 0; i < args.length; i++) {
-        (function(arr, self) {
-            window['_gaq'].push(function() {
+        (function (arr, self) {
+            window['_gaq'].push(function () {
                 self._execute.call(self, arr);
             });
-        })(args[i], self);
+        }(args[i], self));
     }
 };
 
@@ -252,7 +252,7 @@ window['_gas'] = _gas = new GAS();
  *
  * Watchout for circular calls
  */
-_gas.push(['_addHook', '_trackException', function(exception, message) {
+_gas.push(['_addHook', '_trackException', function (exception, message) {
     _gas.push(['_trackEvent',
         'Exception ' + (exception.name || 'Error'),
         message || exception.message || exception,
@@ -264,7 +264,7 @@ _gas.push(['_addHook', '_trackException', function(exception, message) {
 /**
  * Hook to enable Debug Mode
  */
-_gas.push(['_addHook', '_setDebug', function(set_debug) {
+_gas.push(['_addHook', '_setDebug', function (set_debug) {
     _gas.debug_mode = !!set_debug;
 }]);
 
@@ -276,7 +276,7 @@ _gas.push(['_addHook', '_setDebug', function(set_debug) {
  * @param {string} func _gas Function Name to remove Hooks from.
  * @return {boolean} Always returns false.
  */
-_gas.push(['_addHook', '_popHook', function(func) {
+_gas.push(['_addHook', '_popHook', function (func) {
     var arr = _gas._hooks[func];
     if (arr && arr.pop) {
         arr.pop();
@@ -289,7 +289,7 @@ _gas.push(['_addHook', '_popHook', function(func) {
  *
  * The default tracker is the nameless tracker that is pushed into _gaq_push
  */
-_gas.push(['_addHook', '_gasSetDefaultTracker', function(tname) {
+_gas.push(['_addHook', '_gasSetDefaultTracker', function (tname) {
     _gas._default_tracker = tname;
     return false;
 }]);

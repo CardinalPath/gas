@@ -16,11 +16,11 @@
  *
  * @constructor
  */
-var GasHelper = function() {
+var GasHelper = function () {
     this._setDummyTracker();
 };
 
-GasHelper.prototype._setDummyTracker = function() {
+GasHelper.prototype._setDummyTracker = function () {
     if (!this['tracker']) {
         var trackers = window['_gat']['_getTrackers']();
         if (trackers.length > 0) {
@@ -36,7 +36,7 @@ GasHelper.prototype._setDummyTracker = function() {
  * @param {object} item Item to search form.
  * @return {boolean} true if contains.
  */
-GasHelper.prototype.inArray = function(obj, item) {
+GasHelper.prototype.inArray = function (obj, item) {
     if (obj && obj.length) {
         for (var i = 0; i < obj.length; i++) {
             if (obj[i] === item) {
@@ -54,7 +54,7 @@ GasHelper.prototype.inArray = function(obj, item) {
  * @param {boolean} strict_opt If we should remove any non ascii char.
  * @return {string} Sanitized string.
  */
-GasHelper.prototype._sanitizeString = function(str, strict_opt) {
+GasHelper.prototype._sanitizeString = function (str, strict_opt) {
     str = str.toLowerCase()
         .replace(/^\ +/, '')
         .replace(/\ +$/, '')
@@ -86,8 +86,8 @@ GasHelper.prototype._sanitizeString = function(str, strict_opt) {
  * it.
  * @return {boolean} true if it was successfuly binded.
  */
-GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
-    var fnc = function(event) {
+GasHelper.prototype._addEventListener = function (obj, evt, ofnc, bubble) {
+    var fnc = function (event) {
         if (!event || !event.target) {
             event = window.event;
             event.target = event.srcElement;
@@ -109,12 +109,12 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
         if (typeof obj[evt] === 'function') {
             // Object already has a function on traditional
             // Let's wrap it with our own function inside another function
-            fnc = (function(f1, f2) {
-                return function() {
+            fnc = (function (f1, f2) {
+                return function () {
                     f1.apply(this, arguments);
                     f2.apply(this, arguments);
-                }
-            })(obj[evt], fnc);
+                };
+            }(obj[evt], fnc));
         }
         obj[evt] = fnc;
         return true;
@@ -127,12 +127,12 @@ GasHelper.prototype._addEventListener = function(obj, evt, ofnc, bubble) {
  * Binds to the document root. Listens to all events of the specific type.
  * If event don't bubble it won't catch
  */
-GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
+GasHelper.prototype._liveEvent = function (tag, evt, ofunc) {
     var gh = this;
     tag = tag.toUpperCase();
     tag = tag.split(',');
 
-    gh._addEventListener(document, evt, function(me) {
+    gh._addEventListener(document, evt, function (me) {
         for (var el = me.target; el.nodeName !== 'HTML';
             el = el.parentNode)
         {
@@ -155,13 +155,13 @@ GasHelper.prototype._liveEvent = function(tag, evt, ofunc) {
  * @param {function(Event)} callback DOMReady callback.
  * @return {boolean} Ignore return value.
  */
-GasHelper.prototype._DOMReady = function(callback) {
+GasHelper.prototype._DOMReady = function (callback) {
     var scp = this;
-    var cb = function() {
-        if (arguments.callee.done) return;
-        arguments.callee.done = true;
+    function cb() {
+        if (cb.done) return;
+        cb.done = true;
         callback.apply(scp, arguments);
-    };
+    }
     if (/^(interactive|complete)/.test(document.readyState)) return cb();
     this._addEventListener(document, 'DOMContentLoaded', cb, false);
     this._addEventListener(window, 'load', cb, false);

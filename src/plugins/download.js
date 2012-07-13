@@ -41,12 +41,12 @@ function _checkFile(src, extensions) {
  * @param {Array|object} opts List of possible extensions for download
  * links.
  */
-var _trackDownloads = function(opts) {
+var _trackDownloads = function (opts) {
     var gh = this;
 
     if (!gh._downloadTracked) {
         gh._downloadTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }
@@ -66,7 +66,7 @@ var _trackDownloads = function(opts) {
     ext = ext.split(',');
     opts['extensions'] = opts['extensions'].concat(ext);
 
-    gh._liveEvent('a', 'mousedown', function(e) {
+    gh._liveEvent('a', 'mousedown', function (e) {
         var el = this;
         if (el.href) {
             var ext = _checkFile.call(gh,

@@ -21,7 +21,7 @@ function _clickTracking(opts) {
     opts['css_class'] = opts['css_class'] || ['ga_track'];
     opts['category'] = opts['category'] || 'Click Tracking';
     var re = opts['css_class'].join('|');
-    gh._addEventListener(document, evt, function(me) {
+    gh._addEventListener(document, 'mousedown', function (me) {
         for (var el = me.target; el.nodeName !== 'HTML'; el = el.parentNode)
         {
             if (el && el.className && el.className.match(re) !== null) {

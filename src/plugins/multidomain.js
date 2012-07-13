@@ -20,14 +20,14 @@ _gas._allowAnchor = false;
  * This stored value is used on _getLinkerUrl, _link and _linkByPost so it's
  * used the same by default
  */
-_gas.push(['_addHook', '_setAllowAnchor', function(val) {
+_gas.push(['_addHook', '_setAllowAnchor', function (val) {
     _gas._allowAnchor = !!val;
 }]);
 
 /**
  * _link Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_link', function(url, use_anchor) {
+_gas.push(['_addHook', '_link', function (url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -37,7 +37,7 @@ _gas.push(['_addHook', '_link', function(url, use_anchor) {
 /**
  * _linkByPost Hook to use stored allowAnchor value.
  */
-_gas.push(['_addHook', '_linkByPost', function(url, use_anchor) {
+_gas.push(['_addHook', '_linkByPost', function (url, use_anchor) {
     if (use_anchor === undefined) {
         use_anchor = _gas._allowAnchor;
     }
@@ -56,7 +56,7 @@ var _external_domains = [];
  *
  * @type string
  */
-var _internal_domain = undefined;
+var _internal_domain;
 
 /**
  * _setDomainName Hook to add pushed domains to _external_domains if it doesn't
@@ -66,7 +66,7 @@ var _internal_domain = undefined;
  * apply the one that matches the current domain and the other ones will be
  * used to track external domains with cookie data.
  */
-_gas.push(['_addHook', '_setDomainName', function(domainName) {
+_gas.push(['_addHook', '_setDomainName', function (domainName) {
     if (sindexOf.call('.' + document.location.hostname, domainName) < 0) {
         _external_domains.push(domainName);
         return false;
@@ -81,7 +81,7 @@ _gas.push(['_addHook', '_setDomainName', function(domainName) {
  * domain are marked to send cookies.
  * You should use _setDomainName for this in most of the cases.
  */
-_gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
+_gas.push(['_addHook', '_addExternalDomainName', function (domainName) {
     _external_domains.push(domainName);
     return false;
 }]);
@@ -98,7 +98,7 @@ _gas.push(['_addHook', '_addExternalDomainName', function(domainName) {
 function track_links(event_used) {
     if (!this._multidomainTracked) {
         this._multidomainTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }
@@ -113,7 +113,7 @@ function track_links(event_used) {
         el = links[i];
         if (sindexOf.call(el.href, 'http') === 0) {
             // Check to see if it's a internal link
-            if (el.hostname == internal ||
+            if (el.hostname === internal ||
               sindexOf.call(el.hostname, _internal_domain) >= 0) {
                 continue;
             }
@@ -125,16 +125,16 @@ function track_links(event_used) {
                             el.href,
                             _gas._allowAnchor
                         );
-                    }else {
+                    } else {
                         if (event_used === 'click') {
-                            this._addEventListener(el, event_used, function(e) {
-                                if (this.target && this.target == '_blank') {
+                            this._addEventListener(el, event_used, function (e) {
+                                if (this.target && this.target === '_blank') {
                                     window.open(
                                         gh['tracker']['_getLinkerUrl'](
                                             this.href, _gas._allowAnchor
                                         )
                                     );
-                                }else {
+                                } else {
                                     _gas.push(
                                         ['_link', this.href, _gas._allowAnchor]
                                     );
@@ -145,8 +145,8 @@ function track_links(event_used) {
                                     e.returnValue = false;
                                 return false; //needed for ie7
                             });
-                        }else {
-                            this._addEventListener(el, event_used, function() {
+                        } else {
+                            this._addEventListener(el, event_used, function () {
                                 this.href = gh['tracker']['_getLinkerUrl'](
                                     this.href,
                                     _gas._allowAnchor
@@ -161,11 +161,11 @@ function track_links(event_used) {
     return false;
 }
 
-var _gasMultiDomain = function() {
+var _gasMultiDomain = function () {
     var gh = this;
     var args = slice.call(arguments);
     if (gh && gh._DOMReady) {
-        gh._DOMReady(function() {
+        gh._DOMReady(function () {
             track_links.apply(gh, args);
         });
     }

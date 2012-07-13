@@ -27,27 +27,27 @@ function _trackMediaElement(e) {
  * @param {String} tag Either 'audio' or 'video'.
  * @this {GasHelper} GA Helper object.
  */
-var _trackMedia = function(tag) {
+var _trackMedia = function (tag) {
     var self = this;
     self._liveEvent(tag, 'play', _trackMediaElement);
     self._liveEvent(tag, 'pause', _trackMediaElement);
     self._liveEvent(tag, 'ended', _trackMediaElement);
 };
 
-var _trackVideo = function() {
+var _trackVideo = function () {
     if (!this._videoTracked) {
         this._videoTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }
     _trackMedia.call(this, 'video');
 };
 
-var _trackAudio = function() {
+var _trackAudio = function () {
     if (!this._audioTracked) {
         this._audioTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }

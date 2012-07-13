@@ -15,10 +15,10 @@
  * @this {object} GA Helper object.
  * @param {object} opts Custom options for Outbound Links.
  */
-var _gasTrackOutboundLinks = function(opts) {
+var _gasTrackOutboundLinks = function (opts) {
     if (!this._outboundTracked) {
         this._outboundTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }
@@ -28,10 +28,10 @@ var _gasTrackOutboundLinks = function(opts) {
     }
     opts['category'] = opts['category'] || 'Outbound';
 
-    gh._liveEvent('a', 'mousedown', function(e) {
+    gh._liveEvent('a', 'mousedown', function (e) {
         var l = this;
         if (
-            (l.protocol == 'http:' || l.protocol == 'https:') &&
+            (l.protocol === 'http:' || l.protocol === 'https:') &&
             sindexOf.call(l.hostname, document.location.hostname) === -1)
         {
             var path = (l.pathname + l.search + ''),

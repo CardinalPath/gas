@@ -12,10 +12,10 @@
  *
  * @param {object} opts GAS Options.
  */
-var _gasTrackMailto = function(opts) {
+var _gasTrackMailto = function (opts) {
     if (!this._mailtoTracked) {
         this._mailtoTracked = true;
-    }else {
+    } else {
         //Oops double tracking detected.
         return;
     }
@@ -25,7 +25,7 @@ var _gasTrackMailto = function(opts) {
     }
     opts['category'] = opts['category'] || 'Mailto';
 
-    this._liveEvent('a', 'mousedown', function(e) {
+    this._liveEvent('a', 'mousedown', function (e) {
         var el = e.target;
         if (el && el.href && el.href.toLowerCase &&
           sindexOf.call(el.href.toLowerCase(), 'mailto:') === 0) {

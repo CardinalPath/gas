@@ -80,8 +80,8 @@ function _vimeoPostMessageListener(event) {
         var data = JSON.parse(event.data);
         if (data.event === 'ready') {
             _trackVimeo.call(_gas.gh); // Force rerun since a player is ready
-        }else if (data.method) {
-            if (data.method == 'getVideoUrl') {
+        } else if (data.method) {
+            if (data.method === 'getVideoUrl') {
                 _vimeo_urls[data.player_id] = data.value;
             }
         } else if (data.event === 'playProgress') {
@@ -122,11 +122,11 @@ function _trackVimeo() {
                 if (force) {
                     // Reload the video enabling the api
                     player_src += separator + 'api=1&player_id=' + player_id;
-                }else {
+                } else {
                     // We won't track players that don't have api enabled.
                     continue;
                 }
-            }else {
+            } else {
                 if (sindexOf.call(player_src, 'player_id=') < -1) {
                     player_src += separator + 'player_id=' + player_id;
                 }
@@ -158,7 +158,7 @@ function _trackVimeo() {
     }
 }
 
-var _gasTrackVimeo = function(opts) {
+var _gasTrackVimeo = function (opts) {
     var gh = this;
     // Support
     if (typeof opts === 'boolean' || opts === 'force') {
@@ -169,7 +169,7 @@ var _gasTrackVimeo = function(opts) {
     opts['percentages'] = opts['percentages'] || [];
     opts['force'] = opts['force'] || false;
     _vimeoOpts = opts;
-    gh._DOMReady(function() {
+    gh._DOMReady(function () {
         _trackVimeo.call(gh);
     });
     return false;

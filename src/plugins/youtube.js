@@ -22,21 +22,8 @@ var _ytOpts;
 var _ytPoolMaps = {};
 
 
-function _ytStartPool(target) {
-    if (_ytTimeTriggers && _ytTimeTriggers.length) {
-        var h = target['getVideoData']()['video_id'];
-        if (_ytPoolMaps[h]) {
-            _ytStopPool(target);
-        }else {
-            _ytPoolMaps[h] = {};
-            _ytPoolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
-        }
-        _ytPoolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
-    }
-}
-
 function _ytPool(target, hash) {
-    if (_ytPoolMaps[hash] == undefined ||
+    if (_ytPoolMaps[hash] === undefined ||
         _ytPoolMaps[hash].timeTriggers.length <= 0) {
         return false;
     }
@@ -61,6 +48,20 @@ function _ytStopPool(target) {
     }
 }
 
+function _ytStartPool(target) {
+    if (_ytTimeTriggers && _ytTimeTriggers.length) {
+        var h = target['getVideoData']()['video_id'];
+        if (_ytPoolMaps[h]) {
+            _ytStopPool(target);
+        } else {
+            _ytPoolMaps[h] = {};
+            _ytPoolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
+        }
+        _ytPoolMaps[h].timer = setTimeout(_ytPool, 1000, target, h);
+    }
+}
+
+
 /**
  * Called when the Video State changes
  *
@@ -71,18 +72,18 @@ function _ytStopPool(target) {
 function _ytStateChange(event) {
     var action = '';
     switch (event['data']) {
-        case 0:
-            action = 'finish';
-            _ytStopPool(event['target']);
-            break;
-        case 1:
-            action = 'play';
-            _ytStartPool(event['target']);
-            break;
-        case 2:
-            action = 'pause';
-            _ytStopPool(event['target']);
-            break;
+    case 0:
+        action = 'finish';
+        _ytStopPool(event['target']);
+        break;
+    case 1:
+        action = 'play';
+        _ytStartPool(event['target']);
+        break;
+    case 2:
+        action = 'pause';
+        _ytStopPool(event['target']);
+        break;
     }
     if (action) {
         _gas.push(['_trackEvent',
@@ -111,11 +112,11 @@ function _ytError(event) {
 function _ytMigrateObjectEmbed() {
     var objs = document.getElementsByTagName('object');
     var pars, ifr, ytid;
-    var r = /(https?:\/\/www\.youtube(-nocookie)?\.com[^/]*).*\/v\/([^&?]+)/;
+    var r = /(https?:\/\/www\.youtube(-nocookie)?\.com[^\/]*).*\/v\/([^&?]+)/;
     for (var i = 0; i < objs.length; i++) {
         pars = objs[i].getElementsByTagName('param');
         for (var j = 0; j < pars.length; j++) {
-            if (pars[j].name == 'movie' && pars[j].value) {
+            if (pars[j].name === 'movie' && pars[j].value) {
                 // Replace the object with an iframe
                 ytid = pars[j].value.match(r);
                 if (ytid && ytid[1] && ytid[3]) {
@@ -166,10 +167,10 @@ function _trackYoutube(opts) {
                     // Reload the video enabling the api
                     if (sindexOf.call(iframes[i].src, '?') < 0) {
                         iframes[i].src += '?enablejsapi=1';
-                    }else {
+                    } else {
                         iframes[i].src += '&enablejsapi=1';
                     }
-                }else {
+                } else {
                     // We can't track players that don't have api enabled.
                     continue;
                 }
@@ -182,7 +183,7 @@ function _trackYoutube(opts) {
             _ytTimeTriggers = opt_timeTriggers;
         }
         // this function will be called when the youtube api loads
-        window['onYouTubePlayerAPIReady'] = function() {
+        window['onYouTubePlayerAPIReady'] = function () {
             var p;
             for (var i = 0; i < youtube_videos.length; i++) {
                 p = new window['YT']['Player'](youtube_videos[i]);
@@ -205,7 +206,7 @@ function _trackYoutube(opts) {
     }
 }
 
-var _gasTrackYoutube = function(opts) {
+var _gasTrackYoutube = function (opts) {
     // Support for legacy parameters
     var args = slice.call(arguments);
     if (args[0] && (typeof args[0] === 'boolean' || args[0] === 'force')) {
@@ -222,7 +223,7 @@ var _gasTrackYoutube = function(opts) {
 
     _ytOpts = opts;
     var gh = this;
-    gh._DOMReady(function() {
+    gh._DOMReady(function () {
         _trackYoutube.call(gh, opts);
     });
     return false;
