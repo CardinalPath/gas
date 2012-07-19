@@ -182,10 +182,13 @@ GAS.prototype._execute = function() {
             return return_val;
         }
 
-        // Intercept _link and _linkByPost and _require. They can only be called once.
-        if (foo === '_link' || foo === '_linkByPost' || foo === '_require') {
+        // Intercept functions that can only be called once.
+        if (foo === '_link' || foo === '_linkByPost' || foo === '_require' ||
+            foo === '_anonymizeIp')
+        {
+            acc_foo = _build_acct_name(acct_name) + foo;
             args = slice.call(sub);
-            args.unshift(foo);
+            args.unshift(acc_foo);
             return _gaq_push(args);
         }
 
