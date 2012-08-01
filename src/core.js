@@ -186,9 +186,8 @@ GAS.prototype._execute = function() {
         if (foo === '_link' || foo === '_linkByPost' || foo === '_require' ||
             foo === '_anonymizeIp')
         {
-            acc_foo = _build_acct_name(acct_name) + foo;
             args = slice.call(sub);
-            args.unshift(acc_foo);
+            args.unshift(foo);
             return _gaq_push(args);
         }
 
