@@ -24,7 +24,7 @@ var _ytPoolMaps = {};
 
 function _ytStartPool(target) {
     if (_ytTimeTriggers && _ytTimeTriggers.length) {
-        var h = target['getVideoData']()['video_id'];
+        var h = target['d']['videoData']['video_id'];
         if (_ytPoolMaps[h]) {
             _ytStopPool(target);
         }else {
@@ -54,7 +54,7 @@ function _ytPool(target, hash) {
 }
 
 function _ytStopPool(target) {
-    var h = target['getVideoData']()['video_id'];
+    var h = target['d']['videoData']['video_id'];
     if (_ytPoolMaps[h] && _ytPoolMaps[h].timer) {
         _ytPool(target, h); // Pool one last time before clearing it.
         clearTimeout(_ytPoolMaps[h].timer);
