@@ -21,7 +21,6 @@ var _ytOpts;
  */
 var _ytPoolMaps = {};
 
-
 function _ytPool(target, hash) {
     if (_ytPoolMaps[hash] === undefined ||
         _ytPoolMaps[hash].timeTriggers.length <= 0) {
@@ -41,7 +40,7 @@ function _ytPool(target, hash) {
 }
 
 function _ytStopPool(target) {
-    var h = target['getVideoData']()['video_id'];
+    var h = target['getVideoUrl']();
     if (_ytPoolMaps[h] && _ytPoolMaps[h].timer) {
         _ytPool(target, h); // Pool one last time before clearing it.
         clearTimeout(_ytPoolMaps[h].timer);
@@ -50,10 +49,10 @@ function _ytStopPool(target) {
 
 function _ytStartPool(target) {
     if (_ytTimeTriggers && _ytTimeTriggers.length) {
-        var h = target['getVideoData']()['video_id'];
+        var h = target['getVideoUrl']();
         if (_ytPoolMaps[h]) {
             _ytStopPool(target);
-        } else {
+        }else {
             _ytPoolMaps[h] = {};
             _ytPoolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }
