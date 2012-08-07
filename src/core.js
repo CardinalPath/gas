@@ -39,7 +39,7 @@ var document = window.document,
  */
 function GAS() {
     var self = this;
-    self['version'] = '1.8';
+    self['version'] = '1.9';
     self._accounts = {};
     self._accounts_length = 0;
     self._queue = _prev_gas;
@@ -182,8 +182,10 @@ GAS.prototype._execute = function () {
             return return_val;
         }
 
-        // Intercept _link and _linkByPost and _require. They can only be called once.
-        if (foo === '_link' || foo === '_linkByPost' || foo === '_require') {
+        // Intercept functions that can only be called once.
+        if (foo === '_link' || foo === '_linkByPost' || foo === '_require' ||
+            foo === '_anonymizeIp')
+        {
             args = slice.call(sub);
             args.unshift(foo);
             return _gaq_push(args);
