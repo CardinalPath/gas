@@ -21,10 +21,17 @@ var _ytOpts;
  */
 var _ytPoolMaps = {};
 
+function _ytIdFromUrl(url) {
+    var regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match&&match[1].length==11){
+        return match[1];
+    }
+}
 
 function _ytStartPool(target) {
     if (_ytTimeTriggers && _ytTimeTriggers.length) {
-        var h = target['d']['videoData']['video_id'];
+        var h = _ytIdFromUrl(target['getVideoUrl']());
         if (_ytPoolMaps[h]) {
             _ytStopPool(target);
         }else {
@@ -54,7 +61,7 @@ function _ytPool(target, hash) {
 }
 
 function _ytStopPool(target) {
-    var h = target['d']['videoData']['video_id'];
+    var h = _ytIdFromUrl(target['getVideoUrl']());
     if (_ytPoolMaps[h] && _ytPoolMaps[h].timer) {
         _ytPool(target, h); // Pool one last time before clearing it.
         clearTimeout(_ytPoolMaps[h].timer);
