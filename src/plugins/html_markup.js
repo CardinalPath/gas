@@ -10,22 +10,37 @@
  */
 
 /**
+ * Sets Default pagename and Custom Vars based on Meta
+ *
  * If a meta name='ga_vpv' is availalbe on the page use that as a page
  * replacement if the pageview is not passed as parameter.
+ *
+ * If meta name="ga_custom_var" the 4 values for a custom var must be on
+ * content separated by a caret (^).
  */
-function _gasMetaVPV() {
+function _gasMeta() {
     var i, meta,
         metas = document.getElementsByTagName('meta');
     for (i = 0; i < metas.length; i++) {
         if (metas[i].name === 'ga_vpv') {
             // Fire transaction
-            meta = metas[i];
-            _gas.push(['_addHook', '_trackPageview', function (p) {
+            meta = metas[i].content;
+            window._gas.push(['_addHook', '_trackPageview', function (p) {
                 if (p === undefined) {
-                    return meta;
+                    return [meta];
                 }
             }]);
             return;
+        } else if (metas[i].name === 'ga_custom_var') {
+            meta = metas[i].content.split('^');
+            if (meta.length === 4) {
+                window._gas.push(['_setCustomVar',
+                    parseInt(meta[0], 10),
+                    meta[1],
+                    meta[2],
+                    parseInt(meta[3], 10)
+                ]);
+            }
         }
     }
 }
@@ -94,6 +109,6 @@ function _gasHTMLMarkup() {
     }, true);
 }
 
-_gas.push(['_addHook', '_gasMetaVPV', _gasMetaVPV]);
+_gas.push(['_addHook', '_gasMeta', _gasMeta]);
 _gas.push(['_addHook', '_gasHTMLMarkup', _gasHTMLMarkup]);
 
