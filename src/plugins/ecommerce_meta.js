@@ -1,9 +1,9 @@
 /**
  * GAS - Google Analytics on Steroids
  *
- *  Ecommerce Meta
+ * Ecommerce Meta
  *
- * Copyright 2011, Cardinal Path and Direct Performance
+ * Copyright 2012, Cardinal Path and Direct Performance
  * Licensed under the GPLv3 license.
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
@@ -17,11 +17,12 @@ function _gasMetaEcommerce() {
     for (i = 0; i < metas.length; i++) {
         if (metas[i].name === 'ga_trans') {
             // Fire transaction
-            meta = metas[i].content.split('*');
+            meta = metas[i].content.split('^');
             if (meta.length < 3) {
                 // 3 is the minimum for transaction
                 break;
             }
+            // Add default values for remaining params
             while (meta.length < 8) {
                 meta.push('');
             }
@@ -39,7 +40,7 @@ function _gasMetaEcommerce() {
         }
         else if (metas[i].name === 'ga_item') {
             // Fire item
-            meta = metas[i].content.split('*');
+            meta = metas[i].content.split('^');
             if (meta.length === 6) {
                 _gas.push(['_addItem',
                         meta[0],
