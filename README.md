@@ -192,7 +192,7 @@ This will setup Youtube Video Tracking so that events will be fired at 25%, 50%,
 This function should be called before `_trackPageview`. It will look for
 Custom Variables as meta elements with `name="ga_custom_var"`. It will also
 look for metas with `name="ga_vpv"` to be used as virtual pagepaths for
-_trackPageview. Note that ga_vpv will only be aplied with _trackPageview is
+`_trackPageview`. Note that ga_vpv will only be aplied when `_trackPageview` is
 called with no parameters.
 
 For metas to control customVars the parameters are the same as calling
@@ -210,7 +210,8 @@ eg:
 ### _gasMetaEcommerce
 `_gas.push(['_gasMetaEcommerce']);`
 
-Will look for ecommerce transactions as meta elements.
+Will look for ecommerce transactions as meta elements. The parameters are the
+same as calling the javascript functions but must be separated by a caret (^).
 
 eg:
 
@@ -248,8 +249,7 @@ For Social Actions the required attributes are `x-ga-social-network` and
 eg:
 
 ``` html
-<div
-     x-ga-social-network="Pinterest"
+<div x-ga-social-network="Pinterest"
      x-ga-social-action="Pin It"
      x-ga-social-target="/targeturlTest.aspx"
      x-ga-social-pagepath="/basePagePath.php"
