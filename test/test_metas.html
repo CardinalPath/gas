@@ -1,0 +1,41 @@
+<html>
+<head>
+    <meta name="ga_vpv" content="/test_url" />
+    <meta name="ga_custom_var" content="1^Test1^TestA^1" />
+    <meta name="ga_custom_var" content="2^Test2^TestB^1" />
+    <meta name="ga_custom_var" content="3^Test3^TestC^2" />
+    <meta name="ga_custom_var" content="4^Test4^TestD^3" />
+    <meta name="ga_trans" content="1234^Acme Clothing^35.97^1.29^5^San Jose^California^USA" />
+    <meta name="ga_item" content="1234^DD44^T-Shirt^Green Medium^11.99^1" />
+    <meta name="ga_item" content="1234^DD45^T-Shirt^Red Medium^11.99^2" />
+    <script type="text/javascript">
+        var _gas = _gas || [];
+        _gas.push(['_setDebug', true]);
+        _gas.push(['_setAccount', 'UA-YYYYYY-Y']);
+        _gas.push([['_gasMeta']]);
+        _gas.push([['_gasHTMLMarkup']]);
+        _gas.push(['_trackPageview']);
+        _gas.push([['_gasMetaEcommerce']]);
+
+        (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = '../dist/gas.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+    <ul>
+        <li><div><a x-ga-event-category="TestCat" x-ga-event-action="Test Act" href="#">Minimal event On Anchor</a></div></li>
+        <li><div x-ga-event-category="TestCat" x-ga-event-action="Test Act"><a href="#">Minimal event On Div</a></div></li>
+        <li><div><a x-ga-social-network="TestNet" x-ga-social-action="Test Act" href="#">Minimal social On Anchor</a></div></li>
+        <li><div x-ga-social-network="TestNet" x-ga-social-action="Test Act"><a href="#">Minimal social On Div</a></div></li>
+        <li><div x-ga-event-category="TestCat" x-ga-event-action="Test Act" x-ga-event-label="Test Label" x-ga-event-value="30" x-ga-event-noninteractive="true"><a href="#">Full event On Div</a></div></li>
+        <li><div x-ga-social-network="TestNet" x-ga-social-action="Test Act" x-ga-social-target="/targeturlTest.aspx" x-ga-social-pagepath="/basePagePath.php"><a href="#">Full social On Div</a></div></li>
+        <li><div x-ga-social-network="TestNet" x-ga-social-action="Test Act" x-ga-social-target="/targeturlTest.aspx" x-ga-social-pagepath="/basePagePath.php"><a  x-ga-event-category="TestCat" x-ga-event-action="Test Act" x-ga-event-label="Test Label" x-ga-event-value="30" x-ga-event-noninteractive="true" href="#">Full social On Div and full event on Anchor</a></div></li>
+    </ul>
+</body>
+</html>

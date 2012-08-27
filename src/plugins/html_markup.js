@@ -23,14 +23,14 @@ function _gasMeta() {
         metas = document.getElementsByTagName('meta');
     for (i = 0; i < metas.length; i++) {
         if (metas[i].name === 'ga_vpv') {
-            // Fire transaction
             meta = metas[i].content;
-            window._gas.push(['_addHook', '_trackPageview', function (p) {
-                if (p === undefined) {
-                    return [meta];
-                }
-            }]);
-            return;
+            (function (vpv) {
+                window._gas.push(['_addHook', '_trackPageview', function (p) {
+                    if (p === undefined) {
+                        return [vpv];
+                    }
+                }]);
+            }(meta));
         } else if (metas[i].name === 'ga_custom_var') {
             meta = metas[i].content.split('^');
             if (meta.length === 4) {
@@ -89,7 +89,7 @@ function _gasHTMLMarkup() {
                   el.getAttribute('x-ga-event-action'),
                   el.getAttribute('x-ga-event-label') || undefined,
                   parseInt(el.getAttribute('x-ga-event-value'), 10) || 0,
-                  el.getAttribute('x-ga-event-noninteractive') === 'true' ? true : undefined
+                  el.getAttribute('x-ga-event-noninteractive') === 'true' ? true : false
                 ]);
             }
             if (el.getAttribute('x-ga-social-network')) {
