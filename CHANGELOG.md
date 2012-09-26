@@ -1,6 +1,15 @@
 GAS Changelog
 =============
 
+1.10.1
+------
+- Experimental Support for `_gasMeta`, `_gasMetaEcommerce` and
+`_gasHTMLMarkup`.
+
+1.10
+----
+- Fixed bug with Youtube Tracking #29.
+
 1.6.0
 -----
 - fixed #16 API changed to make it more clear when we're calling GAS functions.
