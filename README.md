@@ -14,7 +14,10 @@ To install GAS download the script from [download page][download] and put it som
 your website. Also install the basic snippet on every page of your website. Be
 sure to change the Account Number (UA) and the correct gas.js file location.
 
+You can also use gas hosted on [cdnjs].
+
 [download]: https://github.com/CardinalPath/gas/downloads
+[cdnjs]: http://cdnjs.com/index.html#gas
 
 The basic snippet looks like this:
 
@@ -36,7 +39,7 @@ _gas.push(['_gasTrackMailto']);
 var ga = document.createElement('script');
 ga.type = 'text/javascript';
 ga.async = true;
-ga.src = '/gas.js';
+ga.src = '//cdnjs.cloudflare.com/ajax/libs/gas/1.10.1/gas.min.js';
 var s = document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga, s);
 })();
