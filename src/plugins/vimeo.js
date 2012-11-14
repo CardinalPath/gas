@@ -9,6 +9,8 @@
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
 
+ /*jshint latedef:false*/
+
 var _vimeoTimeTriggers = [];
 var _vimeoPoolMaps = {};
 

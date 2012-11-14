@@ -6,6 +6,7 @@
  *
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
+ /*global document:true*/
 
 /**
  * Google Analytics original _gaq.

@@ -52,7 +52,7 @@ function _ytStartPool(target) {
         var h = target['getVideoUrl']();
         if (_ytPoolMaps[h]) {
             _ytStopPool(target);
-        }else {
+        } else {
             _ytPoolMaps[h] = {};
             _ytPoolMaps[h].timeTriggers = slice.call(_ytTimeTriggers);
         }

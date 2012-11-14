@@ -67,7 +67,7 @@ GasHelper.prototype._sanitizeString = function (str, strict_opt) {
         .replace(/[ç¢©]/g, 'c');
 
     if (strict_opt) {
-        str = str.replace(/[^a-z0-9_-]/g, '_');
+        str = str.replace(/[^a-z0-9_\-]/g, '_');
     }
     return str.replace(/_+/g, '_');
 };
