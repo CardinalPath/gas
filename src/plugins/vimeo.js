@@ -9,8 +9,6 @@
  * @author Eduardo Cereto <eduardocereto@gmail.com>
  */
 
- /*jshint latedef:false*/
-
 var _vimeoTimeTriggers = [];
 var _vimeoPoolMaps = {};
 
@@ -77,6 +75,7 @@ var _vimeoOpts;
  * postMessage Listener
  * @param {Object} event The Vimeo API return event.
  */
+/*jshint latedef:false*/
 function _vimeoPostMessageListener(event) {
     if (sindexOf.call(event.origin, '//player.vimeo.com') > -1) {
         var data = JSON.parse(event.data);
@@ -95,6 +94,7 @@ function _vimeoPostMessageListener(event) {
     }
 
 }
+/*jshint latedef:true*/
 
 /**
  * Triggers the Vimeo Tracking on the page
