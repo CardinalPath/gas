@@ -133,15 +133,15 @@ GasHelper.prototype._liveEvent = function (tag, evt, ofunc) {
     tag = tag.split(',');
 
     gh._addEventListener(document, evt, function (me) {
-        for (var el = me.target; el.nodeName !== 'HTML';
-            el = el.parentNode)
+        var el = me.target;
+
+        while (el && el.nodeName && el.nodeName.toUpperCase() !== 'HTML')
         {
-            if (gh.inArray(tag, el.nodeName) || el.parentNode === null) {
+            if (gh.inArray(tag, el.nodeName)) {
+                ofunc.call(el, me);
                 break;
             }
-        }
-        if (el && gh.inArray(tag, el.nodeName)) {
-            ofunc.call(el, me);
+            el = el.parentNode;
         }
 
     }, true);
