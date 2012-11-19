@@ -7,7 +7,7 @@ while (_gas._queue.length > 0) {
 }
 
 // Import ga.js
-if (_gaq && _gaq.length >= 0) {
+if (typeof window._gat === 'undefined') {
     (function () {
         var ga = document.createElement('script');
         ga.type = 'text/javascript';
