@@ -8,7 +8,7 @@
 _gas.push(['_addHook', '_trackEvent', function () {
     var args = slice.call(arguments);
     if (args[3]) {
-        args[3] = (args[3] < 0 ? 0 : Math.round(args[3])) || 0;
+        args[3] = Math.round(args[3]);
     }
     return args;
 }]);
