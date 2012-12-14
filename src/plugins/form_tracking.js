@@ -31,7 +31,7 @@ var _gasTrackForms = function (opts) {
         this._formTracked = true;
     } else {
         //Oops double tracking detected.
-        return;
+        return false;
     }
     var scp = this;
     if (typeof opts !== 'object') {
@@ -70,6 +70,7 @@ var _gasTrackForms = function (opts) {
             }
         }
     });
+    return false;
 };
 
 _gas.push(['_addHook', '_gasTrackForms', _gasTrackForms]);

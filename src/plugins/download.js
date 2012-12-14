@@ -48,7 +48,7 @@ var _trackDownloads = function (opts) {
         gh._downloadTracked = true;
     } else {
         //Oops double tracking detected.
-        return;
+        return false;
     }
     if (!opts) {
         opts = {'extensions': []};

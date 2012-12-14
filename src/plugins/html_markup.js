@@ -43,6 +43,7 @@ function _gasMeta() {
             }
         }
     }
+    return false;
 }
 
 /**
@@ -107,6 +108,8 @@ function _gasHTMLMarkup() {
             }
         }
     }, true);
+
+    return false;
 }
 
 _gas.push(['_addHook', '_gasMeta', _gasMeta]);

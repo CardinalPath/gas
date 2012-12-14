@@ -47,6 +47,7 @@ var _gasTrackOutboundLinks = function (opts) {
         }
 
     });
+    return false;
 };
 
 _gas.push(['_addHook', '_gasTrackOutboundLinks', _gasTrackOutboundLinks]);
