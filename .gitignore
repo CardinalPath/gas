@@ -7,3 +7,4 @@ Icon?
 *.zip
 _site
 dist/
+node_modules
