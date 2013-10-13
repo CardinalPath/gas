@@ -37,9 +37,11 @@ _gas.push(['_gasTrackMailto']);
 
 (function() {
 var ga = document.createElement('script');
+ga.id = 'gas-script';
+ga.setAttribute('data-use-dcjs', 'false');
 ga.type = 'text/javascript';
 ga.async = true;
-ga.src = '//cdnjs.cloudflare.com/ajax/libs/gas/1.10.1/gas.min.js';
+ga.src = '//cdnjs.cloudflare.com/ajax/libs/gas/1.11.0/gas.min.js';
 var s = document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga, s);
 })();
@@ -388,3 +390,11 @@ _gas.push(['_addHook', '_setVar', function(val){
 The above Hook will intercept and cancel any call to the, now deprecated, 
 `_setVar`. It will then trigger a call to `_setCustomVar` with an
 equivalent value.
+
+### Display Advertising Support
+
+Available in versions 1.11.0+, you can include dc.js instead of ga.js through gas by changing the setAttribute line of the default snippet to
+
+```
+ga.setAttribute('data-use-dcjs', 'true');
+```
