@@ -16,9 +16,11 @@
  *
  * @constructor
  */
+/*jshint -W079*/
 var GasHelper = function () {
     this._setDummyTracker();
 };
+/*jshint +W079*/
 
 GasHelper.prototype._setDummyTracker = function () {
     if (!this['tracker']) {
@@ -45,31 +47,6 @@ GasHelper.prototype.inArray = function (obj, item) {
         }
     }
     return false;
-};
-
-/**
- * Removes special characters and Lowercase String
- *
- * @param {string} str to be sanitized.
- * @param {boolean} strict_opt If we should remove any non ascii char.
- * @return {string} Sanitized string.
- */
-GasHelper.prototype._sanitizeString = function (str, strict_opt) {
-    str = str.toLowerCase()
-        .replace(/^\ +/, '')
-        .replace(/\ +$/, '')
-        .replace(/\s+/g, '_')
-        .replace(/[áàâãåäæª]/g, 'a')
-        .replace(/[éèêëЄ€]/g, 'e')
-        .replace(/[íìîï]/g, 'i')
-        .replace(/[óòôõöøº]/g, 'o')
-        .replace(/[úùûü]/g, 'u')
-        .replace(/[ç¢©]/g, 'c');
-
-    if (strict_opt) {
-        str = str.replace(/[^a-z0-9_\-]/g, '_');
-    }
-    return str.replace(/_+/g, '_');
 };
 
 /**

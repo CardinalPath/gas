@@ -101,7 +101,7 @@ function _trackMaxScroll(opts) {
         this._maxScrollTracked = true;
     } else {
         //Oops double tracking detected.
-        return false;;
+        return false;
     }
     _maxScrollOpts = opts || {};
     _maxScrollOpts['category'] = _maxScrollOpts['category'] || 'Max Scroll';

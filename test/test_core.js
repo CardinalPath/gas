@@ -39,24 +39,6 @@ test('multiple parameters passed to _gas.push', function() {
     _gas.push(['_popHook', '_trackPageview']);
 });
 
-test('_sanitizeString', function() {
-    var san = _gas.gh._sanitizeString;
-    expect(6);
-    equals(san('  /tééééá íóú  '), '/teeeea_iou');
-    equals(san(''), '');
-    equals(san(' '), '');
-    equals(san('ÇA ÄR'), 'ca_ar');
-
-    stop();
-    _gas.push(function() {
-        equals(this._sanitizeString('Áéí óù '), 'aei_ou',
-            'From within pushed function');
-        start();
-    });
-
-    equals(san('&$*()[]/\éa', true), '_ea', 'strict mode');
-});
-
 test('_addHook _trackPageview', function() {
     expect(1);
 

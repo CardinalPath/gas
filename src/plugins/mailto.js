@@ -17,7 +17,7 @@ var _gasTrackMailto = function (opts) {
         this._mailtoTracked = true;
     } else {
         //Oops double tracking detected.
-        return false;;
+        return false;
     }
 
     if (!opts) {

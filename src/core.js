@@ -24,6 +24,7 @@ if (_prev_gas._accounts_length >= 0) {
 }
 
 //Shortcuts, these speed up and compress the code
+/*jshint -W079*/
 var document = window.document,
     toString = Object.prototype.toString,
     hasOwn = Object.prototype.hasOwnProperty,
@@ -33,7 +34,7 @@ var document = window.document,
     sindexOf = String.prototype.indexOf,
     url = document.location.href,
     documentElement = document.documentElement;
-
+/*jshint +W079*/
 /**
  * GAS Sigleton
  * @constructor
@@ -247,7 +248,9 @@ GAS.prototype.push = function () {
  * everything pushed to _gas is run through possible hooks and then pushed to
  * _gaq
  */
+/*global _gas:true*/
 window['_gas'] = _gas = new GAS();
+/*global _gas:false*/
 
 
 /**
