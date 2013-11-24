@@ -16,7 +16,7 @@ sure to change the Account Number (UA) and the correct gas.js file location.
 
 You can also use gas hosted on [cdnjs].
 
-[download]: https://github.com/CardinalPath/gas/downloads
+[download]: https://github.com/CardinalPath/gas/releases
 [cdnjs]: http://cdnjs.com/index.html#gas
 
 The basic snippet looks like this:
