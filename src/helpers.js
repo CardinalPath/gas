@@ -16,9 +16,11 @@
  *
  * @constructor
  */
+/*jshint -W079*/
 var GasHelper = function () {
     this._setDummyTracker();
 };
+/*jshint +W079*/
 
 GasHelper.prototype._setDummyTracker = function () {
     if (!this['tracker']) {
@@ -45,31 +47,6 @@ GasHelper.prototype.inArray = function (obj, item) {
         }
     }
     return false;
-};
-
-/**
- * Removes special characters and Lowercase String
- *
- * @param {string} str to be sanitized.
- * @param {boolean} strict_opt If we should remove any non ascii char.
- * @return {string} Sanitized string.
- */
-GasHelper.prototype._sanitizeString = function (str, strict_opt) {
-    str = str.toLowerCase()
-        .replace(/^\ +/, '')
-        .replace(/\ +$/, '')
-        .replace(/\s+/g, '_')
-        .replace(/[áàâãåäæª]/g, 'a')
-        .replace(/[éèêëЄ€]/g, 'e')
-        .replace(/[íìîï]/g, 'i')
-        .replace(/[óòôõöøº]/g, 'o')
-        .replace(/[úùûü]/g, 'u')
-        .replace(/[ç¢©]/g, 'c');
-
-    if (strict_opt) {
-        str = str.replace(/[^a-z0-9_\-]/g, '_');
-    }
-    return str.replace(/_+/g, '_');
 };
 
 /**
@@ -133,15 +110,15 @@ GasHelper.prototype._liveEvent = function (tag, evt, ofunc) {
     tag = tag.split(',');
 
     gh._addEventListener(document, evt, function (me) {
-        for (var el = me.target; el.nodeName !== 'HTML';
-            el = el.parentNode)
+        var el = me.target;
+
+        while (el && el.nodeName && el.nodeName.toUpperCase() !== 'HTML')
         {
-            if (gh.inArray(tag, el.nodeName) || el.parentNode === null) {
+            if (gh.inArray(tag, el.nodeName)) {
+                ofunc.call(el, me);
                 break;
             }
-        }
-        if (el && gh.inArray(tag, el.nodeName)) {
-            ofunc.call(el, me);
+            el = el.parentNode;
         }
 
     }, true);

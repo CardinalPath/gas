@@ -32,6 +32,7 @@ var _trackMedia = function (tag) {
     self._liveEvent(tag, 'play', _trackMediaElement);
     self._liveEvent(tag, 'pause', _trackMediaElement);
     self._liveEvent(tag, 'ended', _trackMediaElement);
+    return false;
 };
 
 var _trackVideo = function () {
@@ -41,7 +42,7 @@ var _trackVideo = function () {
         //Oops double tracking detected.
         return;
     }
-    _trackMedia.call(this, 'video');
+    return _trackMedia.call(this, 'video');
 };
 
 var _trackAudio = function () {
@@ -51,7 +52,7 @@ var _trackAudio = function () {
         //Oops double tracking detected.
         return;
     }
-    _trackMedia.call(this, 'audio');
+    return _trackMedia.call(this, 'audio');
 };
 
 _gas.push(['_addHook', '_gasTrackVideo', _trackVideo]);

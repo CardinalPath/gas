@@ -1,6 +1,16 @@
 GAS Changelog
 =============
 
+1.11.0
+------
+- Display Advertising (dc.js) support (9d4bb3e)
+- Build system moved to Grunt (f3921fc)
+- Removed _sanitizeString helper function (e042350)
+- Outbound events are non-interactive now (9585c4e)
+- Allow negative event values (ce4515c)
+- Don't push GAS functions inside _gaq. (18c5e79)
+- Extra checks on the live handler, fixes issue with ie8 (ae1d554) 
+
 1.10.1
 ------
 - Experimental Support for `_gasMeta`, `_gasMetaEcommerce` and

@@ -58,6 +58,7 @@ function _gasMetaEcommerce() {
         _gas.push(['_trackTrans']);
         //_gas.push(['_clearTrans']);
     }
+    return false;
 }
 
 _gas.push(['_addHook', '_gasMetaEcommerce', _gasMetaEcommerce]);

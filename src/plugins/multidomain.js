@@ -169,6 +169,7 @@ var _gasMultiDomain = function () {
             track_links.apply(gh, args);
         });
     }
+    return false;
 };
 
 /**

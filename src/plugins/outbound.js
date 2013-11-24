@@ -42,11 +42,14 @@ var _gasTrackOutboundLinks = function (opts) {
             _gas.push(['_trackEvent',
                 opts['category'],
                 l.hostname,
-                path
+                path,
+                0,
+                true
             ]);
         }
 
     });
+    return false;
 };
 
 _gas.push(['_addHook', '_gasTrackOutboundLinks', _gasTrackOutboundLinks]);
