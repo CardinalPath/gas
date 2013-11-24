@@ -40,7 +40,7 @@ _gas.push(['_gasTrackMailto']);
 (function() {
 var ga = document.createElement('script');
 ga.id = 'gas-script';
-ga.setAttribute('data-use-dcjs', 'false');
+ga.setAttribute('data-use-dcjs', 'false'); // CHANGE TO TRUE FOR DC.JS SUPPORT
 ga.type = 'text/javascript';
 ga.async = true;
 ga.src = '//cdnjs.cloudflare.com/ajax/libs/gas/1.11.0/gas.min.js';
