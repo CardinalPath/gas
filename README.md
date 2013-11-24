@@ -31,6 +31,8 @@ _gas.push(['_gasTrackForms']);
 _gas.push(['_gasTrackOutboundLinks']);
 _gas.push(['_gasTrackMaxScroll']);
 _gas.push(['_gasTrackDownloads']);
+_gas.push(['_gasTrackVideo']);
+_gas.push(['_gasTrackAudio']);
 _gas.push(['_gasTrackYoutube', {force: true}]);
 _gas.push(['_gasTrackVimeo', {force: true}]);
 _gas.push(['_gasTrackMailto']);
@@ -123,6 +125,22 @@ Tracks clicks on links with `href="mailto:..."`.
 **parameters**
 
 - _String_ _opts.category_ : The event category (default value is: "Mailto")
+
+
+### _gasTrackVideo
+`_gas.push(['_gasTrackVideo'])`
+
+Tracks [HTML5 Video][] element events: 'play', 'pause' and 'ended'
+
+[HTML5 Video]: https://developer.mozilla.org/en-US/docs/Using_HTML5_audio_and_video
+
+### _gasTrackAudio
+`_gas.push(['_gasTrackAudio'])`
+
+Tracks [HTML5 Audio][] element events: 'play', 'pause' and 'ended'
+
+[HTML5 Audio]: https://developer.mozilla.org/en-US/docs/Using_HTML5_audio_and_video
+
 
 ### _gasTrackVimeo
 `_gas.push(['_gasTrackVimeo', opts])`
