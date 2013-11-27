@@ -409,9 +409,20 @@ The above Hook will intercept and cancel any call to the, now deprecated,
 `_setVar`. It will then trigger a call to `_setCustomVar` with an
 equivalent value.
 
+### In Page Analytics / Enhanced Link Attribution
+
+Add the following snippet before your `_gas.push(['_trackPageView])` call. Read Google's [In Page Analytics / Enhanced Link Attribution documentation][ela] for more information.
+
+```javascript
+_gas.push(['_require', 'inpage_linkid', 
+    '//www.google-analytics.com/plugins/ga/inpage_linkid.js']);
+```
+
+[ela]: https://support.google.com/analytics/answer/2558867?hl=en&hlrm=nl
+
 ### Display Advertising Support
 
-Available in versions 1.11.0+, you can include dc.js instead of ga.js through gas by changing the setAttribute line of the default snippet to
+Available in versions 1.11.0+, you can include dc.js instead of ga.js through GAS by changing the setAttribute line of the default snippet to
 
 ```
 ga.setAttribute('data-use-dcjs', 'true');
