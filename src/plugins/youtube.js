@@ -165,9 +165,9 @@ function _trackYoutube(opts) {
                 if (force) {
                     // Reload the video enabling the api
                     if (sindexOf.call(iframes[i].src, '?') < 0) {
-                        iframes[i].src += '?enablejsapi=1';
+                        iframes[i].src += '?enablejsapi=1&origin='+encodeURIComponent(location.protocol+'//'+location.hostname);
                     } else {
-                        iframes[i].src += '&enablejsapi=1';
+                        iframes[i].src += '&enablejsapi=1&origin='+encodeURIComponent(location.protocol+'//'+location.hostname);
                     }
                 } else {
                     // We can't track players that don't have api enabled.
