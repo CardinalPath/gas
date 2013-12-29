@@ -120,7 +120,8 @@ function _ytMigrateObjectEmbed() {
                 ytid = pars[j].value.match(r);
                 if (ytid && ytid[1] && ytid[3]) {
                     ifr = document.createElement('iframe');
-                    ifr.src = ytid[1] + '/embed/' + ytid[3] + '?enablejsapi=1';
+                    ifr.src = ytid[1] + '/embed/' + ytid[3] + '?enablejsapi=1' +
+                        '&origin=' + encodeURIComponent(location.protocol + '//' + location.hostname);
                     ifr.width = objs[i].width;
                     ifr.height = objs[i].height;
                     ifr.setAttribute('frameBorder', '0');
